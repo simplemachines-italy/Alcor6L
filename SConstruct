@@ -195,8 +195,12 @@ vars.AddVariables(
                     'specifies toolchain to use (auto=search for usable toolchain)',
                     'auto',
                     allowed_values=toolchain_list.keys() + [ 'auto' ] ),
+  MatchEnumVariable('lang',
+                    'Build Alcor6L with support for the specified language',
+                    'lua',
+                    allowed_values=[ 'lua', 'picoc' ] ),
   BoolVariable(     'optram',
-                    'enables Lua Tiny RAM enhancements',
+                    'enables Tiny RAM enhancements',
                     True ),
   MatchEnumVariable('boot',
                     'boot mode, standard will boot to shell, luarpc boots to an rpc server',
@@ -326,7 +330,8 @@ if not GetOption( 'help' ):
   if not GetOption( 'clean' ):
     print
     print "*********************************"
-    print "Compiling eLua ..."
+    print "Compiling Alcor6L ..."
+    print "Language        ", comp['lang']
     print "CPU:            ", comp['cpu']
     print "Board:          ", comp['board']
     print "Platform:       ", platform
@@ -368,7 +373,14 @@ if not GetOption( 'help' ):
 
   lua_full_files = " " + " ".join( [ "src/lang/lua/%s" % name for name in lua_files.split() ] )
 
-  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua'])
+  # PicoC source files and include path
+  picoc_files = """picoc.c table.c lex.c parse.c expression.c heap.c type.c variable.c platform.c clibrary.c include.c
+    cstdlib/stdio.c cstdlib/math.c cstdlib/string.c cstdlib/stdlib.c cstdlib/errno.c cstdlib/ctype.c
+    cstdlib/stdbool.c platform/platform_unix.c platform/library_unix.c rotable.c"""
+
+  picoc_full_files = " " + " ".join( [ "src/lang/picoc/%s" % name for name in picoc_files.split() ] )
+
+  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua', 'src/lang/picoc' ])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
