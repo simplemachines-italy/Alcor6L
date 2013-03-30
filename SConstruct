@@ -366,7 +366,7 @@ if not GetOption( 'help' ):
     lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c
     ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c"""
 
-  lua_full_files = " " + " ".join( [ "src/lua/%s" % name for name in lua_files.split() ] )
+  lua_full_files = " " + " ".join( [ "src/lang/lua/%s" % name for name in lua_files.split() ] )
 
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lua'])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
