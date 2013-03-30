@@ -368,7 +368,7 @@ if not GetOption( 'help' ):
 
   lua_full_files = " " + " ".join( [ "src/lang/lua/%s" % name for name in lua_files.split() ] )
 
-  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lua'])
+  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua'])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
