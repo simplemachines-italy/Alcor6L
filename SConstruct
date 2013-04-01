@@ -11,7 +11,7 @@ def cnorm( name ):
 def gen_header( name, defines ):
   hname = os.path.join( os.getcwd(), "inc", name.lower() + ".h" )
   h = open( hname, "w" )
-  h.write("// eLua " + name + " definition\n\n")
+  h.write("// Alcor6L " + name + " definition\n\n")
   h.write("#ifndef __" + name.upper() + "_H__\n")
   h.write("#define __" + name.upper() + "_H__\n\n")
 
@@ -175,10 +175,6 @@ vars.AddVariables(
                     'Build for bootloader usage, default is none.',
                     'none',
                     allowed_values = [ 'none', 'emblod' ] ),
-  MatchEnumVariable('target',
-                    'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
-                    'lua',
-                    allowed_values = [ 'lua', 'lualong', 'lualonglong' ] ),
   MatchEnumVariable('cpu',
                     'build for the specified CPU (board will be inferred, if possible)',
                     'auto',
@@ -211,6 +207,36 @@ vars.AddVariables(
                     'verbatim',
                     allowed_values=[ 'verbatim' , 'compress', 'compile' ] ) )
 
+vars.Update(comp)
+
+# Target config variables.
+if comp['lang'] == 'picoc':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float picoc or integer-only',
+                      'fp',
+                      allowed_values = [ 'fp', 'nofp' ] ) )
+else:
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
+                      'lua',
+                      allowed_values = [ 'lua', 'lualong', 'lualonglong' ] ) )
+
+# Boot config variables.
+# For picoc, the only boot option for now is 'standard'
+if comp['lang'] == 'picoc':
+  vars.AddVariables(
+    MatchEnumVariable('boot',
+                      'boot mode, standard will boot to shell',
+                      'standard',
+                      allowed_values = [ 'standard' ] ) )
+else:
+  vars.AddVariables(
+    MatchEnumVariable('boot',
+                      'boot mode, standard will boot to shell, luarpc boots to an rpc server',
+                      'standard',
+                      allowed_values=[ 'standard' , 'luarpc' ] ) )
 
 vars.Update(comp)
 
@@ -438,7 +464,7 @@ if not GetOption( 'help' ):
   execfile( "src/platform/%s/conf.py" % platform )
 
   # Complete file list
-  source_files = Split( app_files + specific_files + newlib_files + uip_files + lua_full_files + module_files + rfs_files + shell_files )
+  source_files = Split( app_files + specific_files + newlib_files + uip_files + lua_full_files + picoc_full_files + module_files + rfs_files + shell_files )
 
   comp = conf.Finish()
 
