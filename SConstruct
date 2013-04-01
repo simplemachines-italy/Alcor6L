@@ -464,7 +464,13 @@ if not GetOption( 'help' ):
   execfile( "src/platform/%s/conf.py" % platform )
 
   # Complete file list
-  source_files = Split( app_files + specific_files + newlib_files + uip_files + lua_full_files + picoc_full_files + module_files + rfs_files + shell_files )
+  source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files )
+
+  # Language specific files.
+  if comp['lang'] == 'picoc':
+    source_files += Split( picoc_full_files )
+  else:
+    source_files += Split( lua_full_files )
 
   comp = conf.Finish()
 
