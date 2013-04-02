@@ -370,8 +370,15 @@ if not GetOption( 'help' ):
     print "*********************************"
     print
 
-  output = 'elua_' + comp['target'] + '_' + comp['cpu'].lower()
+  output = 'alcor_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
 
+  # Language specific defines.
+  if comp['lang'] == 'picoc':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOC'])
+  else:
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_LUA'])
+
+  # CPU, board and platform specific defines.
   comp.Append(CPPDEFINES = { 'ELUA_CPU' : comp['cpu'],
                              'ELUA_BOARD' : comp['board'],
                              'ELUA_PLATFORM' : platform.upper() } )
