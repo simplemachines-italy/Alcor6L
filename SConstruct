@@ -379,25 +379,25 @@ if not GetOption( 'help' ):
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_LUA'])
 
   # CPU, board and platform specific defines.
-  comp.Append(CPPDEFINES = { 'ELUA_CPU' : comp['cpu'],
-                             'ELUA_BOARD' : comp['board'],
-                             'ELUA_PLATFORM' : platform.upper() } )
+  comp.Append(CPPDEFINES = { 'ALCOR_CPU' : comp['cpu'],
+                             'ALCOR_BOARD' : comp['board'],
+                             'ALCOR_PLATFORM' : platform.upper() } )
   comp.Append(CPPDEFINES = {'__BUFSIZ__' : 128})
 
   # Also make the above into direct defines (to use in conditional C code)
-  conf.env.Append(CPPDEFINES = ["ELUA_CPU_" + cnorm( comp['cpu'] ), "ELUA_BOARD_" + cnorm( comp['board'] ), "ELUA_PLATFORM_" +  cnorm( platform )])
+  conf.env.Append(CPPDEFINES = ["ALCOR_CPU_" + cnorm( comp['cpu'] ), "ALCOR_BOARD_" + cnorm( comp['board'] ), "ALCOR_PLATFORM_" +  cnorm( platform )])
 
   if comp['allocator'] == 'multiple':
      conf.env.Append(CPPDEFINES = ['USE_MULTIPLE_ALLOCATOR'])
   elif comp['allocator'] == 'simple':
      conf.env.Append(CPPDEFINES = ['USE_SIMPLE_ALLOCATOR'])
 
-  if comp['boot'] == 'luarpc':
+  if comp['boot'] == 'luarpc' and comp['lang'] == 'lua':
     conf.env.Append(CPPDEFINES = ['ELUA_BOOT_RPC'])
 
   # Special macro definitions for the SYM target
   if platform == 'sim':
-    conf.env.Append(CPPDEFINES = ['ELUA_SIMULATOR',"ELUA_SIM_" + cnorm( comp['cpu'] ) ] )
+    conf.env.Append(CPPDEFINES = ['ALCOR_SIMULATOR',"ALCOR_SIM_" + cnorm( comp['cpu'] ) ] )
 
   # Lua source files and include path
   lua_files = """lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c
@@ -421,9 +421,9 @@ if not GetOption( 'help' ):
   if comp['target'] != 'lualong' and comp['target'] != 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_PACK_VALUE'])
   if platform_list[platform]['big_endian']:
-    conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_BIG'])
+    conf.env.Append(CPPDEFINES = ['ALCOR_ENDIAN_BIG'])
   else:
-    conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_LITTLE'])
+    conf.env.Append(CPPDEFINES = ['ALCOR_ENDIAN_LITTLE'])
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
   conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
 
