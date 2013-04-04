@@ -12,7 +12,7 @@
 #include "rotable.h"
 
 // picoc: realfrequency = pwm_setup(id, frequency, duty);
-static void pwm_setup(param *p, var *r, var **param, int n)
+static void pwm_setup(param *p, val *r, val **param, int n)
 {
   u32 freq;
   unsigned duty, id;
