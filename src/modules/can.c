@@ -25,7 +25,7 @@ extern void can_lib_setup_func(void)
 }
 
 // picoc: can_setup(id, clock);
-static void can_setup(pstate *p, var *r, var **param, int n)
+static void can_setup(pstate *p, val *r, val **param, int n)
 {
   unsigned id;
   u32 clock, res;
@@ -39,7 +39,7 @@ static void can_setup(pstate *p, var *r, var **param, int n)
 }
 
 // picoc: can_send(id, canid, canidtype, message);
-static void can_send(pstate *p, var *r, var **param, int n)
+static void can_send(pstate *p, val *r, val **param, int n)
 {
   size_t len;
   int id, canid, idtype;
@@ -62,7 +62,7 @@ static void can_send(pstate *p, var *r, var **param, int n)
 }
 
 // picoc: can_recv(id, &message);
-static void can_recv(pstate *p, var *r, var **param, int n)
+static void can_recv(pstate *p, val *r, val **param, int n)
 {
   u8 len, idtype, data[8];
   int id;
