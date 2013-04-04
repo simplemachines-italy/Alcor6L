@@ -16,7 +16,7 @@
 // picoc: platform = pd_platform();
 static void pd_platform(pstate *p, val *r, val **param, int n)
 {
-  r->Val->Identifer = MACRO_NAME(ALCOR_PLATFORM);
+  r->Val->Identifier = MACRO_NAME(ALCOR_PLATFORM);
 }
 
 // picoc: cpuname = pd_cpu();
