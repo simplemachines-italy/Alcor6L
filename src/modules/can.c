@@ -61,7 +61,7 @@ static void can_send(pstate *p, var *r, var **param, int n)
   r->Val->Integer = len;
 }
 
-// picoc: canid, canidtype, message = recv(id, *message);
+// picoc: can_recv(id, &message);
 static void can_recv(pstate *p, var *r, var **param, int n)
 {
   u8 len, idtype, data[8];
@@ -71,10 +71,12 @@ static void can_recv(pstate *p, var *r, var **param, int n)
   id = param[0]->Val->Integer;
   MOD_CHECK_ID(can, id);
 
-  if (platform_can_recv(id, &canid, &idtype, &len, data) == PLATFORM_OK)
+  if (platform_can_recv(id, &canid, &idtype, &len, data) == PLATFORM_OK) {
+    param[1]->Val->Identifier = data;
     r->Val->Integer = len;
-  else
+  } else {
     r->Val->Integer = -1;
+  }
 }
 
 #define MIN_OPT_LEVEL 2
@@ -93,7 +95,7 @@ const PICOC_RO_TYPE can_variables[] = {
 const PICOC_REG_TYPE can_library[] = {
   {FUNC(can_setup), PROTO("unsigned int can_setup(unsigned int, unsigned int);")},
   {FUNC(can_send), PROTO("int can_send(int, int, int, char *);")},
-  {FUNC(can_recv), PROTO("int can_recv(int);")},
+  {FUNC(can_recv), PROTO("int can_recv(int, char *);")},
   {NILFUNC, NILPROTO}
 };
 
