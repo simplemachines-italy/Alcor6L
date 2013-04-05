@@ -23,7 +23,7 @@
 //#define BUILD_RFS
 //#define BUILD_SERMUX
 
-#if defined( ELUA_CPU_AT32UC3A0128 )
+#if defined( ALCOR_CPU_AT32UC3A0128 )
   // Build options for 120KB image
 # define RAM_SIZE 0x8000
 #else
@@ -124,7 +124,7 @@
 #define PLATLINE
 #endif
 
-#if defined( ELUA_CPU_AT32UC3A0128 )
+#if defined( ALCOR_CPU_AT32UC3A0128 )
 
 // Minimal ROM modules, to fit in 120KB
 #define LUA_PLATFORM_LIBS_ROM\
@@ -210,21 +210,21 @@
 #define AVR32_NUM_GPIO        110 // actually 109, but consider also PA31
 
 #ifdef BOOTLOADER_EMBLOD
-# define ELUA_FIRMWARE_SIZE 0x80000
+# define ALCOR_FIRMWARE_SIZE 0x80000
 #else
-# define ELUA_FIRMWARE_SIZE 0
+# define ALCOR_FIRMWARE_SIZE 0
 #endif
 
 // Allocator data: define your free memory zones here in two arrays
 // (start address and end address)
 #ifdef USE_MULTIPLE_ALLOCATOR
-#define MEM_START_ADDRESS     { ( void* )end, ( void* )( SDRAM + ELUA_FIRMWARE_SIZE ) }
+#define MEM_START_ADDRESS     { ( void* )end, ( void* )( SDRAM + ALCOR_FIRMWARE_SIZE ) }
 #define MEM_END_ADDRESS       { ( void* )( RAM_SIZE - STACK_SIZE_TOTAL - 1 ), ( void* )( SDRAM + SDRAM_SIZE - 1 ) }
 #else
 // Newlib<1.19.0 has a bug in their dlmalloc that corrupts memory when there
 // are multiple regions, and it appears that simple allocator also has problems.
 // So with these allocators, only use a single region - the slower 32MB one.
-#define MEM_START_ADDRESS     { ( void* )( SDRAM + ELUA_FIRMWARE_SIZE ) }
+#define MEM_START_ADDRESS     { ( void* )( SDRAM + ALCOR_FIRMWARE_SIZE ) }
 #define MEM_END_ADDRESS       { ( void* )( SDRAM + SDRAM_SIZE - 1 ) }
 #endif
 
