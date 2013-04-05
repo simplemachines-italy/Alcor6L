@@ -12,8 +12,8 @@
 #include "rotable.h"
 
 // Platform variables
-const int IdStd = PICOC_CAN_ID_STD;
-const int IdExt = PICOC_CAN_ID_EXT;
+const int IdStd = ALCOR_CAN_ID_STD;
+const int IdExt = ALCOR_CAN_ID_EXT;
 
 // Library setup function */
 extern void can_lib_setup_func(void)
@@ -52,10 +52,8 @@ static void can_send(pstate *p, val *r, val **param, int n)
   data = param[3]->Val->Identifier;
   len = strlen(data);
 
-  if (len > PLATFORM_CAN_MAXLEN) {
-    r->Val->Integer = -1;
-    return ProgramFail(NULL, "message exceeds max length");
-  }
+  if (len > PLATFORM_CAN_MAXLEN)
+    return pmod_error("message exceeds max length");
 
   platform_can_send(id, canid, idtype, len, (const u8 *)data);
   r->Val->Integer = len;
