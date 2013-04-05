@@ -73,53 +73,53 @@
 
 // Which port/pins are used for I2C?
 
-#if   defined(ELUA_CPU_AT32UC3A0128) || \
-      defined(ELUA_CPU_AT32UC3A0256) || \
-      defined(ELUA_CPU_AT32UC3A0512) || \
-      defined(ELUA_CPU_AT32UC3A1128) || \
-      defined(ELUA_CPU_AT32UC3A1256) || \
-      defined(ELUA_CPU_AT32UC3A1512)
+#if   defined(ALCOR_CPU_AT32UC3A0128) || \
+      defined(ALCOR_CPU_AT32UC3A0256) || \
+      defined(ALCOR_CPU_AT32UC3A0512) || \
+      defined(ALCOR_CPU_AT32UC3A1128) || \
+      defined(ALCOR_CPU_AT32UC3A1256) || \
+      defined(ALCOR_CPU_AT32UC3A1512)
 
 // One master-slave TWI interface
 # define SDA_PIN     AVR32_PIN_PA29
 # define SCL_PIN     AVR32_PIN_PA30
 
-#elif defined(ELUA_CPU_AT32UC3A364)  || defined(ELUA_CPU_AT32UC3A364S)  || \
-      defined(ELUA_CPU_AT32UC3A3128) || defined(ELUA_CPU_AT32UC3A3128S) || \
-      defined(ELUA_CPU_AT32UC3A3256) || defined(ELUA_CPU_AT32UC3A3256S) || \
-      defined(ELUA_CPU_AT32UC3A464)  || defined(ELUA_CPU_AT32UC3A464S)  || \
-      defined(ELUA_CPU_AT32UC3A4128) || defined(ELUA_CPU_AT32UC3A4128S) || \
-      defined(ELUA_CPU_AT32UC3A4256) || defined(ELUA_CPU_AT32UC3A4256S)
+#elif defined(ALCOR_CPU_AT32UC3A364)  || defined(ALCOR_CPU_AT32UC3A364S)  || \
+      defined(ALCOR_CPU_AT32UC3A3128) || defined(ALCOR_CPU_AT32UC3A3128S) || \
+      defined(ALCOR_CPU_AT32UC3A3256) || defined(ALCOR_CPU_AT32UC3A3256S) || \
+      defined(ALCOR_CPU_AT32UC3A464)  || defined(ALCOR_CPU_AT32UC3A464S)  || \
+      defined(ALCOR_CPU_AT32UC3A4128) || defined(ALCOR_CPU_AT32UC3A4128S) || \
+      defined(ALCOR_CPU_AT32UC3A4256) || defined(ALCOR_CPU_AT32UC3A4256S)
 
 // The first of the two TWIM/TWIS interfaces, in pin configuration A
 # define SDA_PIN     AVR32_PIN_PA25
 # define SCL_PIN     AVR32_PIN_PA26
 
-#elif defined(ELUA_CPU_AT32UC3B064)  || \
-      defined(ELUA_CPU_AT32UC3B0128) || \
-      defined(ELUA_CPU_AT32UC3B0256) || \
-      defined(ELUA_CPU_AT32UC3B0512) || \
-      defined(ELUA_CPU_AT32UC3B164)  || \
-      defined(ELUA_CPU_AT32UC3B1128) || \
-      defined(ELUA_CPU_AT32UC3B1256) || \
-      defined(ELUA_CPU_AT32UC3B1512)
+#elif defined(ALCOR_CPU_AT32UC3B064)  || \
+      defined(ALCOR_CPU_AT32UC3B0128) || \
+      defined(ALCOR_CPU_AT32UC3B0256) || \
+      defined(ALCOR_CPU_AT32UC3B0512) || \
+      defined(ALCOR_CPU_AT32UC3B164)  || \
+      defined(ALCOR_CPU_AT32UC3B1128) || \
+      defined(ALCOR_CPU_AT32UC3B1256) || \
+      defined(ALCOR_CPU_AT32UC3B1512)
 
 // One master-slave TWI interface
 # define SDA_PIN     AVR32_PIN_PA10
 # define SCL_PIN     AVR32_PIN_PA09
 
-#elif defined(ELUA_CPU_AT32UC3C064C)  || \
-      defined(ELUA_CPU_AT32UC3C0128C) || \
-      defined(ELUA_CPU_AT32UC3C0256C) || \
-      defined(ELUA_CPU_AT32UC3C0512C) || \
-      defined(ELUA_CPU_AT32UC3C164C)  || \
-      defined(ELUA_CPU_AT32UC3C1128C) || \
-      defined(ELUA_CPU_AT32UC3C1256C) || \
-      defined(ELUA_CPU_AT32UC3C1512C) || \
-      defined(ELUA_CPU_AT32UC3C264C)  || \
-      defined(ELUA_CPU_AT32UC3C2128C) || \
-      defined(ELUA_CPU_AT32UC3C2256C) || \
-      defined(ELUA_CPU_AT32UC3C2512C)
+#elif defined(ALCOR_CPU_AT32UC3C064C)  || \
+      defined(ALCOR_CPU_AT32UC3C0128C) || \
+      defined(ALCOR_CPU_AT32UC3C0256C) || \
+      defined(ALCOR_CPU_AT32UC3C0512C) || \
+      defined(ALCOR_CPU_AT32UC3C164C)  || \
+      defined(ALCOR_CPU_AT32UC3C1128C) || \
+      defined(ALCOR_CPU_AT32UC3C1256C) || \
+      defined(ALCOR_CPU_AT32UC3C1512C) || \
+      defined(ALCOR_CPU_AT32UC3C264C)  || \
+      defined(ALCOR_CPU_AT32UC3C2128C) || \
+      defined(ALCOR_CPU_AT32UC3C2256C) || \
+      defined(ALCOR_CPU_AT32UC3C2512C)
 
 // One master-slave TWI interface
 # define SDA_PIN     AVR32_PIN_PC02
