@@ -12,18 +12,21 @@
 #include "rotable.h"
 
 // picoc: realfrequency = pwm_setup(id, frequency, duty);
-static void pwm_setup(param *p, val *r, val **param, int n)
+static void pwm_setup(pstate *p, val *r, val **param, int n)
 {
   u32 freq;
   unsigned duty, id;
 
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
-  freq = param[1]->Val->UnsignedInteger;
-  duty = param[2]->Val->UnsignedInteger;
 
+  freq = param[1]->Val->UnsignedInteger;
+  if (freq <= 0)
+    return pmod_error("frequency must be > 0");
+
+  duty = param[2]->Val->UnsignedInteger;
   if (duty > 100)
-    duty = 100;
+    return pmod_error("duty cycle must be from 0 to 100");
 
   freq = platform_pwm_setup(id, freq, duty);
   r->Val->Integer = freq;
@@ -36,7 +39,7 @@ static void pwm_start(pstate *p, val *r, val **param, int n)
 
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
-  platform_pwm_op(id, PLATFORM_PWM_OP_START, 0);
+  platform_pwm_start(id);
   r->Val->Integer = 0;
 }
 
@@ -47,7 +50,7 @@ static void pwm_stop(pstate *p, val *r, val **param, int n)
   
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
-  platform_pwm_op(id, PLATFORM_PWM_OP_STOP, 0);
+  platform_pwm_stop(id);
   r->Val->Integer = 0;
 }
 
@@ -60,7 +63,9 @@ static void pwm_setclock(pstate *p, val *r, val **param, int n)
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
   clk = param[1]->Val->UnsignedInteger;
-  clk = platform_pwm_op(id, PLATFORM_PWM_OP_SET_CLOCK, clk);
+  if (clk <= 0)
+    return pmod_error("frequency must be > 0");
+  clk = platform_pwm_set_clock(id, (u32)clk);
   r->Val->UnsignedInteger = clk;
 }
 
@@ -72,7 +77,7 @@ static void pwm_getclock(pstate *p, val *r, val **param, int n)
 
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
-  clk = platform_pwm_op(id, PLATFORM_PWM_OP_GET_CLOCK, 0);
+  clk = platform_pwm_get_clock(id);
   r->Val->UnsignedInteger = clk;
 }
 
