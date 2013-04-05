@@ -12,6 +12,7 @@
 
 #include "interpreter.h"
 #include "rotable.h"
+#include "picoc_mod.h"
 
 // picoc: platform = pd_platform();
 static void pd_platform(pstate *p, val *r, val **param, int n)
