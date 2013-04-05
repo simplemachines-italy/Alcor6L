@@ -96,6 +96,18 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// Language configurations: PicoC.
+
+// stack and heap config
+// values are set after experimentation. Needs validation.
+#define HEAP_SIZE             (48*1024)
+#define PICOC_STACK_SIZE      (42*1024)
+
+#else
+
 #if defined( ELUA_BOOT_RPC ) && !defined( BUILD_RPC )
 #define BUILD_RPC
 #endif
@@ -155,6 +167,8 @@
   PLATLINE\
 
 #endif
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // *****************************************************************************
 // Configuration data
