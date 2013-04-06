@@ -433,7 +433,7 @@ if not GetOption( 'help' ):
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c

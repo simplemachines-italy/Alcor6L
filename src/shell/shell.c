@@ -41,10 +41,17 @@ SHELL_FUNC( shell_adv_rm );
 SHELL_FUNC( shell_recv );
 SHELL_FUNC( shell_help );
 SHELL_FUNC( shell_cat );
-SHELL_FUNC( shell_lua );
 SHELL_FUNC( shell_ver );
 SHELL_FUNC( shell_mkdir );
 SHELL_FUNC( shell_wofmt );
+
+// Language specific shell functions.
+#ifdef ALCOR_LANG_PICOC
+SHELL_FUNC( shell_picoc );
+#else
+SHELL_FUNC( shell_lua );
+#endif
+
 
 // ----------------------------------------------------------------------------
 // Helpers
@@ -198,8 +205,12 @@ void shellh_show_help( const char *cmd, const char *helptext )
 // Insert shell commands here
 static const SHELL_COMMAND shell_commands[] =
 {
-  { "help", shell_help },
+#ifdef ALCOR_LANG_PICOC
+  { "picoc", shell_picoc },
+#else
   { "lua", shell_lua },
+#endif
+  { "help", shell_help },
   { "recv", shell_recv },
   { "ver", shell_ver },
   { "exit", NULL },
