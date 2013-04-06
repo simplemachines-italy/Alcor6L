@@ -2,7 +2,6 @@
 
 #include "platform.h"
 #include "term.h"
-#include "platform_conf.h"
 #include <string.h>
 
 #if defined (ALCOR_LANG_PICOC) && defined (BUILD_TERM)
@@ -13,6 +12,7 @@
 #include "interpreter.h"
 #include "rotable.h"
 #include "picoc_mod.h"
+#include "platform_conf.h"
 
 // Platform variables
 const int NoWait = TERM_INPUT_DONT_WAIT;
@@ -163,8 +163,8 @@ static void pterm_decode(pstate *p, val *r, val **param, int n)
   unsigned i, total = sizeof(term_key_names) / sizeof(char*);
 
   if (!key || *key != 'K') {
-    ProgramFail(NULL, "Invalid key.");
     r->Val->Integer = -1;
+    return pmod_error("Invalid key.");
   }
   for (i = 0; i < total; i++)
     if (!strcmp(key, term_key_names[i]))
@@ -181,8 +181,8 @@ static void pterm_decode(pstate *p, val *r, val **param, int n)
 #if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
 /* rotable for platform variables */
 const PICOC_RO_TYPE term_variables[] = {
-  {STRKEY("WAIT"), INT(Wait)},
-  {STRKEY("NOWAIT"), INT(NoWait)},
+  {STRKEY("TERM_WAIT"), INT(Wait)},
+  {STRKEY("TERM_NOWAIT"), INT(NoWait)},
   {NILKEY, NILVAL}
 };
 #endif
@@ -223,6 +223,7 @@ extern void term_library_init(void)
 #include "lauxlib.h"
 #include "auxmods.h"
 #include "lrotable.h"
+#include "platform_conf.h"
 
 // Lua: clrscr()
 static int luaterm_clrscr( lua_State* L )
