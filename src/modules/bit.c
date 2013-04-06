@@ -4,6 +4,7 @@
 
 // Modified by BogdanM for eLua
 
+#ifdef ALCOR_LANG_LUA
 
 #include <limits.h>
 
@@ -147,3 +148,5 @@ const LUA_REG_TYPE bit_map[] = {
 LUALIB_API int luaopen_bit (lua_State *L) {
   LREGISTER( L, "bit", bit_map );
 }
+
+#endif // #ifdef ALCOR_LANG_LUA

@@ -13,6 +13,8 @@
 //    - accessing and calling types nested multiple levels deep on tables now works
 //  - port from Lua 4.x to 5.x
 
+#ifdef ALCOR_LANG_LUA
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -1790,3 +1792,5 @@ LUALIB_API int luaopen_rpc(lua_State *L)
 #endif
 
 #endif
+
+#endif // #ifdef ALCOR_LANG_LUA

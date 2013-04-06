@@ -10,6 +10,8 @@
 * Modified by BogdanM for eLua
 */
 
+#ifdef ALCOR_LANG_LUA
+
 #define OP_ZSTRING      'z'             /* zero-terminated string */
 #define OP_BSTRING      'p'             /* string preceded by length byte */
 #define OP_WSTRING      'P'             /* string preceded by length word */
@@ -272,3 +274,5 @@ int luaopen_pack( lua_State *L )
 {
   LREGISTER( L, AUXLIB_PACK, pack_map );
 }
+
+#endif // #ifdef ALCOR_LANG_LUA
