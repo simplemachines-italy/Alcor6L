@@ -25,12 +25,19 @@ typedef struct
   const char *help_full;
 } SHELL_HELP_DATA;
 
+// Language specific includes.
+#ifdef ALCOR_LANG_PICOC
+SHELL_HELP( picoc );
+#else
+SHELL_HELP( lua );
+#endif
+
+// Other shell commands.
 SHELL_HELP( cp );
 SHELL_HELP( rm );
 SHELL_HELP( ls );
 SHELL_HELP( recv );
 SHELL_HELP( cat );
-SHELL_HELP( lua );
 SHELL_HELP( ver );
 SHELL_HELP( mkdir );
 SHELL_HELP( wofmt );
@@ -51,7 +58,11 @@ static const char shell_help_summary_exit[] = "exit the shell";
 static const SHELL_HELP_DATA shell_help_data[] = 
 {
   SHELL_INFO( help ),
+#ifdef ALCOR_LANG_PICOC
+  SHELL_INFO( picoc ),
+#else
   SHELL_INFO( lua ),
+#endif
   SHELL_INFO( ls ),
   SHELL_INFO_ALIAS( dir, ls ),
   SHELL_INFO( cat ),
