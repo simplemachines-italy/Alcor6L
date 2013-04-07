@@ -12,7 +12,7 @@
 // ****************************************************************************
 // Lua handlers
 
-#ifdef BUILD_LUA_INT_HANDLERS
+#if defined( BUILD_LUA_INT_HANDLERS ) && defined( ALCOR_LANG_LUA ) 
 
 // Interrupt queue read and write indexes
 static volatile u8 elua_int_read_idx, elua_int_write_idx;
@@ -153,7 +153,7 @@ int elua_int_add( elua_int_id inttype, elua_int_resnum resnum )
   return PLATFORM_ERR;
 }
 
-#endif // #ifdef BUILD_LUA_INT_HANDLERS
+#endif // #if defined( BUILD_LUA_INT_HANDLERS ) && defined( ALCOR_LANG_LUA )
 
 // ****************************************************************************
 // C handlers
