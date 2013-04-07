@@ -181,8 +181,8 @@ const LUA_REG_TYPE can_map[] =
   { LSTRKEY( "send" ),  LFUNCVAL( can_send ) },  
   { LSTRKEY( "recv" ),  LFUNCVAL( can_recv ) },
 #if LUA_OPTIMIZE_MEMORY > 0
-  { LSTRKEY( "ID_STD" ), LNUMVAL( ELUA_CAN_ID_STD ) },
-  { LSTRKEY( "ID_EXT" ), LNUMVAL( ELUA_CAN_ID_EXT ) },
+  { LSTRKEY( "ID_STD" ), LNUMVAL( ALCOR_CAN_ID_STD ) },
+  { LSTRKEY( "ID_EXT" ), LNUMVAL( ALCOR_CAN_ID_EXT ) },
 #endif
   { LNILKEY, LNILVAL }
 };
