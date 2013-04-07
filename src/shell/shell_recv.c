@@ -19,7 +19,12 @@
 
 const char shell_help_recv[] = "[<path>]\n"
   "  [<path>] - the data received via XMODEM will be saved to this file.\n"
+#ifdef ALCOR_LANG_PICOC
+  "Without arguments, it shows this help message.\n";
+#else
   "Without arguments it runs Lua to execute the data it receives.\n";
+#endif
+
 const char shell_help_summary_recv[] = "receive files via XMODEM";
 
 extern char *shell_prog;
@@ -28,9 +33,15 @@ void shell_recv( int argc, char **argv )
 {
   char *p;
   long actsize;
+#ifdef ALCOR_LANG_LUA
   lua_State* L;
+#endif
 
+#ifdef ALCOR_LANG_PICOC
+  if( ( argc > 2 ) || ( argc == 0 ) )
+#else
   if( argc > 2 )
+#endif
   {
     SHELL_SHOW_HELP( recv );
     return;
@@ -73,6 +84,7 @@ void shell_recv( int argc, char **argv )
       printf( "unable to save file %s (no space left on target?)\n", argv[ 1 ] );
     fclose( foutput );
   }
+#ifdef ALCOR_LANG_LUA
   else // no arg, running the file with lua.
   {
     if( ( L = lua_open() ) == NULL )
@@ -88,6 +100,7 @@ void shell_recv( int argc, char **argv )
         printf( "Error: %s\n", lua_tostring( L, -1 ) );
     lua_close( L );
   }
+#endif
 exit:
   free( shell_prog );
   shell_prog = NULL;
