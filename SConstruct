@@ -425,7 +425,11 @@ if not GetOption( 'help' ):
   else:
     conf.env.Append(CPPDEFINES = ['ALCOR_ENDIAN_LITTLE'])
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
-  conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  # Tiny RAM optimizations.
+  if comp['lang'] == 'picoc':
+    conf.env.Append(CPPDEFINES = {"PICOC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  else:
+    conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
 
   # Additional libraries
   local_libs = ''
