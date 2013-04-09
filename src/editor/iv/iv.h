@@ -101,7 +101,6 @@ int get_print_pos(char *line_buffer, int pos_x_line);
 void grow_line_buffer(void);
 void do_insert(struct ll_struct *file_buffer, char *cmd_line, int *cmd_line_index);
 int fill_line_buffer(struct ll_struct *file_buffer, long index);
-static void get_winsize(void);
 int insert_into_line_buffer(long pos, int input);
 long ll_count(struct ll_struct *ll);
 int ll_delete(struct ll_struct *ll, long index);
@@ -117,12 +116,10 @@ void parse_input_cmds(struct ll_struct *file_buffer, char *cmd_line, int *cmd_li
 int process_command(struct ll_struct *file_buffer);
 void process_output(struct ll_struct *file_buffer, char *cmd_line);
 int read_file(struct ll_struct *file_buffer);
-static void redraw_screen(struct ll_struct *file_buffer);
 void restore_input_mode(void);
 int set_input_mode(void);
 int set_print_pos(char *line_buffer, int pos_x);
 void show_error(char error_type, char *error_message);
-static void sig_winch(int signo);
 int write_file(struct ll_struct *file_buffer);
 int iv_main(int argc, char **argv);
 

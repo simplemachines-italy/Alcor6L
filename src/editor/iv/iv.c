@@ -72,6 +72,10 @@ struct ll_struct file_buffer_begin;
  */
 static jmp_buf ebuf;
 
+static void get_winsize(void);
+static void redraw_screen(struct ll_struct *file_buffer);
+static void sig_winch(int signo);
+
 #if DEBUG > 1
 #define DEBUG_CALL \
   tv_old = tv_new; \
