@@ -414,6 +414,7 @@ if not GetOption( 'help' ):
   picoc_full_files = " " + " ".join( [ "src/lang/picoc/%s" % name for name in picoc_files.split() ] )
 
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua', 'src/lang/picoc' ])
+  comp.Append(CPPPATH = [ 'src/editor/iv' ])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
@@ -437,7 +438,7 @@ if not GetOption( 'help' ):
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c src/shell/shell_picoc.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c
@@ -455,13 +456,17 @@ if not GetOption( 'help' ):
   app_files = app_files + "src/elua_mmc.c src/mmcfs.c src/fatfs/ff.c src/fatfs/ccsbcs.c "
   comp.Append(CPPPATH = ['src/fatfs'])
 
-  # Lua module files
+  # Alcor6L module files
   module_names = "pio.c spi.c tmr.c pd.c uart.c term.c pwm.c lpack.c bit.c net.c cpu.c adc.c can.c luarpc.c bitarray.c elua.c i2c.c"
   module_files = " " + " ".join( [ "src/modules/%s" % name for name in module_names.split() ] )
 
   # Remote file system files
   rfs_names = "remotefs.c client.c elua_os_io.c elua_rfs.c"
   rfs_files = " " + " ".join( [ "src/remotefs/%s" % name for name in rfs_names.split() ] )
+
+  # iv editor files.
+  iv_names = "iv.c"
+  iv_files = " " + " ".join( ["src/editor/iv/%s" % name for name in iv_names.split() ] )
 
   # Optimizer flags (speed or size)
   comp.Append(CCFLAGS = ['-Os','-fomit-frame-pointer'])
@@ -475,7 +480,7 @@ if not GetOption( 'help' ):
   execfile( "src/platform/%s/conf.py" % platform )
 
   # Complete file list
-  source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files )
+  source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
 
   # Language specific files.
   if comp['lang'] == 'picoc':

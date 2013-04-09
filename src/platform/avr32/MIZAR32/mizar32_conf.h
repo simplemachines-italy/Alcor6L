@@ -38,6 +38,7 @@
 # define BUILD_UIP
 # define BUILD_LUA_INT_HANDLERS
 # define BUILD_USB_CDC
+# define BUILD_EDITOR_IV
 #endif
 
 #ifdef BUILD_UIP

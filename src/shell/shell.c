@@ -44,6 +44,7 @@ SHELL_FUNC( shell_cat );
 SHELL_FUNC( shell_ver );
 SHELL_FUNC( shell_mkdir );
 SHELL_FUNC( shell_wofmt );
+SHELL_FUNC( shell_iv );
 
 // Language specific shell functions.
 #ifdef ALCOR_LANG_PICOC
@@ -51,7 +52,6 @@ SHELL_FUNC( shell_picoc );
 #else
 SHELL_FUNC( shell_lua );
 #endif
-
 
 // ----------------------------------------------------------------------------
 // Helpers
@@ -223,6 +223,7 @@ static const SHELL_COMMAND shell_commands[] =
   { "mkdir", shell_mkdir },
   { "rm", shell_adv_rm },
   { "mv", shell_adv_mv },
+  { "iv", shell_iv },
   { NULL, NULL }
 };
 
