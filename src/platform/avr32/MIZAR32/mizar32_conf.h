@@ -35,7 +35,7 @@
 # define BUILD_LCD
 # define BUILD_RTC
 # define BUILD_TERM
-# define BUILD_UIP
+// # define BUILD_UIP
 # define BUILD_LUA_INT_HANDLERS
 # define BUILD_USB_CDC
 # define BUILD_EDITOR_IV
