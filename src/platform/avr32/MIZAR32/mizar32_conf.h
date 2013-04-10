@@ -109,6 +109,9 @@
 
 #else
 
+// ****************************************************************************
+// Language configurations: Lua.
+
 #if defined( ELUA_BOOT_RPC ) && !defined( BUILD_RPC )
 #define BUILD_RPC
 #endif
