@@ -33,18 +33,18 @@ void PicocInitialise(int StackSize)
      * an issue for MCU peripherals not common
      * for all platforms.
      */
-    pd_library_init();
-    pwm_library_init();
-    tmr_library_init();
-    adc_library_init();
-    pio_library_init();
-    can_library_init();
-    term_library_init();
-    picoc_platform_library_init();
-    spi_library_init();
-    uart_library_init();
+    //pd_library_init();
+    //pwm_library_init();
+    //tmr_library_init();
+    //adc_library_init();
+    //pio_library_init();
+    //can_library_init();
+    //term_library_init();
+    //picoc_platform_library_init();
+    //spi_library_init();
+    //uart_library_init();
 #ifdef BUILD_ADC
-    disp_library_init();
+    //disp_library_init();
 #endif /* #ifdef BUILD_ADC */
 #endif
 		
