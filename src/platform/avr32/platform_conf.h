@@ -1,12 +1,18 @@
-// eLua platform configuration
+// eLua platform configuration - modified
+// for Alcor6L.
 
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#include "auxmods.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc_mod.h"
+#else
+# include "auxmod.h"
+# include "elua_int.h"
+#endif
+
 #include "board.h"
 #include "stacks.h"
-#include "elua_int.h"
 
 #define PLATFORM_HAS_SYSTIMER
 
