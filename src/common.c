@@ -621,6 +621,9 @@ const char* cmn_str64( u64 x )
 // If timeout is PLATFORM_TIMER_INF_TIMEOUT -> also infinite timeout (independent of timer_id)
 // If both are specified -> wait the specified timeout on the specified timer_id
 // If timer_id is 'nil' the system timer will be used
+
+#ifdef ALCOR_LANG_LUA
+
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout )
 {
   lua_Number tempn;
@@ -638,3 +641,4 @@ void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_typ
     luaL_error( L, "the system timer is not implemented on this platform" );
 }
 
+#endif

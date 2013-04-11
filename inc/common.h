@@ -3,8 +3,11 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
+#ifdef ALCOR_LANG_LUA
+# include "lua.h"
+#endif
+
 #include "elua_int.h"
-#include "lua.h"
 #include "platform.h"
 #include "devman.h"
 
@@ -61,7 +64,10 @@ unsigned int intlog2( unsigned int v );
 char lastchar( const char *s );
 char firstchar( const char *s );
 const char* cmn_str64( u64 x );
+
+#ifdef ALCOR_LANG_LUA
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout );
+#endif
 
 #endif // #ifndef __COMMON_H__
 
