@@ -1,6 +1,9 @@
 // eLua interrupt support
 
 #include "elua_int.h"
+
+#ifdef ALCOR_LANG_LUA
+
 #include "lua.h"
 #include "platform.h"
 #include "platform_conf.h"
@@ -12,7 +15,7 @@
 // ****************************************************************************
 // Lua handlers
 
-#if defined( BUILD_LUA_INT_HANDLERS ) && defined( ALCOR_LANG_LUA ) 
+#if defined( BUILD_LUA_INT_HANDLERS )
 
 // Interrupt queue read and write indexes
 static volatile u8 elua_int_read_idx, elua_int_write_idx;
@@ -153,7 +156,9 @@ int elua_int_add( elua_int_id inttype, elua_int_resnum resnum )
   return PLATFORM_ERR;
 }
 
-#endif // #if defined( BUILD_LUA_INT_HANDLERS ) && defined( ALCOR_LANG_LUA )
+#endif // #if defined( BUILD_LUA_INT_HANDLERS )
+
+#endif // #ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // C handlers
