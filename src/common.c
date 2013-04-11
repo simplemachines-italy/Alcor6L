@@ -16,9 +16,14 @@
 #include "xmodem.h"
 #include "elua_int.h"
 #include "sermux.h"
-#include "lua.h"
-#include "lapi.h"
-#include "lauxlib.h"
+
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+#else
+# include "lua.h"
+# include "lapi.h"
+# include "lauxlib.h"
+#endif
 
 // [TODO] the new builder should automatically do this
 #if defined( BUILD_LUA_INT_HANDLERS ) || defined( BUILD_C_INT_HANDLERS )
