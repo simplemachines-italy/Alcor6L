@@ -12,6 +12,7 @@
 #include "common.h"
 #include "type.h"
 #include "platform_conf.h"
+#include "picoc.h"
 
 // EOF is different in UART mode and TCP/IP mode
 #ifdef BUILD_CON_GENERIC
@@ -20,12 +21,11 @@
   #define SHELL_EOF_STRING        "CTRL+D"
 #endif
 
-const char shell_help_picoc[] = "[-e <stat>] [-l <name>] [-i] [-v] [<file>]\n"
-  "  [<script>]: execute the given file and runs 'main'.\n"
+const char shell_help_picoc[] = "[-s <file>] [-i] [<file>]\n"
+  "  [<file>]: execute the given file and runs 'main'.\n"
   "  [-s <file>]: Script mode (runs program without calling main).\n"
   "  [-i]: enter interactive mode.\n"
-  "  [-v]: show version information.\n"
-  "Without arguments it executes the interactive PicoC interpreter.\n";
+  "Without arguments, it takes you to the PicoC help menu.\n";
 const char shell_help_summary_picoc[] = "start a PicoC session";
 
 void shell_picoc( int argc, char **argv )
