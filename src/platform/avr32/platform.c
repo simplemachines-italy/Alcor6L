@@ -1230,6 +1230,8 @@ void platform_cdc_timer_handler()
 
 #ifdef PS_LIB_TABLE_NAME
 
+#ifdef ALCOR_LANG_LUA
+
 #define MIN_OPT_LEVEL 2
 #include "lua.h"
 #include "lauxlib.h"
@@ -1278,5 +1280,7 @@ LUALIB_API int luaopen_platform( lua_State *L )
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
+
+#endif // #ifdef ALCOR_LANG_LUA
 
 #endif // #ifdef PS_LIB_TABLE_NAME
