@@ -609,6 +609,12 @@ typedef struct
  *
  * \note More optimized if only used with values unknown at compile time.
  */
+
+// PicoC too defines a 'min'
+# ifdef min
+#  undef min
+# endif
+
 #if (defined __GNUC__)
   #define min(a, b) \
   (\
