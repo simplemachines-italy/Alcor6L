@@ -198,10 +198,6 @@ vars.AddVariables(
   BoolVariable(     'optram',
                     'enables Tiny RAM enhancements',
                     True ),
-  MatchEnumVariable('boot',
-                    'boot mode, standard will boot to shell, luarpc boots to an rpc server',
-                    'standard',
-                    allowed_values=[ 'standard' , 'luarpc' ] ),
   MatchEnumVariable('romfs',
                     'ROMFS compilation mode',
                     'verbatim',
@@ -351,7 +347,6 @@ if not GetOption( 'help' ):
     print "WARNING: unable to determine version from repository"
     elua_vers = "unknown"
 
-
   # User report
   if not GetOption( 'clean' ):
     print
@@ -413,7 +408,13 @@ if not GetOption( 'help' ):
 
   picoc_full_files = " " + " ".join( [ "src/lang/picoc/%s" % name for name in picoc_files.split() ] )
 
-  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua', 'src/lang/picoc' ])
+  # comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua', 'src/lang/picoc' ])
+  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
+  if comp['lang'] == 'picoc':
+    comp.Append(CPPPATH = ['src/lang/picoc'])
+  else:
+    comp.Append(CPPPATH = ['src/lang/lua'])
+
   comp.Append(CPPPATH = [ 'src/editor/iv' ])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
@@ -426,6 +427,7 @@ if not GetOption( 'help' ):
   else:
     conf.env.Append(CPPDEFINES = ['ALCOR_ENDIAN_LITTLE'])
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
+
   # Tiny RAM optimizations.
   if comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = {"PICOC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
