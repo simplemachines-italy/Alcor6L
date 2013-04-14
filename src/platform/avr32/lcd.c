@@ -335,6 +335,19 @@ static void lcd_definechar(pstate *p, val *r, val **param, int n)
 #define MIN_OPT_LEVEL 2
 #include "rodefs.h"
 
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE lcd_variables[] = {
+  {STRKEY("lcd_NONE"), INT(lcd_none)},
+  {STRKEY("lcd_BLOCK"), INT(lcd_block)},
+  {STRKEY("lcd_LINE"), INT(lcd_line)},
+  {STRKEY("lcd_LEFT"), INT(lcd_left)},
+  {STRKEY("lcd_RIGHT"), INT(lcd_right)},
+  {STRKEY("lcd_OFF"), INT(lcd_off)},
+  {STRKEY("lcd_ON"), INT(lcd_on)},
+  {NILKEY, NILVAL}
+};
+#endif
+
 const PICOC_REG_TYPE lcd_disp_library[] = {
   {FUNC(lcd_reset), PROTO("void mizar32_disp_reset(void);")},
   {FUNC(lcd_setup), PROTO("void mizar32_disp_setup(unsigned int, unsigned int);")},
