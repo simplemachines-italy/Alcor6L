@@ -11,9 +11,15 @@
 #include "type.h"
 #include "platform_conf.h"
 #include "xmodem.h"
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+#endif
 
 #ifdef BUILD_XMODEM
 
