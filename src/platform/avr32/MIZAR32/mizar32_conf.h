@@ -36,7 +36,14 @@
 # define BUILD_RTC
 # define BUILD_TERM
 // # define BUILD_UIP
+
+// Interrupt handler support
+#ifdef ALCOR_LANG_PICOC
+# define BUILD_PICOC_INT_HANDLERS
+#else
 # define BUILD_LUA_INT_HANDLERS
+#endif
+
 # define BUILD_USB_CDC
 # define BUILD_EDITOR_IV
 #endif
