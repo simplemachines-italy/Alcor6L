@@ -1,29 +1,39 @@
 // Module for interfacing with terminal functions
+// Modified to include support for PicoC.
+
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
 
 #include "platform.h"
 #include "term.h"
 #include <string.h>
+#include "platform_conf.h"
 
 #if defined (ALCOR_LANG_PICOC) && defined (BUILD_TERM)
 
 // ****************************************************************************
 // Terminal module for PicoC.
 
-#include "interpreter.h"
-#include "rotable.h"
-#include "picoc_mod.h"
-#include "platform_conf.h"
-
 // Platform variables
-const int NoWait = TERM_INPUT_DONT_WAIT;
-const int Wait = TERM_INPUT_WAIT;
+const int no_wait = TERM_INPUT_DONT_WAIT;
+const int wait = TERM_INPUT_WAIT;
 
 // Library setup function
 extern void term_lib_setup_func(void)
 {
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
-  VariableDefinePlatformVar(NULL, "WAIT", &IntType, (union AnyValue *)&Wait, FALSE);
-  VariableDefinePlatformVar(NULL, "NOWAIT", &IntType, (union AnyValue *)&NoWait, FALSE);
+#if PICOC_TINYRAM_OFF
+  picoc_def_int("term_WAIT", wait);
+  picoc_def_int("term_NOWAIT", no_wait);
 #endif
 }
 
@@ -142,6 +152,7 @@ static void pterm_getcy(pstate *p, val *r, val **param, int n)
 static void pterm_getchar(pstate *p, val *r, val **param, int n)
 {
   int temp = TERM_INPUT_WAIT, res;
+
   temp = param[0]->Val->Integer;
   res = term_getch(temp);
   if (!res) {
@@ -178,11 +189,10 @@ static void pterm_decode(pstate *p, val *r, val **param, int n)
 #define MIN_OPT_LEVEL 2
 #include "rodefs.h"
 
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
-/* rotable for platform variables */
+#if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE term_variables[] = {
-  {STRKEY("TERM_WAIT"), INT(Wait)},
-  {STRKEY("TERM_NOWAIT"), INT(NoWait)},
+  {STRKEY("term_WAIT"), INT(Wait)},
+  {STRKEY("term_NOWAIT"), INT(NoWait)},
   {NILKEY, NILVAL}
 };
 #endif
@@ -207,7 +217,7 @@ const PICOC_REG_TYPE term_library[] = {
   {NILFUNC, NILPROTO}
 };
 
-// init library.
+// Init library.
 extern void term_library_init(void)
 {
   REGISTER("term.h", &term_lib_setup_func, &term_library[0]);
@@ -217,13 +227,6 @@ extern void term_library_init(void)
 
 // ****************************************************************************
 // Terminal module for Lua.
-
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-#include "auxmods.h"
-#include "lrotable.h"
-#include "platform_conf.h"
 
 // Lua: clrscr()
 static int luaterm_clrscr( lua_State* L )
