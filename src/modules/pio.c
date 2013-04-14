@@ -1,11 +1,21 @@
 // Module for interfacing with PIO
+// Modified to include support for
+// PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
 #include "platform_conf.h"
 #include <stdio.h>
 #include <string.h>
@@ -33,6 +43,18 @@ static void pioh_clear_masks()
   for( i = 0; i < PLATFORM_IO_PORTS; i ++ )
     pio_masks[ i ] = 0;
 }
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// PIO module for PicoC.
+
+// TODO:
+
+#else
+
+// ****************************************************************************
+// PIO module for Lua.
 
 // Helper function: pin operations
 // Gets the stack index of the first pin and the operation
@@ -470,3 +492,4 @@ LUALIB_API int luaopen_pio( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
+#endif // ALCOR_LANG_PICOC

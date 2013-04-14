@@ -1,13 +1,20 @@
 // eLua module for Mizar2 Real Time Clock hardware
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "lrotable.h"
 //#include "lrodefs.h"
 #include "platform_conf.h"
-
 //#include "rtc.h"
 #include "i2c.h"
 
@@ -144,6 +151,61 @@ static void write_rtc_regs(u8 *regs)
   i2c_send(rtc_slave_address, regs - 1, NFIELDS+1, true);
 }
 
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// RTC module for PicoC.
+
+static void rtc_get(pstate *p,  val *r, val **param, int n)
+{
+  u8 regs[7];
+  
+  rtc_init();
+  if (rtc_type == RTC_SYSTEM) {
+    // Unimplemented as yet.
+    return pmod_error("No real-time clock chip present.");
+  }
+
+  read_rtc_regs(regs);
+
+  switch (param[0]->Val->Integer) {
+    case SEC:
+      r->Val->Integer = fromBCD(regs[SEC] & 0x7F);
+      break;
+    case MIN:
+      r->Val->Integer = fromBCD(regs[MIN] & 0x7F);
+      break;
+    case HOUR:
+      r->Val->Integer = fromBCD(regs[HOUR] & 0x3F);
+      break;
+    case WDAY:
+      r->Val->Integer = regs[WDAY] & 0x07;
+      break;
+    case DAY:
+      r->Val->Integer = fromBCD(regs[DAY] & 0x3F);
+      break;
+    case MONTH:
+      r->Val->Integer = fromBCD(regs[MONTH] & 0x1F);
+      break;
+    case YEAR:
+      r->Val->Integer = fromBCD(regs[YEAR] & 0xFF)
+	+ ((regs[MONTH] & 0x80) ? 2000 : 1900);
+      break;
+    default:
+      pmod_error("Invalid RTC command.");
+  }
+}
+
+static void rtc_set(pstate *p, val *r, val **param, int n)
+{
+
+}
+
+#else
+
+// ****************************************************************************
+// RTC module for Lua.
+
 // Read the time from the RTC.
 static int rtc_get( lua_State *L )
 {
@@ -271,3 +333,5 @@ const LUA_REG_TYPE rtc_map[] =
   { LSTRKEY( "set" ), LFUNCVAL( rtc_set ) },
   { LNILKEY, LNILVAL }
 };
+
+#endif // ALCOR_LANG_PICOC

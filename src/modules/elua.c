@@ -1,12 +1,21 @@
 // Interface with core services
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+# include "legc.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
-#include "legc.h"
 #include "platform_conf.h"
 #include "linenoise.h"
 #include "shell.h"
@@ -18,6 +27,18 @@
 #else
 #include "version.h"
 #endif
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// eLua core module for PicoC.
+
+// TODO:
+
+#else
+
+// ****************************************************************************
+// eLua core module for Lua.
 
 // Lua: elua.egc_setup( mode, [ memlimit ] )
 static int elua_egc_setup( lua_State *L )
@@ -108,3 +129,5 @@ LUALIB_API int luaopen_elua( lua_State *L )
   return 1;
 #endif
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

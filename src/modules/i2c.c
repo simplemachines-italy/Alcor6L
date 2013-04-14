@@ -1,13 +1,32 @@
 // Module for interfacing with the I2C interface
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
 #include <string.h>
 #include <ctype.h>
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// I2C module for PicoC.
+
+#else
+
+// ****************************************************************************
+// I2C module for Lua.
 
 // Lua: speed = i2c.setup( id, speed )
 static int i2c_setup( lua_State *L )
@@ -173,3 +192,4 @@ LUALIB_API int luaopen_i2c( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
+#endif // #ifdef ALCOR_LANG_PICOC

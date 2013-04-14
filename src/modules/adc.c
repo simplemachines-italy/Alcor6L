@@ -1,16 +1,37 @@
 // Module for interfacing with ADC
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
 #include "common.h"
-#include "auxmods.h"
-#include "lrotable.h"
 #include "platform_conf.h"
 #include "elua_adc.h"
 
 #ifdef BUILD_ADC
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// ADC (Analog to digital converter) module for PicoC.
+
+// TODO:
+
+#else
+
+// ****************************************************************************
+// ADC (Analog to digital converter) module for Lua.
 
 // Lua: data = maxval( id )
 static int adc_maxval( lua_State* L )
@@ -253,3 +274,5 @@ LUALIB_API int luaopen_adc( lua_State *L )
 }
 
 #endif
+
+#endif // #ifdef ALCOR_LANG_PICOC

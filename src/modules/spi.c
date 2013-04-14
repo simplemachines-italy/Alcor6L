@@ -1,11 +1,32 @@
 // Module for interfacing with Lua SPI code
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// SPI module for PicoC.
+
+// TODO:
+
+#else
+
+// ****************************************************************************
+// SPI module for Lua.
 
 // Lua: sson( id )
 static int spi_sson( lua_State* L )
@@ -136,3 +157,5 @@ LUALIB_API int luaopen_spi( lua_State *L )
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

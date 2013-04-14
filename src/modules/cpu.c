@@ -1,15 +1,36 @@
 // Module for interfacing with CPU
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-#include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include <string.h> 
+#include "platform.h"
 
 #define _C( x ) { #x, x }
 #include "platform_conf.h"
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// CPU module for PicoC.
+
+// TODO:
+
+#else
+
+// **************************************************************************** 
+// CPU module for Lua.
 
 // Lua: w32( address, data )
 static int cpu_w32( lua_State *L )
@@ -290,3 +311,5 @@ LUALIB_API int luaopen_cpu( lua_State *L )
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

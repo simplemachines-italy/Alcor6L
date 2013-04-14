@@ -1,21 +1,22 @@
 // eLua interrupt support
+// Modified for the Alcor system of
+// multiple languages.
 
 #include "elua_int.h"
 
-#ifdef ALCOR_LANG_LUA
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+#else
+# include "lua.h"
+# include "ldebug.h"
+#endif
 
-#include "lua.h"
 #include "platform.h"
 #include "platform_conf.h"
 #include "type.h"
-#include "ldebug.h"
 #include <stdio.h>
 #include <string.h>
-
-// ****************************************************************************
-// Lua handlers
-
-#if defined( BUILD_LUA_INT_HANDLERS )
 
 // Interrupt queue read and write indexes
 static volatile u8 elua_int_read_idx, elua_int_write_idx;
@@ -27,6 +28,31 @@ static u32 elua_int_flags[ LUA_INT_MAX_SOURCES / 32 ];
 // Masking for read/write indexes
 #define INT_IDX_SHIFT                   ( PLATFORM_INT_QUEUE_LOG_SIZE )
 #define INT_IDX_MASK                    ( ( 1 << INT_IDX_SHIFT ) - 1 )
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// Interrupt handlers for PicoC.
+
+// TODO:
+// Interrupt handler mechanism for PicoC.
+
+// For now, BUILD_PICOC_INT_HANDLERS doesn't make
+// much sense. However, we can include this macro
+// in platform_conf.
+
+// A reference required in common_tmr.c.
+int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
+{
+  return PLATFORM_ERR;
+}
+
+#else
+
+// ****************************************************************************
+// Interrupt handlers for Lua.
+
+#if defined (BUILD_LUA_INT_HANDLERS)
 
 // Our hook function (called by the Lua VM)
 static void elua_int_hook( lua_State *L, lua_Debug *ar )
@@ -131,7 +157,7 @@ void elua_int_cleanup()
   memset( elua_int_queue, ELUA_INT_EMPTY_SLOT, sizeof( elua_int_queue ) );
 }
 
-#else // #ifdef BUILD_LUA_INT_HANDLERS
+#else // #if defined (BUILD_LUA_INT_HANDLERS)
 
 // This is needed by lua_close (lstate.c)
 void elua_int_disable_all()
@@ -156,9 +182,9 @@ int elua_int_add( elua_int_id inttype, elua_int_resnum resnum )
   return PLATFORM_ERR;
 }
 
-#endif // #if defined( BUILD_LUA_INT_HANDLERS )
+#endif // #if defined(BUILD_LUA_INT_HANDLERS)
 
-#endif // #ifdef ALCOR_LANG_LUA
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // C handlers
