@@ -364,7 +364,7 @@ const PICOC_REG_TYPE lcd_disp_library[] = {
   {NILFUNC, NILPROTO}
 };
 
-/* library setup function */
+// Library setup function.
 extern void lcd_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
