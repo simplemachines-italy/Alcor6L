@@ -11,6 +11,8 @@
 #define PICOC_REG_TYPE              struct LibraryFunction
 #define PICOC_TINYRAM_OFF\
   (PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB)
+#define PICOC_TINYRAM_ON\
+  (PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB)
 
 #if (MIN_OPT_LEVEL > 0) && (PICOC_OPTIMIZE_MEMORY >= MIN_OPT_LEVEL)
 /* for ro-functions */
