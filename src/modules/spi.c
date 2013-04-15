@@ -21,7 +21,121 @@
 // ****************************************************************************
 // SPI module for PicoC.
 
+// Platform variables
+const int master = PLATFORM_SPI_MASTER;
+const int slave = PLATFORM_SPI_SLAVE;
+
+// Library setup function
+extern void spi_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_int("spi_WAIT", master);
+  picoc_def_int("spi_NOWAIT", slave);
+#endif
+}
+
+// PicoC: spi_sson(id);
+static void spi_sson(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+
+  MOD_CHECK_ID(spi, id);
+  platform_spi_select(id, PLATFORM_SPI_SELECT_ON);
+}
+
+// PicoC: spi_ssoff(id);
+static void spi_ssoff(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(spi, id);
+  platform_spi_select(id, PLATFORM_SPI_SELECT_OFF);
+}
+
+// In PicoC:
+// clock = setup(id, MASTER/SLAVE, clock, cpol, cpha, databits);
+static void spi_setup(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, cpol, cpha, is_master, databits;
+  u32 clock, res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(spi, id);
+  is_master = param[1]->Val->UnsignedInteger;
+  if (!is_master)
+    return pmod_error("invalid type (only spi.MASTER is supported)");
+  clock = param[2]->Val->UnsignedInteger;
+  cpol = param[3]->Val->UnsignedInteger;
+  if ((cpol != 0) && (cpol != 1))
+    return pmod_error("invalid clock polarity.");
+  cpha = param[4]->Val->UnsignedInteger;
+  if ((cpha != 0) && (cpha != 1))
+    return pmod_error("invalid clock phase.");
+  databits = param[5]->Val->UnsignedInteger;
+  res = platform_spi_setup(id, is_master, clock, cpol, cpha, databits);
+  r->Val->UnsignedInteger = res;
+}
+
+// TODO: The following two functions should be
+// variadic functions.
+
+// PicoC: spi_write_num(id, num);
+static void spi_write_num(pstate *p, val *r, val **param, int n)	      
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+  spi_data_type val = param[1]->Val->UnsignedInteger;
+
+  platform_spi_send_recv(id, val);
+  r->Val->Integer = 1;
+}
+
+// PicoC: spi_write_string(id, string, len);
+static void spi_write_string(pstate *p, val *r, val **param, int n)
+{
+  unsigned int id = param[0]->Val->UnsignedInteger, i;
+  char *str  = param[1]->Val->Identifier;
+  unsigned int len = param[2]->Val->UnsignedInteger;
+
+  for (i = 0; i < len; i++)
+    platform_spi_send_recv(id, str[i]);
+
+  r->Val->Integer = len;
+}
+
 // TODO:
+// static void spi_readwrite(pstate *p, val *r, val **param, int n)
+// {}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE spi_variables[] = {
+  {STRKEY("spi_MASTER"), INT(master)},
+  {STRKEY("spi_SLAVE"), INT(slave)},
+  {NILKEY, NILVAL}
+};
+#endif
+
+// Library functions.
+const PICOC_REG_TYPE spi_library[] = {
+  {FUNC(spi_sson), PROTO("void spi_sson(unsigned int);")},
+  {FUNC(spi_ssoff), PROTO("void spi_ssoff(unsigned int);")},
+  {FUNC(spi_setup), PROTO("unsigned int spi_setup(unsigned int, unsigned int,\
+                           unsigned int, unsigned int, unsigned int,\
+                           unsigned int);")},
+  {FUNC(spi_write_num), PROTO("int spi_write_num(unsigned int, unsigned int);")},
+  {FUNC(spi_write_string), PROTO("unsigned int spi_write_string(unsigned int,\
+                                  char *, unsigned int);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void spi_library_init(void)
+{
+  REGISTER("spi.h", &spi_lib_setup_func, &spi_library[0]);
+}
 
 #else
 
