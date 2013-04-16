@@ -12,15 +12,15 @@
 #include "rotable.h"
 
 // Platform variables
-const int IdStd = ALCOR_CAN_ID_STD;
-const int IdExt = ALCOR_CAN_ID_EXT;
+const int id_std = ALCOR_CAN_ID_STD;
+const int id_ext = ALCOR_CAN_ID_EXT;
 
 // Library setup function */
 extern void can_lib_setup_func(void)
 {
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
-  VariableDefinePlatformVar(NULL, "ID_STD", &IntType, (union AnyValue *)&IdStd, FALSE);
-  VariableDefinePlatformVar(NULL, "ID_EXT", &IntType, (union AnyValue *)&IdExt, FALSE);
+#if PICOC_TINYRAM_OFF
+  picoc_tinyram_off("can_ID_STD", id_std);
+  picoc_tinyram_off("can_ID_EXT", id_ext);
 #endif
 }
 
@@ -80,11 +80,10 @@ static void can_recv(pstate *p, val *r, val **param, int n)
 #define MIN_OPT_LEVEL 2
 #include "rodefs.h"
 
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
-// Rotable for platform variables
+#if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE can_variables[] = {
-  {STRKEY("ID_STD"), INT(IdStd)},
-  {STRKEY("ID_EXT"), INT(IdExt)},
+  {STRKEY("can_ID_STD"), INT(id_std)},
+  {STRKEY("can_ID_EXT"), INT(id_ext)},
   {NILKEY, NILVAL}
 };
 #endif
