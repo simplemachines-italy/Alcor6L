@@ -191,8 +191,8 @@ static void pterm_decode(pstate *p, val *r, val **param, int n)
 
 #if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE term_variables[] = {
-  {STRKEY("term_WAIT"), INT(Wait)},
-  {STRKEY("term_NOWAIT"), INT(NoWait)},
+  {STRKEY("term_WAIT"), INT(wait)},
+  {STRKEY("term_NOWAIT"), INT(no_wait)},
   {NILKEY, NILVAL}
 };
 #endif
