@@ -23,6 +23,167 @@
 // ****************************************************************************
 // I2C module for PicoC.
 
+// A few platform constants.
+const int fast = PLATFORM_I2C_SPEED_FAST;
+const int slow = PLATFORM_I2C_SPEED_SLOW;
+const int trans = PLATFORM_I2C_DIRECTION_TRANSMITTER;
+const int rec = PLATFORM_I2C_DIRECTION_RECEIVER;
+
+// Library setup function
+extern void i2c_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_int("i2c_FAST", fast);
+  picoc_def_int("i2c_SLOW", slow);
+  picoc_def_int("i2c_TRANSMITTER", trans);
+  picoc_def_int("i2c_RECEIVER", rec);
+#endif
+}
+                                                            
+// PicoC: i2c_setup(id, speed);
+static void i2c_setup(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+  s32 speed = (s32)param[1]->Val->UnsignedInteger;
+  
+  MOD_CHECK_ID(i2c, id);
+  if (speed <= 0)
+    return pmod_error("frequency must be > 0");
+
+  r->Val->UnsignedInteger = platform_i2c_setup(id, (u32)speed);
+}
+
+// PicoC: i2c_start(id);
+static void i2c_start(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+
+  MOD_CHECK_ID(i2c, id);
+  platform_i2c_send_start(id);
+}
+
+// PicoC: i2c_stop(id);
+static void i2c_stop(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+
+  MOD_CHECK_ID(i2c, id);
+  platform_i2c_send_stop(id);
+}
+
+// PicoC: i2c_address(id, address, direction);
+static void i2c_address(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+  int add = param[1]->Val->Integer;
+  int dir = param[2]->Val->Integer;
+
+  MOD_CHECK_ID(i2c, id);
+  if (add < 0 || add > 127)
+    return pmod_error("slave address must be from 0 to 127");
+  
+  r->Val->UnsignedInteger = platform_i2c_send_address(id, (u16)add, dir);
+}
+
+// For PicoC, we split the write function into two
+// seperate functions - one to write integers and
+// the other to write strings.
+
+// TODO: Write a variadic version for the write*
+// functions below.
+
+// PicoC: i2c_write_integer(id, val);
+static void i2c_write_integer(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+  int numdata;
+
+  MOD_CHECK_ID(i2c, id);
+  numdata = param[1]->Val->Integer;
+
+  if (numdata < 0 || numdata > 255)
+    return pmod_error("Numeric data can be between 0 and 255 only.");
+
+  if (!platform_i2c_send_byte(id, numdata))
+    return pmod_error("i2c_send_byte failed.");
+
+  r->Val->UnsignedInteger = 1;
+}
+
+// PicoC: i2c_write_string(id, str);
+static void i2c_write_string(pstate *p, val *r, val **param, int n)
+{
+  unsigned int id = param[0]->Val->UnsignedInteger;
+  const char *pdata;
+  size_t datalen, i;
+  u32 wrote = 0;
+
+  MOD_CHECK_ID(i2c, id);
+  pdata = param[1]->Val->Identifier;
+  datalen = strlen(pdata);
+  for (i = 0; i < datalen; i++) {
+    if (platform_i2c_send_byte(id, pdata[i]) == 0)
+      break;
+    wrote += 1;
+  }
+
+  r->Val->UnsignedInteger = wrote;
+}
+
+// PicoC: i2c_read(id, size);
+static void i2c_read(pstate *p, val *r, val **param, int n)
+{
+  unsigned id = param[0]->Val->UnsignedInteger;
+  u32 size = param[1]->Val->UnsignedInteger, i;
+  char *b = HeapAllocMem(size + 1);
+  unsigned int count = 0;
+  int data;
+
+  MOD_CHECK_ID(i2c, id);
+  if (size == 0)
+    return;
+  for (i = 0; i < size; i++) {
+    if ((data = platform_i2c_recv_byte(id, i < size - 1)) == -1) {
+      break;
+    } else {
+      b[count] = (char)data;
+      count++;
+    }
+  }
+  r->Val->Identifier = b;
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE i2c_variables[] = {
+  {STRKEY("i2c_FAST"), INT(fast)},
+  {STRKEY("i2c_SLOW"), INT(slow)},
+  {STRKEY("i2c_TRANSMITTER"), INT(trans)},
+  {STRKEY("i2c_RECEIVER"), INT(rec)},
+  {NILKEY, NILVAL}
+};
+#endif
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE i2c_library[] = {
+  {FUNC(i2c_setup), PROTO("unsigned int i2c_setup(unsigned int, unsigned int);")},
+  {FUNC(i2c_start), PROTO("void i2c_start(unsigned int);")},
+  {FUNC(i2c_stop), PROTO("void i2c_stop(unsigned int);")},
+  {FUNC(i2c_address), PROTO("unsigned int i2c_address(unsigned int, int, int);")},
+  {FUNC(i2c_write_integer), PROTO("unsigned int i2c_write_integer(unsigned int, int);")},
+  {FUNC(i2c_write_string), PROTO("unsigned int i2c_write_string(unsigned int, char *);")},
+  {FUNC(i2c_read), PROTO("char *i2c_read(unsigned int, unsigned int);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void i2c_library_init(void)
+{
+  REGISTER("i2c.h", &i2c_lib_setup_func, &i2c_library[0]);
+}
+
 #else
 
 // ****************************************************************************
