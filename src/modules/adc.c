@@ -26,7 +26,7 @@
 // ****************************************************************************
 // ADC (Analog to digital converter) module for PicoC.
 
-// TODO:
+// In progress.
 
 #else
 
