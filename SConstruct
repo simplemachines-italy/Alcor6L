@@ -399,23 +399,22 @@ if not GetOption( 'help' ):
     lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c
     ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c"""
 
-  lua_full_files = " " + " ".join( [ "src/lang/lua/%s" % name for name in lua_files.split() ] )
+  lua_full_files = " " + " ".join( [ "src/lua/%s" % name for name in lua_files.split() ] )
 
   # PicoC source files and include path
   picoc_files = """picoc.c table.c lex.c parse.c expression.c heap.c type.c variable.c platform.c clibrary.c include.c
     cstdlib/stdio.c cstdlib/math.c cstdlib/string.c cstdlib/stdlib.c cstdlib/errno.c cstdlib/ctype.c
     cstdlib/stdbool.c platform/platform_unix.c platform/library_unix.c rotable.c"""
 
-  picoc_full_files = " " + " ".join( [ "src/lang/picoc/%s" % name for name in picoc_files.split() ] )
+  picoc_full_files = " " + " ".join( [ "src/picoc/%s" % name for name in picoc_files.split() ] )
 
-  # comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lang/lua', 'src/lang/picoc' ])
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
   if comp['lang'] == 'picoc':
-    comp.Append(CPPPATH = ['src/lang/picoc'])
+    comp.Append(CPPPATH = ['src/picoc'])
   else:
-    comp.Append(CPPPATH = ['src/lang/lua'])
+    comp.Append(CPPPATH = ['src/lua'])
 
-  comp.Append(CPPPATH = [ 'src/editor/iv' ])
+  comp.Append(CPPPATH = [ 'src/iv' ])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
@@ -471,7 +470,7 @@ if not GetOption( 'help' ):
 
   # iv editor files.
   iv_names = "iv.c"
-  iv_files = " " + " ".join( ["src/editor/iv/%s" % name for name in iv_names.split() ] )
+  iv_files = " " + " ".join( ["src/iv/%s" % name for name in iv_names.split() ] )
 
   # Optimizer flags (speed or size)
   comp.Append(CCFLAGS = ['-Os','-fomit-frame-pointer'])
