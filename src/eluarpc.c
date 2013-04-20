@@ -1,5 +1,7 @@
 // eLua RPC mechanism
 
+#ifdef ALCOR_LANG_LUA
+
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -357,3 +359,5 @@ int eluarpc_gen_read( const u8 *p, const char *fmt, ... )
   eluarpc_match_packet_end( p );  
   return eluarpc_err_flag;
 }
+
+#endif // ALCOR_LANG_LUA
