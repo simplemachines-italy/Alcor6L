@@ -7,7 +7,7 @@
 #ifdef ALCOR_LANG_PICOC
 # include "picoc_mod.h"
 #else
-# include "auxmod.h"
+# include "auxmods.h"
 # include "elua_int.h"
 #endif
 
