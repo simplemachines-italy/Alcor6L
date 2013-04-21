@@ -26,7 +26,218 @@
 // ****************************************************************************
 // ADC (Analog to digital converter) module for PicoC.
 
-// In progress.
+// PicoC: data = adc_maxval(id);
+static void adc_maxval(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  u32 res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+  res = platform_adc_get_maxval(id);
+  
+  r->Val->UnsignedInteger = res;
+}
+
+// PicoC: realclock = adc_setclock(id, freq, timer_id);
+static void adc_setclock(pstate *p, val *r, val **param, int n)
+{
+  s32 sfreq; // signed version for negative checking
+  u32 freq;
+  unsigned id, timer_id = 0;
+  
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+  sfreq = param[1]->Val->LongInteger;
+  if (sfreq < 0)
+    return pmod_error("frequency must be 0 or positive");
+  freq = (u32) sfreq;
+  if (freq > 0) {
+    timer_id = param[2]->Val->UnsignedInteger;
+    MOD_CHECK_ID(timer, timer_id);
+    MOD_CHECK_RES_ID(adc, id, timer, timer_id);
+  }
+  
+  platform_adc_set_timer(id, timer_id);
+  freq = platform_adc_set_clock(id, freq);
+  r->Val->UnsignedInteger = freq;
+}
+
+// PicoC: data = adc_isdone(id);
+static void adc_isdone(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+  r->Val->UnsignedInteger = platform_adc_is_done(id);
+}
+
+// PicoC: adc_setblocking(id, mode);
+static void adc_setblocking(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, mode;
+  
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+  mode = param[1]->Val->UnsignedInteger;
+  platform_adc_set_blocking(id, mode);
+}
+
+// PicoC: adc_setsmoothing(id, length);
+static void adc_setsmoothing(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, length, res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+
+  length = param[1]->Val->UnsignedInteger;
+  if (!(length & (length - 1))) {
+    res = platform_adc_set_smoothing(id, length);
+    if (res == PLATFORM_ERR)
+      return pmod_error("Buffer allocation failed.");
+    else
+      return;
+  } else {
+    return pmod_error("Length must be power of 2");
+  }
+}
+
+// PicoC: adc_sample(id, count);
+// In PicoC, you could write an array and
+// use an iteration to init and setup a
+// list of channels.
+static void adc_sample(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, count;
+  int res;
+
+  count = param[1]->Val->UnsignedInteger;
+  if ((count == 0) || count & (count - 1))
+    return pmod_error("count must be power of 2 and > 0");
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+      
+  res = adc_setup_channel(id, intlog2(count));
+  if (res != PLATFORM_OK)
+    return pmod_error("sampling setup failed");
+      
+  platform_adc_start_sequence();
+  r->Val->Integer = res;
+}
+
+// PicoC: val = adc_getsample(id);
+static void adc_getsample(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+  
+  // If we have at least one sample, return it
+  if (adc_wait_samples(id, 1) >= 1)
+    r->Val->Integer = adc_get_processed_sample(id);
+}
+
+#if defined (BUF_ENABLE_ADC)
+// PicoC: adc_getsamples(id, count, arr);
+// In PicoC, setup an array of integers of
+// size 'count'.
+static void adc_getsamples(pstate *p, val *r, val **param, int n)
+{
+  int id, i, *arr;
+  u16 bcnt, count = 0;
+  
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+  
+  count = (u16)param[1]->Val->UnsignedInteger;
+  arr = (int *)param[2]->Val->Pointer;
+
+  bcnt = adc_wait_samples(id, count);
+  
+  /* If count is zero, grab all samples */
+  if (count == 0)
+    count = bcnt;
+  
+  /* Don't pull more samples than are available */
+  if (count > bcnt)
+    count = bcnt;
+  
+  for (i = 0; i < count; i++)
+    arr[i] = adc_get_processed_sample(id);
+}
+
+// PicoC: adc_insertsamples(id, arr, idx, count);
+// Function parameters:
+// 1. id - ADC channel ID.
+// 2. arr - array to write samples to. Values at arr[idx]
+//    to arr[idx + count -1] will be overwritten with samples
+//    (or 0 if not enough samples are available).
+// 3. idx - first index to use in the array for writing
+//    samples.
+// 4. count - number of samples to return. If not enough
+//    samples are available (after blocking, if enabled)
+//    remaining values will be 0;
+static void adc_insertsamples(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, i, startidx;
+  int *arr;
+  u16 bcnt, count;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(adc, id);
+
+  arr = param[1]->Val->Pointer;
+
+  startidx = param[2]->Val->UnsignedInteger;
+  if (startidx < 0)
+     return pmod_error("idx must be >= 0");
+
+  count = param[3]->Val->UnsignedInteger;
+  if (count == 0)
+    return pmod_error("count must be > 0");
+  
+  bcnt = adc_wait_samples(id, count);
+
+  for (i = startidx; i < (count + startidx); i++) {
+    if (i < bcnt + startidx)
+      arr[i] = adc_get_processed_sample(id);
+    else
+      // zero-out values where we don't have enough samples
+      arr[i] = 0;
+  }
+}
+
+#endif // #if defined (BUF_ENABLE_ADC)
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE adc_library[] = {
+  {FUNC(adc_maxval), PROTO("unsigned int adc_maxval(void);")},
+  {FUNC(adc_setclock), PROTO("unsigned int adc_setclock(unsigned int, long, unsigned int);")},
+  {FUNC(adc_isdone), PROTO("unsigned int adc_isdone(unsigned int);")},
+  {FUNC(adc_setblocking), PROTO("void adc_setblocking(unsigned int, unsigned int);")},
+  {FUNC(adc_setsmoothing), PROTO("void adc_setsmoothing(void);")},
+  {FUNC(adc_sample), PROTO("int adc_sample(unsigned int, unsigned int);")},
+  {FUNC(adc_getsample), PROTO("int adc_getsample(unsigned int);")},
+#if defined (BUF_ENABLE_ADC)
+  {FUNC(adc_getsamples), PROTO("void adc_getsamples(int, unsigned int, int *);")},
+  {FUNC(adc_insertsamples), PROTO("void adc_insertsamples(unsigned int,\
+                                   int *, unsigned int, unsigned int);")},
+#endif
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void adc_library_init(void)
+{
+  REGISTER("adc.h", NULL, &adc_library[0]);
+}
 
 #else
 
