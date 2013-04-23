@@ -293,7 +293,7 @@ static int pio_mt_index( lua_State* L )
       if( sscanf( key + 3, "%d%n", &pin, &sz ) != 1 || sz != strlen( key ) - 3 )
         return 0;      
 
-#ifdef ELUA_PLATFORM_AVR32
+#ifdef ALCOR_PLATFORM_AVR32
       /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
        * random areas of hardware ports 2 and 3:
        * PX00-PX10 = GPIO100-GPIO90     //Port 3 pins 04-00; port 2 pins 31-26
@@ -382,7 +382,7 @@ static int pio_decode( lua_State *L )
   int port = PLATFORM_IO_GET_PORT( code );
   int pin  = PLATFORM_IO_GET_PIN( code );
 
-#ifdef ELUA_PLATFORM_AVR32
+#ifdef ALCOR_PLATFORM_AVR32
   /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
    * random areas of hardware ports 2 and 3:
    * PX00-PX04 = GPIO100-GPIO96     //Port 3 pins 04-00
