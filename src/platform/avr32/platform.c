@@ -223,7 +223,7 @@ int platform_init()
   platform_ethernet_setup();
 #endif
 
-#ifdef ELUA_BOARD_MIZAR32
+#ifdef ALCOR_BOARD_MIZAR32
   // If BUF_ENABLE_UART is enabled on Mizar32 (which it is by default) but the
   // serial board is not plugged in, we get an infinite number of interrupts
   // due to the RX pin picking up electrical noise and crashing the board.
