@@ -422,9 +422,9 @@ if not GetOption( 'help' ):
   if comp['target'] != 'lualong' and comp['target'] != 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_PACK_VALUE'])
   if platform_list[platform]['big_endian']:
-    conf.env.Append(CPPDEFINES = ['ALCOR_ENDIAN_BIG'])
+    conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_BIG'])
   else:
-    conf.env.Append(CPPDEFINES = ['ALCOR_ENDIAN_LITTLE'])
+    conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_LITTLE'])
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
 
   # Tiny RAM optimizations.
