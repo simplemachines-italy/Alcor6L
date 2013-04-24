@@ -33,6 +33,13 @@
 // Shell data
 char* shell_prog;
 
+// Language specific shell functions.
+#ifdef ALCOR_LANG_PICOC
+SHELL_FUNC( shell_picoc );
+#else
+SHELL_FUNC( shell_lua );
+#endif
+
 // Extern implementations of shell functions
 SHELL_FUNC( shell_ls );
 SHELL_FUNC( shell_cp );
@@ -45,13 +52,6 @@ SHELL_FUNC( shell_ver );
 SHELL_FUNC( shell_mkdir );
 SHELL_FUNC( shell_wofmt );
 SHELL_FUNC( shell_iv );
-
-// Language specific shell functions.
-#ifdef ALCOR_LANG_PICOC
-SHELL_FUNC( shell_picoc );
-#else
-SHELL_FUNC( shell_lua );
-#endif
 
 // ----------------------------------------------------------------------------
 // Helpers
