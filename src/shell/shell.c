@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include "common.h"
+#include "eluarpc.h"
 
 #include "platform_conf.h"
 #ifdef BUILD_SHELL
