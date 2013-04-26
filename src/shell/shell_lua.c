@@ -1,5 +1,7 @@
 // Shell: 'lua' implementation
 
+#ifdef ALCOR_LANG_LUA
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,3 +36,4 @@ void shell_lua( int argc, char **argv )
   clearerr( stdin );
 }
 
+#endif // #ifdef ALCOR_LANG_LUA

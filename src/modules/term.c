@@ -1,14 +1,232 @@
 // Module for interfacing with terminal functions
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
 #include "term.h"
-#include "platform_conf.h"
-#include "lrotable.h"
 #include <string.h>
+#include "platform_conf.h"
+
+#if defined (ALCOR_LANG_PICOC) && defined (BUILD_TERM)
+
+// ****************************************************************************
+// Terminal module for PicoC.
+
+// Platform variables
+const int no_wait = TERM_INPUT_DONT_WAIT;
+const int wait = TERM_INPUT_WAIT;
+
+// Library setup function
+extern void term_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_int("term_WAIT", wait);
+  picoc_def_int("term_NOWAIT", no_wait);
+#endif
+}
+
+// picoc: term_clrscr();
+static void pterm_clrscr(pstate *p, val *r, val **param, int n)
+{
+  term_clrscr();
+  r->Val->Integer = 0;
+}
+
+// picoc: term_clreol();
+static void pterm_clreol(pstate *p, val *r, val **param, int n)
+{
+  term_clreol();
+  r->Val->Integer = 0;
+}
+
+// picoc: term_moveto(x y);
+static void pterm_moveto(pstate *p, val *r, val **param, int n)
+{
+  unsigned x, y;
+  x = param[0]->Val->UnsignedInteger;
+  y = param[1]->Val->UnsignedInteger;
+
+  term_gotoxy(x, y);
+  r->Val->Integer = 0;
+}
+
+// picoc: term_moveup(lines);
+static void pterm_moveup(pstate *p, val *r, val **param, int n)
+{
+  unsigned delta;
+
+  delta = param[0]->Val->UnsignedInteger;
+  term_up(delta);
+  r->Val->Integer = 0;
+}
+
+// picoc: movedown(lines);
+static void pterm_movedown(pstate *p, val *r, val **param, int n)
+{
+  unsigned delta;
+  delta = param[0]->Val->UnsignedInteger;
+
+  term_down(delta);
+  r->Val->Integer = 0;
+}
+
+// picoc: term_moveleft(cols);
+static void pterm_moveleft(pstate *p, val *r, val **param, int n)
+{
+  unsigned delta;
+  delta = param[0]->Val->UnsignedInteger;
+
+  term_left(delta);
+  r->Val->Integer = 0;
+}
+
+// picoc: term_moveright(cols);
+static void pterm_moveright(pstate *p, val *r, val **param, int n)
+{
+  unsigned delta;
+  delta = param[0]->Val->UnsignedInteger;
+
+  term_right(delta);
+  r->Val->Integer = 0;
+}
+
+// picoc: lines = term_getlines();
+static void pterm_getlines(pstate *p, val *r, val **param, int n)
+{
+  r->Val->UnsignedInteger = term_get_lines();
+}
+
+// picoc: columns = term_getcols();
+static void pterm_getcols(pstate *p, val *r, val **param, int n)
+{
+  r->Val->UnsignedInteger = term_get_cols();
+}
+
+// picoc: term_puts(x, y, string);
+static void pterm_puts(pstate *p, val *r, val **param, int n)
+{
+  const char *buf = param[2]->Val->Identifier;
+  size_t len = strlen(buf), i;
+
+  term_gotoxy(param[0]->Val->UnsignedInteger,
+              param[1]->Val->UnsignedInteger);
+
+  for (i = 0; i < len; i++)
+    term_putch(buf[i]);
+
+  r->Val->UnsignedInteger = len;
+}
+
+// picoc: term_putch(ch);
+static void pterm_putch(pstate *p, val *r, val **param, int n)
+{
+  term_putch(param[0]->Val->Character);
+  r->Val->UnsignedInteger = 1;
+}
+
+// picoc: cursorx = term_getcx();
+static void pterm_getcx(pstate *p, val *r, val **param, int n)
+{
+  r->Val->UnsignedInteger = term_get_cx();
+}
+
+// picoc: cursory = term_getcy();
+static void pterm_getcy(pstate *p, val *r, val **param, int n)
+{
+  r->Val->UnsignedInteger = term_get_cy();
+}
+
+// picoc: key = term_getchar([mode]);
+static void pterm_getchar(pstate *p, val *r, val **param, int n)
+{
+  int temp = TERM_INPUT_WAIT, res;
+
+  temp = param[0]->Val->Integer;
+  res = term_getch(temp);
+  if (!res) {
+    r->Val->Integer = -1;
+    return;
+  }
+  r->Val->Integer = res;
+}
+
+#undef _D
+#define _D(x) #x
+static const char* term_key_names[] = {TERM_KEYCODES};
+
+// Look for all KC_xxxx codes
+// picoc: term_decode(str);
+static void pterm_decode(pstate *p, val *r, val **param, int n)
+{
+  const char *key = param[0]->Val->Identifier;
+  unsigned i, total = sizeof(term_key_names) / sizeof(char*);
+
+  if (!key || *key != 'K') {
+    r->Val->Integer = -1;
+    return pmod_error("Invalid key.");
+  }
+  for (i = 0; i < total; i++)
+    if (!strcmp(key, term_key_names[i]))
+      break;
+  if (i == total)
+    r->Val->Integer = 0;
+  else
+    r->Val->Integer = i + TERM_FIRST_KEY;
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE term_variables[] = {
+  {STRKEY("term_WAIT"), INT(wait)},
+  {STRKEY("term_NOWAIT"), INT(no_wait)},
+  {NILKEY, NILVAL}
+};
+#endif
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE term_library[] = {
+  {FUNC(pterm_clrscr), PROTO("int term_clrscr(void);")},
+  {FUNC(pterm_clreol), PROTO("int term_clreol(void);")},
+  {FUNC(pterm_moveto), PROTO("int term_moveto(unsigned int, unsigned int);")},
+  {FUNC(pterm_moveup), PROTO("int term_moveup(unsigned int);")},
+  {FUNC(pterm_movedown), PROTO("int term_movedown(unsigned int);")},
+  {FUNC(pterm_moveleft), PROTO("int term_moveleft(unsigned int);")},
+  {FUNC(pterm_moveright), PROTO("int term_moveright(unsigned int);")},
+  {FUNC(pterm_getlines), PROTO("unsigned int term_getlines(void);")},
+  {FUNC(pterm_getcols), PROTO("unsigned int term_getcols(void);")},
+  {FUNC(pterm_puts), PROTO("unsigned int term_puts(unsigned int, unsigned int, char *);")},
+  {FUNC(pterm_putch), PROTO("unsigned int term_putch(char);")},
+  {FUNC(pterm_getcx), PROTO("unsigned int term_getcx(void);")},
+  {FUNC(pterm_getcy), PROTO("unsigned int term_getcy(void);")},
+  {FUNC(pterm_getchar), PROTO("int term_getchar(int);")},
+  {FUNC(pterm_decode), PROTO("int term_decode(char *);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void term_library_init(void)
+{
+  REGISTER("term.h", &term_lib_setup_func, &term_library[0]);
+}
+
+#else
+
+// ****************************************************************************
+// Terminal module for Lua.
 
 // Lua: clrscr()
 static int luaterm_clrscr( lua_State* L )
@@ -220,3 +438,4 @@ LUALIB_API int luaopen_term( lua_State* L )
 #endif // #ifdef BUILD_TERM  
 }
 
+#endif // #ifdef ALCOR_LANG_PICOC

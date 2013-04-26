@@ -11,7 +11,7 @@ def cnorm( name ):
 def gen_header( name, defines ):
   hname = os.path.join( os.getcwd(), "inc", name.lower() + ".h" )
   h = open( hname, "w" )
-  h.write("// eLua " + name + " definition\n\n")
+  h.write("// Alcor6L " + name + " definition\n\n")
   h.write("#ifndef __" + name.upper() + "_H__\n")
   h.write("#define __" + name.upper() + "_H__\n\n")
 
@@ -175,10 +175,6 @@ vars.AddVariables(
                     'Build for bootloader usage, default is none.',
                     'none',
                     allowed_values = [ 'none', 'emblod' ] ),
-  MatchEnumVariable('target',
-                    'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
-                    'lua',
-                    allowed_values = [ 'lua', 'lualong', 'lualonglong' ] ),
   MatchEnumVariable('cpu',
                     'build for the specified CPU (board will be inferred, if possible)',
                     'auto',
@@ -195,18 +191,48 @@ vars.AddVariables(
                     'specifies toolchain to use (auto=search for usable toolchain)',
                     'auto',
                     allowed_values=toolchain_list.keys() + [ 'auto' ] ),
+  MatchEnumVariable('lang',
+                    'Build Alcor6L with support for the specified language',
+                    'lua',
+                    allowed_values=[ 'lua', 'picoc' ] ),
   BoolVariable(     'optram',
-                    'enables Lua Tiny RAM enhancements',
+                    'enables Tiny RAM enhancements',
                     True ),
-  MatchEnumVariable('boot',
-                    'boot mode, standard will boot to shell, luarpc boots to an rpc server',
-                    'standard',
-                    allowed_values=[ 'standard' , 'luarpc' ] ),
   MatchEnumVariable('romfs',
                     'ROMFS compilation mode',
                     'verbatim',
                     allowed_values=[ 'verbatim' , 'compress', 'compile' ] ) )
 
+vars.Update(comp)
+
+# Target config variables.
+if comp['lang'] == 'picoc':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float picoc or integer-only',
+                      'fp',
+                      allowed_values = [ 'fp', 'nofp' ] ) )
+else:
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
+                      'lua',
+                      allowed_values = [ 'lua', 'lualong', 'lualonglong' ] ) )
+
+# Boot config variables.
+# For picoc, the only boot option for now is 'standard'
+if comp['lang'] == 'picoc':
+  vars.AddVariables(
+    MatchEnumVariable('boot',
+                      'boot mode, standard will boot to shell',
+                      'standard',
+                      allowed_values = [ 'standard' ] ) )
+else:
+  vars.AddVariables(
+    MatchEnumVariable('boot',
+                      'boot mode, standard will boot to shell, luarpc boots to an rpc server',
+                      'standard',
+                      allowed_values=[ 'standard' , 'luarpc' ] ) )
 
 vars.Update(comp)
 
@@ -321,12 +347,12 @@ if not GetOption( 'help' ):
     print "WARNING: unable to determine version from repository"
     elua_vers = "unknown"
 
-
   # User report
   if not GetOption( 'clean' ):
     print
     print "*********************************"
-    print "Compiling eLua ..."
+    print "Compiling Alcor6L ..."
+    print "Language        ", comp['lang']
     print "CPU:            ", comp['cpu']
     print "Board:          ", comp['board']
     print "Platform:       ", platform
@@ -339,27 +365,34 @@ if not GetOption( 'help' ):
     print "*********************************"
     print
 
-  output = 'elua_' + comp['target'] + '_' + comp['cpu'].lower()
+  output = 'alcor_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
 
-  comp.Append(CPPDEFINES = { 'ELUA_CPU' : comp['cpu'],
-                             'ELUA_BOARD' : comp['board'],
-                             'ELUA_PLATFORM' : platform.upper() } )
+  # Language specific defines.
+  if comp['lang'] == 'picoc':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOC'])
+  else:
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_LUA'])
+
+  # CPU, board and platform specific defines.
+  comp.Append(CPPDEFINES = { 'ALCOR_CPU' : comp['cpu'],
+                             'ALCOR_BOARD' : comp['board'],
+                             'ALCOR_PLATFORM' : platform.upper() } )
   comp.Append(CPPDEFINES = {'__BUFSIZ__' : 128})
 
   # Also make the above into direct defines (to use in conditional C code)
-  conf.env.Append(CPPDEFINES = ["ELUA_CPU_" + cnorm( comp['cpu'] ), "ELUA_BOARD_" + cnorm( comp['board'] ), "ELUA_PLATFORM_" +  cnorm( platform )])
+  conf.env.Append(CPPDEFINES = ["ALCOR_CPU_" + cnorm( comp['cpu'] ), "ALCOR_BOARD_" + cnorm( comp['board'] ), "ALCOR_PLATFORM_" +  cnorm( platform )])
 
   if comp['allocator'] == 'multiple':
      conf.env.Append(CPPDEFINES = ['USE_MULTIPLE_ALLOCATOR'])
   elif comp['allocator'] == 'simple':
      conf.env.Append(CPPDEFINES = ['USE_SIMPLE_ALLOCATOR'])
 
-  if comp['boot'] == 'luarpc':
+  if comp['boot'] == 'luarpc' and comp['lang'] == 'lua':
     conf.env.Append(CPPDEFINES = ['ELUA_BOOT_RPC'])
 
   # Special macro definitions for the SYM target
   if platform == 'sim':
-    conf.env.Append(CPPDEFINES = ['ELUA_SIMULATOR',"ELUA_SIM_" + cnorm( comp['cpu'] ) ] )
+    conf.env.Append(CPPDEFINES = ['ALCOR_SIMULATOR',"ALCOR_SIM_" + cnorm( comp['cpu'] ) ] )
 
   # Lua source files and include path
   lua_files = """lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c
@@ -368,7 +401,20 @@ if not GetOption( 'help' ):
 
   lua_full_files = " " + " ".join( [ "src/lua/%s" % name for name in lua_files.split() ] )
 
-  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform', 'src/lua'])
+  # PicoC source files and include path
+  picoc_files = """picoc.c table.c lex.c parse.c expression.c heap.c type.c variable.c platform.c clibrary.c include.c
+    cstdlib/stdio.c cstdlib/math.c cstdlib/string.c cstdlib/stdlib.c cstdlib/errno.c cstdlib/ctype.c
+    cstdlib/stdbool.c platform/platform_unix.c platform/library_unix.c rotable.c"""
+
+  picoc_full_files = " " + " ".join( [ "src/picoc/%s" % name for name in picoc_files.split() ] )
+
+  comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
+  if comp['lang'] == 'picoc':
+    comp.Append(CPPPATH = ['src/picoc'])
+  else:
+    comp.Append(CPPPATH = ['src/lua'])
+
+  comp.Append(CPPPATH = [ 'src/iv' ])
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
@@ -380,7 +426,15 @@ if not GetOption( 'help' ):
   else:
     conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_LITTLE'])
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
-  conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+
+  # Tiny RAM optimizations.
+  if comp['lang'] == 'picoc':
+    conf.env.Append(CPPDEFINES = {"PICOC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+    if comp['optram'] == 0:
+      conf.env.Append(CPPDEFINES = ['BUILTIN_MINI_STDLIB'])
+      conf.env.Append(CPPDEFINES = ['PICOC_LIBRARY'])
+  else:
+    conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
 
   # Additional libraries
   local_libs = ''
@@ -388,7 +442,7 @@ if not GetOption( 'help' ):
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c
@@ -406,13 +460,17 @@ if not GetOption( 'help' ):
   app_files = app_files + "src/elua_mmc.c src/mmcfs.c src/fatfs/ff.c src/fatfs/ccsbcs.c "
   comp.Append(CPPPATH = ['src/fatfs'])
 
-  # Lua module files
+  # Alcor6L module files
   module_names = "pio.c spi.c tmr.c pd.c uart.c term.c pwm.c lpack.c bit.c net.c cpu.c adc.c can.c luarpc.c bitarray.c elua.c i2c.c"
   module_files = " " + " ".join( [ "src/modules/%s" % name for name in module_names.split() ] )
 
   # Remote file system files
   rfs_names = "remotefs.c client.c elua_os_io.c elua_rfs.c"
   rfs_files = " " + " ".join( [ "src/remotefs/%s" % name for name in rfs_names.split() ] )
+
+  # iv editor files.
+  iv_names = "iv.c"
+  iv_files = " " + " ".join( ["src/iv/%s" % name for name in iv_names.split() ] )
 
   # Optimizer flags (speed or size)
   comp.Append(CCFLAGS = ['-Os','-fomit-frame-pointer'])
@@ -426,7 +484,13 @@ if not GetOption( 'help' ):
   execfile( "src/platform/%s/conf.py" % platform )
 
   # Complete file list
-  source_files = Split( app_files + specific_files + newlib_files + uip_files + lua_full_files + module_files + rfs_files + shell_files )
+  source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
+
+  # Language specific files.
+  if comp['lang'] == 'picoc':
+    source_files += Split( picoc_full_files )
+  else:
+    source_files += Split( lua_full_files )
 
   comp = conf.Finish()
 

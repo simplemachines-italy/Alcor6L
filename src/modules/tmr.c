@@ -1,13 +1,22 @@
 // Module for interfacing with timers
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
 #include "platform_conf.h"
 #include "common.h"
-#include "lrotable.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +27,18 @@
 #if defined( BUILD_LUA_INT_HANDLERS ) && defined( INT_TMR_MATCH )
 #define HAS_TMR_MATCH_INT
 #endif
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// Timer module for PicoC.
+
+// TODO:
+
+#else
+
+// ****************************************************************************
+// Timer module for Lua.
 
 // Helper function for the read/start functions
 static int tmrh_timer_op( lua_State* L, int op )
@@ -234,3 +255,5 @@ LUALIB_API int luaopen_tmr( lua_State *L )
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

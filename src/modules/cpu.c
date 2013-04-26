@@ -1,15 +1,160 @@
 // Module for interfacing with CPU
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-#include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include <string.h> 
+#include "platform.h"
 
-#define _C( x ) { #x, x }
+#undef _C
+#define _C(x) {#x, x}
 #include "platform_conf.h"
+
+// CPU constants list
+typedef struct
+{
+  const char* name;
+  u32 val;
+} cpu_const_t;
+
+#ifdef PLATFORM_CPU_CONSTANTS
+static const cpu_const_t cpu_constants[] = 
+{
+  PLATFORM_CPU_CONSTANTS,
+  { NULL, 0 }
+};
+#endif
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// CPU module for PicoC.
+
+// PicoC: cpu_w32(address, data);
+static void cpu_w32(pstate *p, val *r, val **param, int n)
+{
+  u32 addr, data;
+ 
+  addr = param[0]->Val->UnsignedInteger;
+  data = param[1]->Val->UnsignedInteger;
+  *(u32 *)addr = data;
+}
+
+// PicoC: data = cpu_r32(address);
+static void cpu_r32(pstate *p, val *r, val **param, int n)
+{
+  u32 addr;
+  
+  addr = param[0]->Val->UnsignedInteger;
+  r->Val->UnsignedInteger = *(u32 *)addr;
+}
+
+// PicoC: cpu_w16(address, data);
+static void cpu_w16(pstate *p, val *r, val **param, int n)
+{
+  u32 addr = param[0]->Val->UnsignedInteger;
+  u16 data = param[1]->Val->UnsignedShortInteger;
+  *(u16 *)addr = data;
+}
+
+// PicoC: data = cpu_r16(address);
+static void cpu_r16(pstate *p, val *r, val **param, int n)
+{
+  u32 addr;
+
+  addr = param[0]->Val->UnsignedInteger;
+  r->Val->UnsignedShortInteger = *(u16 *)addr;
+}
+
+// PicoC: cpu_w8(address, data);
+static void cpu_w8(pstate *p, val *r, val **param, int n)
+{
+  u32 addr;
+  u8 data = param[1]->Val->Character;
+  
+  addr = param[0]->Val->UnsignedInteger;
+  *(u8 *)addr = data;
+}
+
+// PicoC: data = cpu_r8(address);
+static void cpu_r8(pstate *p, val *r, val **param, int n)
+{
+  u32 addr;
+  
+  addr = param[0]->Val->UnsignedInteger;
+  r->Val->Character = *(u8 *)addr;
+}
+
+// PicoC: cpu_clock();
+static void cpu_clock(pstate *p, val *r, val **param, int n)
+{
+  r->Val->UnsignedInteger = platform_cpu_get_frequency();
+}
+
+#ifdef PLATFORM_CPU_CONSTANTS
+
+// Returns the interrupt assignment values.
+// For use in future when interrupts are
+// supported.
+static int cpu_const_h(char *key)
+{
+  unsigned i = 0;
+  while (cpu_constants[i].name != NULL) {
+    if (!strcmp(cpu_constants[i].name, key))
+      return cpu_constants[i].val;
+    i++;
+  }
+  return -1;
+}
+
+// PicoC: val = cpu_const_getval(str);
+static void cpu_const_getval(pstate *p, val *r, val **param, int n)
+{
+  r->Val->Integer =
+    cpu_const_h(param[0]->Val->Identifier);
+}
+
+#endif // #ifdef PLATFORM_CPU_CONSTANTS
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE cpu_library[] = {
+  {FUNC(cpu_w32), PROTO("void cpu_w32(unsigned int, unsigned int);")},
+  {FUNC(cpu_r32), PROTO("unsigned int cpu_r32(unsigned int);")},
+  {FUNC(cpu_w16), PROTO("void cpu_w16(unsigned int, unsigned short);")},
+  {FUNC(cpu_r16), PROTO("unsigned short cpu_r16(unsigned int);")},
+  {FUNC(cpu_w8), PROTO("void cpu_w8(unsigned int, char);")},
+  {FUNC(cpu_r8), PROTO("char cpu_r8(unsigned int);")},
+  {FUNC(cpu_clock), PROTO("unsigned int cpu_clock(void);")},
+#ifdef PLATFORM_CPU_CONSTANTS
+  {FUNC(cpu_const_getval), PROTO("int cpu_const_getval(char *);")},
+#endif
+  {NILFUNC, NILPROTO}
+};
+
+// Init library. 
+extern void cpu_library_init(void)
+{
+  REGISTER("cpu.h", NULL, &cpu_library[0]);
+}
+
+#else
+
+// **************************************************************************** 
+// CPU module for Lua.
 
 // Lua: w32( address, data )
 static int cpu_w32( lua_State *L )
@@ -136,20 +281,7 @@ static int cpu_clock( lua_State *L )
   return 1;
 }
 
-// CPU constants list
-typedef struct
-{
-  const char* name;
-  u32 val;
-} cpu_const_t;
-
 #ifdef PLATFORM_CPU_CONSTANTS
-static const cpu_const_t cpu_constants[] = 
-{
-  PLATFORM_CPU_CONSTANTS,
-  { NULL, 0 }
-};
-
 static int cpu_mt_index( lua_State *L )
 {
   const char *key = luaL_checkstring( L, 2 );
@@ -290,3 +422,5 @@ LUALIB_API int luaopen_cpu( lua_State *L )
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

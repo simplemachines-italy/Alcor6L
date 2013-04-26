@@ -16,9 +16,14 @@
 #include "xmodem.h"
 #include "elua_int.h"
 #include "sermux.h"
-#include "lua.h"
-#include "lapi.h"
-#include "lauxlib.h"
+
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+#else
+# include "lua.h"
+# include "lapi.h"
+# include "lauxlib.h"
+#endif
 
 // [TODO] the new builder should automatically do this
 #if defined( BUILD_LUA_INT_HANDLERS ) || defined( BUILD_C_INT_HANDLERS )
@@ -616,6 +621,9 @@ const char* cmn_str64( u64 x )
 // If timeout is PLATFORM_TIMER_INF_TIMEOUT -> also infinite timeout (independent of timer_id)
 // If both are specified -> wait the specified timeout on the specified timer_id
 // If timer_id is 'nil' the system timer will be used
+
+#ifdef ALCOR_LANG_LUA
+
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout )
 {
   lua_Number tempn;
@@ -633,3 +641,4 @@ void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_typ
     luaL_error( L, "the system timer is not implemented on this platform" );
 }
 
+#endif

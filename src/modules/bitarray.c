@@ -1,5 +1,7 @@
   // Module that implements a fixed size bit array
 
+#ifdef ALCOR_LANG_LUA
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -331,3 +333,5 @@ LUALIB_API int luaopen_bitarray( lua_State* L )
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
+
+#endif // #ifdef ALCOR_LANG_LUA

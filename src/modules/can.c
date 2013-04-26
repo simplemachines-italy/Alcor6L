@@ -1,9 +1,115 @@
 // Module for interfacing Lua code with a Controller Area Network (CAN)
 
+#include "platform.h"
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// CAN for PicoC.
+
+#include "interpreter.h"
+#include "picoc_mod.h"
+#include "rotable.h"
+
+// Platform variables
+const int id_std = ALCOR_CAN_ID_STD;
+const int id_ext = ALCOR_CAN_ID_EXT;
+
+// Library setup function */
+extern void can_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_tinyram_off("can_ID_STD", id_std);
+  picoc_tinyram_off("can_ID_EXT", id_ext);
+#endif
+}
+
+// picoc: can_setup(id, clock);
+static void can_setup(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  u32 clock, res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(can, id);
+  clock = param[1]->Val->UnsignedInteger;
+  res = platform_can_setup(id, clock);
+
+  r->Val->UnsignedInteger = res;
+}
+
+// picoc: can_send(id, canid, canidtype, message);
+static void can_send(pstate *p, val *r, val **param, int n)
+{
+  size_t len;
+  int id, canid, idtype;
+  const char *data;
+
+  id = param[0]->Val->Integer;
+  MOD_CHECK_ID(can, id);
+  canid = param[1]->Val->Integer;
+  idtype = param[2]->Val->Integer;
+  data = param[3]->Val->Identifier;
+  len = strlen(data);
+
+  if (len > PLATFORM_CAN_MAXLEN)
+    return pmod_error("message exceeds max length");
+
+  platform_can_send(id, canid, idtype, len, (const u8 *)data);
+  r->Val->Integer = len;
+}
+
+// picoc: can_recv(id, &message);
+static void can_recv(pstate *p, val *r, val **param, int n)
+{
+  u8 len, idtype, data[8];
+  int id;
+  u32 canid;
+
+  id = param[0]->Val->Integer;
+  MOD_CHECK_ID(can, id);
+
+  if (platform_can_recv(id, &canid, &idtype, &len, data) == PLATFORM_OK) {
+    param[1]->Val->Identifier = data;
+    r->Val->Integer = len;
+  } else {
+    r->Val->Integer = -1;
+  }
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE can_variables[] = {
+  {STRKEY("can_ID_STD"), INT(id_std)},
+  {STRKEY("can_ID_EXT"), INT(id_ext)},
+  {NILKEY, NILVAL}
+};
+#endif
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE can_library[] = {
+  {FUNC(can_setup), PROTO("unsigned int can_setup(unsigned int, unsigned int);")},
+  {FUNC(can_send), PROTO("int can_send(int, int, int, char *);")},
+  {FUNC(can_recv), PROTO("int can_recv(int, char *);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void can_library_init(void)
+{
+  REGISTER("can.h", &can_lib_setup_func, &can_library[0]);
+}
+
+#else
+
+// ****************************************************************************
+// CAN for PicoC.
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
-#include "platform.h"
 #include "auxmods.h"
 #include "lrotable.h"
 
@@ -74,8 +180,8 @@ const LUA_REG_TYPE can_map[] =
   { LSTRKEY( "send" ),  LFUNCVAL( can_send ) },  
   { LSTRKEY( "recv" ),  LFUNCVAL( can_recv ) },
 #if LUA_OPTIMIZE_MEMORY > 0
-  { LSTRKEY( "ID_STD" ), LNUMVAL( ELUA_CAN_ID_STD ) },
-  { LSTRKEY( "ID_EXT" ), LNUMVAL( ELUA_CAN_ID_EXT ) },
+  { LSTRKEY( "ID_STD" ), LNUMVAL( ALCOR_CAN_ID_STD ) },
+  { LSTRKEY( "ID_EXT" ), LNUMVAL( ALCOR_CAN_ID_EXT ) },
 #endif
   { LNILKEY, LNILVAL }
 };
@@ -88,9 +194,11 @@ LUALIB_API int luaopen_can( lua_State *L )
   luaL_register( L, AUXLIB_CAN, can_map );
   
   // Module constants  
-  MOD_REG_NUMBER( L, "ID_STD", ELUA_CAN_ID_STD );
-  MOD_REG_NUMBER( L, "ID_EXT", ELUA_CAN_ID_EXT );
+  MOD_REG_NUMBER( L, "ID_STD", ALCOR_CAN_ID_STD );
+  MOD_REG_NUMBER( L, "ID_EXT", ALCOR_CAN_ID_EXT );
   
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

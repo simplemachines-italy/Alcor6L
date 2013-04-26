@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,40 +9,58 @@
 #include "romfs.h"
 #include "xmodem.h"
 #include "shell.h"
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+
+// Language specific includes.
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+#else
+# include "lua.h"
+# include "lauxlib.h"
+# include "lualib.h"
+#endif
+
 #include "term.h"
 #include "platform_conf.h"
 #include "elua_rfs.h"
+
 #ifdef ELUA_SIMULATOR
 #include "hostif.h"
 #endif
 
-// Validate eLua configuratin options
+// Validate configuratin options
 #include "validate.h"
 
 #include "mmcfs.h"
 #include "romfs.h"
 #include "semifs.h"
 
-// Define here your autorun/boot files, 
+// Define here your autorun/boot files,
 // in the order you want eLua to search for them
 char *boot_order[] = {
-#if defined(BUILD_MMCFS)
+#if defined (BUILD_MMCFS)
+#ifdef ALCOR_LANG_PICOC
+  "/mmc/autorun.c",
+  "/mmc/autorun.pc",
+#else
   "/mmc/autorun.lua",
   "/mmc/autorun.lc",
 #endif
+#endif
 #if defined(BUILD_ROMFS)
+#ifdef ALCOR_LANG_PICOC
+  "/rom/autorun.c",
+  "/rom/autorun.pc",
+#else
   "/rom/autorun.lua",
   "/rom/autorun.lc",
+#endif
 #endif
 };
 
 extern char etext[];
 
 
-#ifdef ELUA_BOOT_RPC
+#if defined (ELUA_BOOT_RPC) && defined (ALCOR_LANG_LUA)
 
 #ifndef RPC_UART_ID
   #define RPC_UART_ID     CON_UART_ID
@@ -108,26 +127,36 @@ int main( void )
     if( ( fp = fopen( boot_order[ i ], "r" ) ) != NULL )
     {
       fclose( fp );
+#ifdef ALCOR_LANG_PICOC
+      char* picoc_argv[] = { "picoc", boot_order[i], NULL };
+      picoc_main( 2, picoc_argv );
+#else
       char* lua_argv[] = { "lua", boot_order[i], NULL };
       lua_main( 2, lua_argv );
+#endif
       break; // autoruns only the first found
     }
   }
 
-#ifdef ELUA_BOOT_RPC
+#if defined (ELUA_BOOT_RPC) && defined (ALCOR_LANG_LUA)
   boot_rpc();
 #else
   
   // Run the shell
   if( shell_init() == 0 )
   {
+#ifdef ALCOR_LANG_PICOC
+    char* picoc_argv[] = { "picoc", NULL };
+    picoc_main( 1, picoc_argv );
+#else
     // Start Lua directly
     char* lua_argv[] = { "lua", NULL };
     lua_main( 1, lua_argv );
+#endif
   }
   else
     shell_start();
-#endif // #ifdef ELUA_BOOT_RPC
+#endif // #if defined (ELUA_BOOT_RPC) && defined (ALCOR_LANG_LUA)
 
 #ifdef ELUA_SIMULATOR
   hostif_exit(0);

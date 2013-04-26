@@ -1,12 +1,21 @@
 // Interface with core services
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+# include "legc.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
-#include "legc.h"
 #include "platform_conf.h"
 #include "linenoise.h"
 #include "shell.h"
@@ -18,6 +27,74 @@
 #else
 #include "version.h"
 #endif
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// eLua core module for PicoC.
+
+//PicoC: elua_version();
+static void elua_version(pstate *p, val *r, val **param, int n)
+{
+  r->Val->Identifier = ELUA_STR_VERSION;
+}
+
+// PicoC: elua_save_history(fname);
+static void elua_save_history(pstate *p, val *r, val **param, int n)
+{
+#ifdef BUILD_LINENOISE
+  const char *fname = param[0]->Val->Identifier;
+  
+  res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
+  if (res == 0)
+    printf("History saved to %s.\n", fname);
+  else if (res == LINENOISE_HISTORY_NOT_ENABLED)
+    printf( "linenoise not enabled for Lua.\n" );
+  else if (res == LINENOISE_HISTORY_EMPTY)
+    printf("History empty, nothing to save.\n");
+  else
+    printf("Unable to save history to %s.\n", fname);
+#else
+  return pmod_error("linenoise support not enabled.");
+#endif
+}
+
+// PicoC: elua_shell(shell_command);
+static void elua_shell(pstate *p, val *r, val **param , int n)
+{
+  const char *pcmd = param[0]->Val->Identifier;
+  char *cmdcpy;
+
+  // "+2" below comes from the string terminator (+1) and the '\n'
+  // that will be added by the shell code (+1)
+  if ((cmdcpy = (char *)malloc(strlen(pcmd) + 2)) == NULL)
+    return pmod_error("not enough memory for elua_shell");
+  strcpy(cmdcpy, pcmd);
+  shellh_execute_command(cmdcpy, 0);
+  free(cmdcpy);
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE elua_library[] = {
+  {FUNC(elua_version), PROTO("char *elua_version(void);")},
+  {FUNC(elua_save_history), PROTO("void elua_save_history(char *);")},
+  {FUNC(elua_shell), PROTO("void elua_shell(char *);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void elua_library_init(void)
+{
+  REGISTER("elua.h", NULL, &elua_library[0]);
+}
+
+#else
+
+// ****************************************************************************
+// eLua core module for Lua.
 
 // Lua: elua.egc_setup( mode, [ memlimit ] )
 static int elua_egc_setup( lua_State *L )
@@ -108,3 +185,5 @@ LUALIB_API int luaopen_elua( lua_State *L )
   return 1;
 #endif
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC

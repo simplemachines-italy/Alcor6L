@@ -1,11 +1,20 @@
 // Module for interfacing with UART
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "lrotable.h"
 #include "common.h"
 #include "sermux.h"
 #include <string.h>
@@ -23,6 +32,18 @@ enum
 };
 
 #define UART_INFINITE_TIMEOUT PLATFORM_TIMER_INF_TIMEOUT
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// UART module for PicoC.
+
+// TODO:
+
+#else
+
+// ****************************************************************************
+// RTC module for Lua.
 
 // Helper function, the same as cmn_get_timeout_data() but with the
 // parameters in the order required by the uart module.
@@ -297,3 +318,4 @@ LUALIB_API int luaopen_uart( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
+#endif // #ifdef ALCOR_LANG_PICOC

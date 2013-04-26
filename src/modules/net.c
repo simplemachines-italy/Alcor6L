@@ -1,18 +1,44 @@
 // Module for interfacing with network functions (elua_net.h)
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "auxmods.h"
+# include "lrotable.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
 #include "elua_net.h"
 #include "common.h"
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
-#include "lrotable.h"
 
 #include "platform_conf.h"
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// Net module for PicoC.
+
+#ifdef BUILD_UIP
+
+#else
+
+#endif
+
+#else
+
+// ****************************************************************************
+// Net module for Lua.
+
 #ifdef BUILD_UIP
 
 // Lua: sock, remoteip, err = accept( port, [timer_id, timeout] )
@@ -236,3 +262,4 @@ LUALIB_API int luaopen_net( lua_State *L )
 
 #endif // #ifdef BUILD_UIP
 
+#endif // #ifdef ALCOR_LANG_PICOC

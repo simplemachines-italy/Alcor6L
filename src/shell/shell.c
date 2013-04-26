@@ -13,6 +13,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include "common.h"
+#include "eluarpc.h"
 
 #include "platform_conf.h"
 #ifdef BUILD_SHELL
@@ -33,6 +34,13 @@
 // Shell data
 char* shell_prog;
 
+// Language specific shell functions.
+#ifdef ALCOR_LANG_PICOC
+SHELL_FUNC( shell_picoc );
+#else
+SHELL_FUNC( shell_lua );
+#endif
+
 // Extern implementations of shell functions
 SHELL_FUNC( shell_ls );
 SHELL_FUNC( shell_cp );
@@ -41,10 +49,10 @@ SHELL_FUNC( shell_adv_rm );
 SHELL_FUNC( shell_recv );
 SHELL_FUNC( shell_help );
 SHELL_FUNC( shell_cat );
-SHELL_FUNC( shell_lua );
 SHELL_FUNC( shell_ver );
 SHELL_FUNC( shell_mkdir );
 SHELL_FUNC( shell_wofmt );
+SHELL_FUNC( shell_iv );
 
 // ----------------------------------------------------------------------------
 // Helpers
@@ -198,8 +206,12 @@ void shellh_show_help( const char *cmd, const char *helptext )
 // Insert shell commands here
 static const SHELL_COMMAND shell_commands[] =
 {
-  { "help", shell_help },
+#ifdef ALCOR_LANG_PICOC
+  { "picoc", shell_picoc },
+#else
   { "lua", shell_lua },
+#endif
+  { "help", shell_help },
   { "recv", shell_recv },
   { "ver", shell_ver },
   { "exit", NULL },
@@ -212,6 +224,7 @@ static const SHELL_COMMAND shell_commands[] =
   { "mkdir", shell_mkdir },
   { "rm", shell_adv_rm },
   { "mv", shell_adv_mv },
+  { "iv", shell_iv },
   { NULL, NULL }
 };
 
@@ -363,7 +376,9 @@ void shell_start()
 {
   char cmd[ SHELL_MAXSIZE + 1 ];
   const SHELL_COMMAND *pcmd;
+#ifdef BUILD_UIP
   int i;
+#endif
 
   printf( SHELL_WELCOMEMSG, ELUA_STR_VERSION );
   while( 1 )

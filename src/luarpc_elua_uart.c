@@ -1,3 +1,6 @@
+
+#ifdef ALCOR_LANG_LUA
+
 #include "lua.h"
 #include "lualib.h"
 #include "lauxlib.h"
@@ -177,3 +180,5 @@ void transport_close( Transport *tpt )
 }
 
 #endif
+
+#endif // #ifdef ALCOR_LANG_LUA

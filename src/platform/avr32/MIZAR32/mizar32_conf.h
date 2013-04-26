@@ -23,7 +23,7 @@
 //#define BUILD_RFS
 //#define BUILD_SERMUX
 
-#if defined( ELUA_CPU_AT32UC3A0128 )
+#if defined( ALCOR_CPU_AT32UC3A0128 )
   // Build options for 120KB image
 # define RAM_SIZE 0x8000
 #else
@@ -35,9 +35,17 @@
 # define BUILD_LCD
 # define BUILD_RTC
 # define BUILD_TERM
-# define BUILD_UIP
+// # define BUILD_UIP
+
+// Interrupt handler support
+#ifdef ALCOR_LANG_PICOC
+# define BUILD_PICOC_INT_HANDLERS
+#else
 # define BUILD_LUA_INT_HANDLERS
+#endif
+
 # define BUILD_USB_CDC
+# define BUILD_EDITOR_IV
 #endif
 
 #ifdef BUILD_UIP
@@ -96,6 +104,21 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// Language configurations: PicoC.
+
+// stack and heap config
+// values are set after experimentation. Needs validation.
+#define HEAP_SIZE             (48*1024)
+#define PICOC_STACK_SIZE      (42*1024)
+
+#else
+
+// ****************************************************************************
+// Language configurations: Lua.
+
 #if defined( ELUA_BOOT_RPC ) && !defined( BUILD_RPC )
 #define BUILD_RPC
 #endif
@@ -124,7 +147,7 @@
 #define PLATLINE
 #endif
 
-#if defined( ELUA_CPU_AT32UC3A0128 )
+#if defined( ALCOR_CPU_AT32UC3A0128 )
 
 // Minimal ROM modules, to fit in 120KB
 #define LUA_PLATFORM_LIBS_ROM\
@@ -155,6 +178,8 @@
   PLATLINE\
 
 #endif
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // *****************************************************************************
 // Configuration data
@@ -210,21 +235,21 @@
 #define AVR32_NUM_GPIO        110 // actually 109, but consider also PA31
 
 #ifdef BOOTLOADER_EMBLOD
-# define ELUA_FIRMWARE_SIZE 0x80000
+# define ALCOR_FIRMWARE_SIZE 0x80000
 #else
-# define ELUA_FIRMWARE_SIZE 0
+# define ALCOR_FIRMWARE_SIZE 0
 #endif
 
 // Allocator data: define your free memory zones here in two arrays
 // (start address and end address)
 #ifdef USE_MULTIPLE_ALLOCATOR
-#define MEM_START_ADDRESS     { ( void* )end, ( void* )( SDRAM + ELUA_FIRMWARE_SIZE ) }
+#define MEM_START_ADDRESS     { ( void* )end, ( void* )( SDRAM + ALCOR_FIRMWARE_SIZE ) }
 #define MEM_END_ADDRESS       { ( void* )( RAM_SIZE - STACK_SIZE_TOTAL - 1 ), ( void* )( SDRAM + SDRAM_SIZE - 1 ) }
 #else
 // Newlib<1.19.0 has a bug in their dlmalloc that corrupts memory when there
 // are multiple regions, and it appears that simple allocator also has problems.
 // So with these allocators, only use a single region - the slower 32MB one.
-#define MEM_START_ADDRESS     { ( void* )( SDRAM + ELUA_FIRMWARE_SIZE ) }
+#define MEM_START_ADDRESS     { ( void* )( SDRAM + ALCOR_FIRMWARE_SIZE ) }
 #define MEM_END_ADDRESS       { ( void* )( SDRAM + SDRAM_SIZE - 1 ) }
 #endif
 
