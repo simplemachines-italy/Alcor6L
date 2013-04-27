@@ -100,7 +100,7 @@ void cpu_library_init(void);
 
 #define MOD_CHECK_TIMER(id)\
   if (id == PLATFORM_TIMER_SYS_ID && !platform_timer_sys_available())\
-    return ProgramFail("the system timer is not available on this platform"); \
+    return ProgramFail(NULL, "the system timer is not available on this platform"); \
   if (!platform_timer_exists(id))\
     return ProgramFail(NULL, "timer %d does not exist", (unsigned)id)	\
 
