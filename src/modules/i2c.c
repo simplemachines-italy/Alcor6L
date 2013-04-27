@@ -33,10 +33,10 @@ const int rec = PLATFORM_I2C_DIRECTION_RECEIVER;
 extern void i2c_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_int("i2c_FAST", fast);
-  picoc_def_int("i2c_SLOW", slow);
-  picoc_def_int("i2c_TRANSMITTER", trans);
-  picoc_def_int("i2c_RECEIVER", rec);
+  picoc_def_integer("i2c_FAST", fast);
+  picoc_def_integer("i2c_SLOW", slow);
+  picoc_def_integer("i2c_TRANSMITTER", trans);
+  picoc_def_integer("i2c_RECEIVER", rec);
 #endif
 }
                                                             

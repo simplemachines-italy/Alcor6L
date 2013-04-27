@@ -368,13 +368,13 @@ const PICOC_REG_TYPE lcd_disp_library[] = {
 extern void lcd_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_int("lcd_NONE", lcd_none);
-  picoc_def_int("lcd_BLOCK", lcd_block);
-  picoc_def_int("lcd_LINE", lcd_line);
-  picoc_def_int("lcd_LEFT", lcd_left);
-  picoc_def_int("lcd_RIGHT", lcd_right);
-  picoc_def_int("lcd_OFF", lcd_off);
-  picoc_def_int("lcd_ON", lcd_none);
+  picoc_def_integer("lcd_NONE", lcd_none);
+  picoc_def_integer("lcd_BLOCK", lcd_block);
+  picoc_def_integer("lcd_LINE", lcd_line);
+  picoc_def_integer("lcd_LEFT", lcd_left);
+  picoc_def_integer("lcd_RIGHT", lcd_right);
+  picoc_def_integer("lcd_OFF", lcd_off);
+  picoc_def_integer("lcd_ON", lcd_none);
 #endif
 }
 

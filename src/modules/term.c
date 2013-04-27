@@ -32,8 +32,8 @@ const int wait = TERM_INPUT_WAIT;
 extern void term_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_int("term_WAIT", wait);
-  picoc_def_int("term_NOWAIT", no_wait);
+  picoc_def_integer("term_WAIT", wait);
+  picoc_def_integer("term_NOWAIT", no_wait);
 #endif
 }
 

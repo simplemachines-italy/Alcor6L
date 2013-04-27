@@ -411,7 +411,7 @@ int VariableDefined(const char *Ident);
 void VariableGet(struct ParseState *Parser, const char *Ident, struct Value **LVal);
 void VariableDefinePlatformVar(struct ParseState *Parser, char *Ident, struct ValueType *Typ, union AnyValue *FromValue, int IsWritable);
 // For defining platform variables in Alcor modules.
-#define picoc_def_int(name, var)\
+#define picoc_def_integer(name, var)\
   VariableDefinePlatformVar(NULL, name, &IntType, (union AnyValue *)&var, FALSE)
 
 void VariableStackFrameAdd(struct ParseState *Parser, const char *FuncName, int NumParams);

@@ -91,11 +91,17 @@ void cpu_library_init(void);
 
 /* Helper macros */
 #define MOD_CHECK_ID(mod, id)\
-	if (!platform_ ## mod ## _exists(id))\
-		return ProgramFail(NULL, #mod " %d does not exist", (unsigned int)id)
+  if (!platform_ ## mod ## _exists(id))\
+    return ProgramFail(NULL, #mod " %d does not exist", (unsigned int)id)
 
 #define MOD_CHECK_RES_ID(mod, id, resmod, resid)\
-	if (!platform_ ## mod ## _check_ ## resmod ## _id(id, resid))\
-		return ProgramFail(NULL, #resmod" %d not valid with " #mod " %d", (unsigned)resid, (unsigned)id)
+  if (!platform_ ## mod ## _check_ ## resmod ## _id(id, resid))\
+    return ProgramFail(NULL, #resmod" %d not valid with " #mod " %d", (unsigned)resid, (unsigned)id)
+
+#define MOD_CHECK_TIMER(id)\
+  if (id == PLATFORM_TIMER_SYS_ID && !platform_timer_sys_available())\
+    return ProgramFail("the system timer is not available on this platform"); \
+  if (!platform_timer_exists(id))\
+    return ProgramFail(NULL, "timer %d does not exist", (unsigned)id)	\
 
 #endif
