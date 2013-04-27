@@ -74,6 +74,22 @@ pio_type platform_pio_op( unsigned port, pio_type pinmask, int op );
 // The ID of the system timer
 #define PLATFORM_TIMER_SYS_ID                 0x100
 
+#ifdef ALCOR_LANG_PICOC
+
+#ifdef NO_FP
+// Maximum values of the system timer
+#define PLATFORM_TIMER_SYS_MAX                ( ( 1LL << 31 ) - 2 )
+// Timer data type
+typedef u32 timer_data_type;
+#else // Regular floating point PicoC
+// Maximum values of the system timer
+#define PLATFORM_TIMER_SYS_MAX                ( ( 1LL << 52 ) - 2 )
+// Timer data type 
+typedef u64 timer_data_type;
+#endif
+
+#else
+
 #if defined( LUA_NUMBER_INTEGRAL ) && !defined( LUA_INTEGRAL_LONGLONG )
 // Maximum values of the system timer
 #define PLATFORM_TIMER_SYS_MAX                ( ( 1LL << 31 ) - 2 )
@@ -85,6 +101,8 @@ typedef u32 timer_data_type;
 // Timer data type
 typedef u64 timer_data_type;
 #endif // #if defined( LUA_NUMBER_INTEGRAL ) && !defined( LUA_INTEGRAL_LONGLONG )
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // This constant means 'infinite timeout'
 #define PLATFORM_TIMER_INF_TIMEOUT            ( PLATFORM_TIMER_SYS_MAX + 1 )
