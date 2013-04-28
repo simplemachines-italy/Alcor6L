@@ -20,7 +20,7 @@ static void pwm_setup(pstate *p, val *r, val **param, int n)
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
 
-  freq = param[1]->Val->UnsignedInteger;
+  freq = param[1]->Val->UnsignedLongInteger;
   if (freq <= 0)
     return pmod_error("frequency must be > 0");
 
@@ -29,7 +29,7 @@ static void pwm_setup(pstate *p, val *r, val **param, int n)
     return pmod_error("duty cycle must be from 0 to 100");
 
   freq = platform_pwm_setup(id, freq, duty);
-  r->Val->Integer = freq;
+  r->Val->UnsignedLongInteger = freq;
 }
 
 // picoc: pwm_start(id);
@@ -40,7 +40,6 @@ static void pwm_start(pstate *p, val *r, val **param, int n)
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
   platform_pwm_start(id);
-  r->Val->Integer = 0;
 }
 
 // picoc: pwm_stop(id);
@@ -51,7 +50,6 @@ static void pwm_stop(pstate *p, val *r, val **param, int n)
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
   platform_pwm_stop(id);
-  r->Val->Integer = 0;
 }
 
 // picoc: realclock = pwm_setclock(id, clock);
@@ -62,11 +60,11 @@ static void pwm_setclock(pstate *p, val *r, val **param, int n)
 
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
-  clk = param[1]->Val->UnsignedInteger;
+  clk = param[1]->Val->UnsignedLongInteger;
   if (clk <= 0)
     return pmod_error("frequency must be > 0");
   clk = platform_pwm_set_clock(id, (u32)clk);
-  r->Val->UnsignedInteger = clk;
+  r->Val->UnsignedLongInteger = clk;
 }
 
 // picoc: clock = pwm_getclock(id);
@@ -78,7 +76,7 @@ static void pwm_getclock(pstate *p, val *r, val **param, int n)
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(pwm, id);
   clk = platform_pwm_get_clock(id);
-  r->Val->UnsignedInteger = clk;
+  r->Val->UnsignedLongInteger = clk;
 }
 
 #define MIN_OPT_LEVEL 2
@@ -86,11 +84,11 @@ static void pwm_getclock(pstate *p, val *r, val **param, int n)
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE pwm_library[] = {
-  {FUNC(pwm_setup), PROTO("unsigned int pwm_setup(unsigned int, unsigned int, unsigned int);")},
-  {FUNC(pwm_start), PROTO("int pwm_start(unsigned int);")},
-  {FUNC(pwm_stop), PROTO("int pwm_stop(unsigned int);")},
-  {FUNC(pwm_setclock), PROTO("unsigned int pwm_setclock(unsigned int, unsigned int);")},
-  {FUNC(pwm_getclock), PROTO("unsigned int pwm_getclock(unsigned int);")},
+  {FUNC(pwm_setup), PROTO("unsigned long pwm_setup(unsigned int, unsigned long, unsigned int);")},
+  {FUNC(pwm_start), PROTO("void pwm_start(unsigned int);")},
+  {FUNC(pwm_stop), PROTO("void pwm_stop(unsigned int);")},
+  {FUNC(pwm_setclock), PROTO("unsigned long pwm_setclock(unsigned int, unsigned long);")},
+  {FUNC(pwm_getclock), PROTO("unsigned long pwm_getclock(unsigned int);")},
   {NILFUNC, NILPROTO}
 };
 
