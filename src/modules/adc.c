@@ -36,7 +36,7 @@ static void adc_maxval(pstate *p, val *r, val **param, int n)
   MOD_CHECK_ID(adc, id);
   res = platform_adc_get_maxval(id);
   
-  r->Val->UnsignedInteger = res;
+  r->Val->UnsignedLongInteger = res;
 }
 
 // PicoC: realclock = adc_setclock(id, freq, timer_id);
@@ -60,7 +60,7 @@ static void adc_setclock(pstate *p, val *r, val **param, int n)
   
   platform_adc_set_timer(id, timer_id);
   freq = platform_adc_set_clock(id, freq);
-  r->Val->UnsignedInteger = freq;
+  r->Val->UnsignedLongInteger = freq;
 }
 
 // PicoC: data = adc_isdone(id);
@@ -218,8 +218,8 @@ static void adc_insertsamples(pstate *p, val *r, val **param, int n)
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE adc_library[] = {
-  {FUNC(adc_maxval), PROTO("unsigned int adc_maxval(void);")},
-  {FUNC(adc_setclock), PROTO("unsigned int adc_setclock(unsigned int, long, unsigned int);")},
+  {FUNC(adc_maxval), PROTO("unsigned long adc_maxval(void);")},
+  {FUNC(adc_setclock), PROTO("unsigned long adc_setclock(unsigned int, long, unsigned int);")},
   {FUNC(adc_isdone), PROTO("unsigned int adc_isdone(unsigned int);")},
   {FUNC(adc_setblocking), PROTO("void adc_setblocking(unsigned int, unsigned int);")},
   {FUNC(adc_setsmoothing), PROTO("void adc_setsmoothing(void);")},
