@@ -46,8 +46,8 @@ static void cpu_w32(pstate *p, val *r, val **param, int n)
 {
   u32 addr, data;
  
-  addr = param[0]->Val->UnsignedInteger;
-  data = param[1]->Val->UnsignedInteger;
+  addr = param[0]->Val->UnsignedLongInteger;
+  data = param[1]->Val->UnsignedLongInteger;
   *(u32 *)addr = data;
 }
 
@@ -56,14 +56,14 @@ static void cpu_r32(pstate *p, val *r, val **param, int n)
 {
   u32 addr;
   
-  addr = param[0]->Val->UnsignedInteger;
-  r->Val->UnsignedInteger = *(u32 *)addr;
+  addr = param[0]->Val->UnsignedLongInteger;
+  r->Val->UnsignedLongInteger = *(u32 *)addr;
 }
 
 // PicoC: cpu_w16(address, data);
 static void cpu_w16(pstate *p, val *r, val **param, int n)
 {
-  u32 addr = param[0]->Val->UnsignedInteger;
+  u32 addr = param[0]->Val->UnsignedLongInteger;
   u16 data = param[1]->Val->UnsignedShortInteger;
   *(u16 *)addr = data;
 }
@@ -73,7 +73,7 @@ static void cpu_r16(pstate *p, val *r, val **param, int n)
 {
   u32 addr;
 
-  addr = param[0]->Val->UnsignedInteger;
+  addr = param[0]->Val->UnsignedLongInteger;
   r->Val->UnsignedShortInteger = *(u16 *)addr;
 }
 
@@ -83,7 +83,7 @@ static void cpu_w8(pstate *p, val *r, val **param, int n)
   u32 addr;
   u8 data = param[1]->Val->Character;
   
-  addr = param[0]->Val->UnsignedInteger;
+  addr = param[0]->Val->UnsignedLongInteger;
   *(u8 *)addr = data;
 }
 
@@ -92,14 +92,15 @@ static void cpu_r8(pstate *p, val *r, val **param, int n)
 {
   u32 addr;
   
-  addr = param[0]->Val->UnsignedInteger;
+  addr = param[0]->Val->UnsignedLongInteger;
   r->Val->Character = *(u8 *)addr;
 }
 
 // PicoC: cpu_clock();
 static void cpu_clock(pstate *p, val *r, val **param, int n)
 {
-  r->Val->UnsignedInteger = platform_cpu_get_frequency();
+  r->Val->UnsignedLongInteger =
+    platform_cpu_get_frequency();
 }
 
 #ifdef PLATFORM_CPU_CONSTANTS
@@ -132,13 +133,13 @@ static void cpu_const_getval(pstate *p, val *r, val **param, int n)
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE cpu_library[] = {
-  {FUNC(cpu_w32), PROTO("void cpu_w32(unsigned int, unsigned int);")},
-  {FUNC(cpu_r32), PROTO("unsigned int cpu_r32(unsigned int);")},
-  {FUNC(cpu_w16), PROTO("void cpu_w16(unsigned int, unsigned short);")},
-  {FUNC(cpu_r16), PROTO("unsigned short cpu_r16(unsigned int);")},
-  {FUNC(cpu_w8), PROTO("void cpu_w8(unsigned int, char);")},
-  {FUNC(cpu_r8), PROTO("char cpu_r8(unsigned int);")},
-  {FUNC(cpu_clock), PROTO("unsigned int cpu_clock(void);")},
+  {FUNC(cpu_w32), PROTO("void cpu_w32(unsigned long, unsigned long);")},
+  {FUNC(cpu_r32), PROTO("unsigned long cpu_r32(unsigned long);")},
+  {FUNC(cpu_w16), PROTO("void cpu_w16(unsigned long, unsigned short);")},
+  {FUNC(cpu_r16), PROTO("unsigned short cpu_r16(unsigned long);")},
+  {FUNC(cpu_w8), PROTO("void cpu_w8(unsigned long, char);")},
+  {FUNC(cpu_r8), PROTO("char cpu_r8(unsigned long);")},
+  {FUNC(cpu_clock), PROTO("unsigned long cpu_clock(void);")},
 #ifdef PLATFORM_CPU_CONSTANTS
   {FUNC(cpu_const_getval), PROTO("int cpu_const_getval(char *);")},
 #endif
