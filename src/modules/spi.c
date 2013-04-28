@@ -65,7 +65,7 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
   is_master = param[1]->Val->UnsignedInteger;
   if (!is_master)
     return pmod_error("invalid type (only spi.MASTER is supported)");
-  clock = param[2]->Val->UnsignedInteger;
+  clock = param[2]->Val->UnsignedLongInteger;
   cpol = param[3]->Val->UnsignedInteger;
   if ((cpol != 0) && (cpol != 1))
     return pmod_error("invalid clock polarity.");
@@ -74,7 +74,7 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
     return pmod_error("invalid clock phase.");
   databits = param[5]->Val->UnsignedInteger;
   res = platform_spi_setup(id, is_master, clock, cpol, cpha, databits);
-  r->Val->UnsignedInteger = res;
+  r->Val->UnsignedLongInteger = res;
 }
 
 // TODO: The following two functions should be
@@ -84,13 +84,13 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
 static void spi_write_num(pstate *p, val *r, val **param, int n)	      
 {
   unsigned id = param[0]->Val->UnsignedInteger;
-  spi_data_type val = param[1]->Val->UnsignedInteger;
+  spi_data_type val = param[1]->Val->UnsignedLongInteger;
 
   platform_spi_send_recv(id, val);
   r->Val->Integer = 1;
 }
 
-// PicoC: spi_write_string(id, string, len);
+// PicoC: len = spi_write_string(id, string, len);
 static void spi_write_string(pstate *p, val *r, val **param, int n)
 {
   unsigned int id = param[0]->Val->UnsignedInteger, i;
@@ -100,7 +100,7 @@ static void spi_write_string(pstate *p, val *r, val **param, int n)
   for (i = 0; i < len; i++)
     platform_spi_send_recv(id, str[i]);
 
-  r->Val->Integer = len;
+  r->Val->UnsignedInteger = len;
 }
 
 // TODO:
@@ -122,10 +122,10 @@ const PICOC_RO_TYPE spi_variables[] = {
 const PICOC_REG_TYPE spi_library[] = {
   {FUNC(spi_sson), PROTO("void spi_sson(unsigned int);")},
   {FUNC(spi_ssoff), PROTO("void spi_ssoff(unsigned int);")},
-  {FUNC(spi_setup), PROTO("unsigned int spi_setup(unsigned int, unsigned int,\
-                           unsigned int, unsigned int, unsigned int,\
+  {FUNC(spi_setup), PROTO("unsigned long spi_setup(unsigned int, unsigned int,\
+                           unsigned long, unsigned int, unsigned int,\
                            unsigned int);")},
-  {FUNC(spi_write_num), PROTO("int spi_write_num(unsigned int, unsigned int);")},
+  {FUNC(spi_write_num), PROTO("int spi_write_num(unsigned int, unsigned long);")},
   {FUNC(spi_write_string), PROTO("unsigned int spi_write_string(unsigned int,\
                                   char *, unsigned int);")},
   {NILFUNC, NILPROTO}
