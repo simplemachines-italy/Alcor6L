@@ -44,13 +44,13 @@ extern void i2c_lib_setup_func(void)
 static void i2c_setup(pstate *p, val *r, val **param, int n)
 {
   unsigned id = param[0]->Val->UnsignedInteger;
-  s32 speed = (s32)param[1]->Val->UnsignedInteger;
+  s32 speed = (s32)param[1]->Val->LongInteger;
   
   MOD_CHECK_ID(i2c, id);
   if (speed <= 0)
     return pmod_error("frequency must be > 0");
 
-  r->Val->UnsignedInteger = platform_i2c_setup(id, (u32)speed);
+  r->Val->UnsignedLongInteger = platform_i2c_setup(id, (u32)speed);
 }
 
 // PicoC: i2c_start(id);
@@ -127,14 +127,14 @@ static void i2c_write_string(pstate *p, val *r, val **param, int n)
     wrote += 1;
   }
 
-  r->Val->UnsignedInteger = wrote;
+  r->Val->UnsignedLongInteger = wrote;
 }
 
 // PicoC: i2c_read(id, size);
 static void i2c_read(pstate *p, val *r, val **param, int n)
 {
   unsigned id = param[0]->Val->UnsignedInteger;
-  u32 size = param[1]->Val->UnsignedInteger, i;
+  u32 size = param[1]->Val->UnsignedLongInteger, i;
   char *b = HeapAllocMem(size + 1);
   unsigned int count = 0;
   int data;
@@ -168,13 +168,13 @@ const PICOC_RO_TYPE i2c_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE i2c_library[] = {
-  {FUNC(i2c_setup), PROTO("unsigned int i2c_setup(unsigned int, unsigned int);")},
+  {FUNC(i2c_setup), PROTO("unsigned long i2c_setup(unsigned int, long);")},
   {FUNC(i2c_start), PROTO("void i2c_start(unsigned int);")},
   {FUNC(i2c_stop), PROTO("void i2c_stop(unsigned int);")},
   {FUNC(i2c_address), PROTO("unsigned int i2c_address(unsigned int, int, int);")},
   {FUNC(i2c_write_integer), PROTO("unsigned int i2c_write_integer(unsigned int, int);")},
-  {FUNC(i2c_write_string), PROTO("unsigned int i2c_write_string(unsigned int, char *);")},
-  {FUNC(i2c_read), PROTO("char *i2c_read(unsigned int, unsigned int);")},
+  {FUNC(i2c_write_string), PROTO("unsigned long i2c_write_string(unsigned int, char *);")},
+  {FUNC(i2c_read), PROTO("char *i2c_read(unsigned int, unsigned long);")},
   {NILFUNC, NILPROTO}
 };
 
