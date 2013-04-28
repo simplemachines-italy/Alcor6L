@@ -32,10 +32,10 @@ static void can_setup(pstate *p, val *r, val **param, int n)
 
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(can, id);
-  clock = param[1]->Val->UnsignedInteger;
+  clock = param[1]->Val->UnsignedLongInteger;
   res = platform_can_setup(id, clock);
 
-  r->Val->UnsignedInteger = res;
+  r->Val->UnsignedLongInteger = res;
 }
 
 // picoc: can_send(id, canid, canidtype, message);
@@ -56,7 +56,7 @@ static void can_send(pstate *p, val *r, val **param, int n)
     return pmod_error("message exceeds max length");
 
   platform_can_send(id, canid, idtype, len, (const u8 *)data);
-  r->Val->Integer = len;
+  r->Val->UnsignedInteger = len;
 }
 
 // picoc: can_recv(id, &message);
@@ -70,7 +70,7 @@ static void can_recv(pstate *p, val *r, val **param, int n)
   MOD_CHECK_ID(can, id);
 
   if (platform_can_recv(id, &canid, &idtype, &len, data) == PLATFORM_OK) {
-    param[1]->Val->Identifier = data;
+    param[1]->Val->Identifier = (char *)data;
     r->Val->Integer = len;
   } else {
     r->Val->Integer = -1;
@@ -90,8 +90,8 @@ const PICOC_RO_TYPE can_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE can_library[] = {
-  {FUNC(can_setup), PROTO("unsigned int can_setup(unsigned int, unsigned int);")},
-  {FUNC(can_send), PROTO("int can_send(int, int, int, char *);")},
+  {FUNC(can_setup), PROTO("unsigned long can_setup(unsigned int, unsigned long);")},
+  {FUNC(can_send), PROTO("unsigned int can_send(int, int, int, char *);")},
   {FUNC(can_recv), PROTO("int can_recv(int, char *);")},
   {NILFUNC, NILPROTO}
 };
