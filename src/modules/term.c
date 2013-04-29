@@ -19,6 +19,11 @@
 #include <string.h>
 #include "platform_conf.h"
 
+// Common for all languages.
+#undef _D
+#define _D(x) #x
+static const char* term_key_names[] = {TERM_KEYCODES};
+
 #if defined (ALCOR_LANG_PICOC) && defined (BUILD_TERM)
 
 // ****************************************************************************
@@ -41,14 +46,12 @@ extern void term_lib_setup_func(void)
 static void pterm_clrscr(pstate *p, val *r, val **param, int n)
 {
   term_clrscr();
-  r->Val->Integer = 0;
 }
 
 // picoc: term_clreol();
 static void pterm_clreol(pstate *p, val *r, val **param, int n)
 {
   term_clreol();
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveto(x y);
@@ -59,7 +62,6 @@ static void pterm_moveto(pstate *p, val *r, val **param, int n)
   y = param[1]->Val->UnsignedInteger;
 
   term_gotoxy(x, y);
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveup(lines);
@@ -69,7 +71,6 @@ static void pterm_moveup(pstate *p, val *r, val **param, int n)
 
   delta = param[0]->Val->UnsignedInteger;
   term_up(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: movedown(lines);
@@ -79,7 +80,6 @@ static void pterm_movedown(pstate *p, val *r, val **param, int n)
   delta = param[0]->Val->UnsignedInteger;
 
   term_down(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveleft(cols);
@@ -89,7 +89,6 @@ static void pterm_moveleft(pstate *p, val *r, val **param, int n)
   delta = param[0]->Val->UnsignedInteger;
 
   term_left(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveright(cols);
@@ -99,7 +98,6 @@ static void pterm_moveright(pstate *p, val *r, val **param, int n)
   delta = param[0]->Val->UnsignedInteger;
 
   term_right(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: lines = term_getlines();
@@ -126,7 +124,7 @@ static void pterm_puts(pstate *p, val *r, val **param, int n)
   for (i = 0; i < len; i++)
     term_putch(buf[i]);
 
-  r->Val->UnsignedInteger = len;
+  r->Val->UnsignedLongInteger = len;
 }
 
 // picoc: term_putch(ch);
@@ -162,10 +160,6 @@ static void pterm_getchar(pstate *p, val *r, val **param, int n)
   r->Val->Integer = res;
 }
 
-#undef _D
-#define _D(x) #x
-static const char* term_key_names[] = {TERM_KEYCODES};
-
 // Look for all KC_xxxx codes
 // picoc: term_decode(str);
 static void pterm_decode(pstate *p, val *r, val **param, int n)
@@ -199,16 +193,16 @@ const PICOC_RO_TYPE term_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE term_library[] = {
-  {FUNC(pterm_clrscr), PROTO("int term_clrscr(void);")},
-  {FUNC(pterm_clreol), PROTO("int term_clreol(void);")},
-  {FUNC(pterm_moveto), PROTO("int term_moveto(unsigned int, unsigned int);")},
-  {FUNC(pterm_moveup), PROTO("int term_moveup(unsigned int);")},
-  {FUNC(pterm_movedown), PROTO("int term_movedown(unsigned int);")},
-  {FUNC(pterm_moveleft), PROTO("int term_moveleft(unsigned int);")},
-  {FUNC(pterm_moveright), PROTO("int term_moveright(unsigned int);")},
+  {FUNC(pterm_clrscr), PROTO("void term_clrscr(void);")},
+  {FUNC(pterm_clreol), PROTO("void term_clreol(void);")},
+  {FUNC(pterm_moveto), PROTO("void term_moveto(unsigned int, unsigned int);")},
+  {FUNC(pterm_moveup), PROTO("void term_moveup(unsigned int);")},
+  {FUNC(pterm_movedown), PROTO("void term_movedown(unsigned int);")},
+  {FUNC(pterm_moveleft), PROTO("void term_moveleft(unsigned int);")},
+  {FUNC(pterm_moveright), PROTO("void term_moveright(unsigned int);")},
   {FUNC(pterm_getlines), PROTO("unsigned int term_getlines(void);")},
   {FUNC(pterm_getcols), PROTO("unsigned int term_getcols(void);")},
-  {FUNC(pterm_puts), PROTO("unsigned int term_puts(unsigned int, unsigned int, char *);")},
+  {FUNC(pterm_puts), PROTO("unsigned long term_puts(unsigned int, unsigned int, char *);")},
   {FUNC(pterm_putch), PROTO("unsigned int term_putch(char);")},
   {FUNC(pterm_getcx), PROTO("unsigned int term_getcx(void);")},
   {FUNC(pterm_getcy), PROTO("unsigned int term_getcy(void);")},
@@ -220,7 +214,8 @@ const PICOC_REG_TYPE term_library[] = {
 // Init library.
 extern void term_library_init(void)
 {
-  REGISTER("term.h", &term_lib_setup_func, &term_library[0]);
+  REGISTER("term.h", &term_lib_setup_func,
+	   &term_library[0]);
 }
 
 #else
@@ -358,11 +353,6 @@ static int luaterm_getchar( lua_State* L )
   lua_pushinteger( L, term_getch( temp ) );
   return 1;
 }
-
-// Key codes by name
-#undef _D
-#define _D( x ) #x
-static const char* term_key_names[] = { TERM_KEYCODES };
 
 // __index metafunction for term
 // Look for all KC_xxxx codes
