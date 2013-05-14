@@ -75,18 +75,10 @@ pio_type platform_pio_op( unsigned port, pio_type pinmask, int op );
 #define PLATFORM_TIMER_SYS_ID                 0x100
 
 #ifdef ALCOR_LANG_PICOC
-
-#ifdef NO_FP
 // Maximum values of the system timer
 #define PLATFORM_TIMER_SYS_MAX                ( ( 1LL << 31 ) - 2 )
 // Timer data type
 typedef u32 timer_data_type;
-#else // Regular floating point PicoC
-// Maximum values of the system timer
-#define PLATFORM_TIMER_SYS_MAX                ( ( 1LL << 52 ) - 2 )
-// Timer data type 
-typedef u64 timer_data_type;
-#endif
 
 #else
 
