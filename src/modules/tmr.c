@@ -25,7 +25,11 @@
 #define MIN_VTIMER_NAME_LEN     5
 
 #if defined( BUILD_LUA_INT_HANDLERS ) && defined( INT_TMR_MATCH )
-#define HAS_TMR_MATCH_INT
+#define HAS_TMR_MATCH_INT_LUA
+#endif
+
+#if defined( BUILD_PICOC_INT_HANDLERS ) && defined( INT_TMR_MATCH )
+#define HAS_TMR_MATCH_INT_PICOC
 #endif
 
 #ifdef ALCOR_LANG_PICOC
@@ -33,7 +37,212 @@
 // ****************************************************************************
 // Timer module for PicoC.
 
-// TODO:
+// In PicoC, we have a roval 'tmr_DEFAULT' -
+// This will be set as PLATFORM_TIMER_SYS_ID
+// in the rotable if memory optimizations
+// are on (optram=1).
+
+// A few helper functions.
+
+static void get_timer_data(timer_data_type *d, val **param, int i)
+{
+  *d = param[i]->Val->UnsignedLongInteger;
+}
+
+static void set_timer_data(val *r, timer_data_type res)
+{
+  r->Val->UnsignedLongInteger = res;
+}
+
+// globals.
+const int sysid = PLATFORM_TIMER_SYS_ID;
+#ifdef HAS_TMR_MATCH_INT_PICOC
+const int oneshot = PLATFORM_TIMER_INT_ONESHOT;
+const int cyclic = PLATFORM_TIMER_INT_CYCLIC;
+#endif
+
+// Library setup function
+extern void tmr_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_integer("tmr_SYS_TIMER", sysid);
+#ifdef HAS_TMR_MATCH_INT_PICOC
+  picoc_def_integer("tmr_INT_ONESHOT", oneshot);
+  picoc_def_integer("tmr_INT_CYCLIC", cyclic);
+#endif // #ifdef HAS_TMR_MATCH_INT_PICOC
+#endif
+}
+
+// PicoC: tmr_delay(id, period);
+static void tmr_delay(pstate *p, val *r, val **param, int n)
+{
+  timer_data_type period;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  get_timer_data(&period, param, 1);
+  platform_timer_delay(id, period);
+}
+
+// PicoC: timervalue = tmr_read(id);
+static void tmr_read(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  timer_data_type res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_READ, 0);
+  set_timer_data(r, res);
+}
+
+// PicoC: time_us = tmr_gettimediff(id, start, end); 
+static void tmr_gettimediff(pstate *p, val *r, val **param, int n)
+{
+  timer_data_type start, end, res;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  get_timer_data(&start, param, 1);
+  get_timer_data(&end, param, 2);
+  res = platform_timer_get_diff_us(id, start, end);
+  set_timer_data(r, res);
+}
+
+// PicoC: time_us = tmr_getdiffnow(id, start);
+static void tmr_getdiffnow(pstate *p, val *r, val **param, int n)
+{
+  timer_data_type start, res;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  get_timer_data(&start, param, 1);
+  res = platform_timer_get_diff_crt(id, start);
+  set_timer_data(r, res);
+}
+
+// PicoC: res = tmr_getmindelay(id);
+static void tmr_getmindelay(pstate *p, val *r, val **param, int n)
+{
+  timer_data_type res;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_GET_MIN_DELAY, 0);
+  set_timer_data(r, res);		 
+}
+
+// PicoC: res = tmr_getmaxdelay(id);
+static void tmr_getmaxdelay(pstate *p, val *r, val **param, int n)
+{
+  timer_data_type res;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_GET_MAX_DELAY, 0);
+  set_timer_data(r, res);
+}
+
+// PicoC: realclock = tmr_setclock(id, clock); 
+static void tmr_setclock(pstate *p, val *r, val **param, int n)
+{
+  u32 clock;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  clock = param[1]->Val->UnsignedLongInteger;
+  clock = platform_timer_op(id, PLATFORM_TIMER_OP_SET_CLOCK, clock);
+  r->Val->UnsignedLongInteger = clock;
+}
+
+// PicoC: clock = tmr_getclock(id); 
+static void tmr_getclock(pstate *p, val *r, val **param, int n)
+{
+  u32 res;
+  unsigned id;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_GET_CLOCK, 0);
+  r->Val->UnsignedLongInteger = res;
+}
+
+#ifdef HAS_TMR_MATCH_INT_PICOC
+// TODO: For now, PicoC on Alcor6L doesn't support
+// interrupts.
+// static void tmr_set_match_int(pstate *p, val *r, val **param, int n)
+// {}
+#endif // HAS_TMR_MATCH_INT_PICOC
+
+#if VTMR_NUM_TIMERS > 0
+// Look for all VIRTx timer identifiers
+static void tmr_decode(pstate *p, val *r, val **param, int n)
+{
+  const char *key = param[0]->Val->Identifier;
+  char* pend;
+  long res;
+
+  if (strlen(key) > MAX_VTIMER_NAME_LEN || strlen(key) < MIN_VTIMER_NAME_LEN) {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  if (strncmp(key, "VIRT", 4)) {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  res = strtol(key + 4, &pend, 10);
+  if (*pend != '\0') {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  if (res >= VTMR_NUM_TIMERS) {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  r->Val->LongInteger = (res + VTMR_FIRST_ID);
+}
+#endif // #if VTMR_NUM_TIMERS > 0 
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE tmr_variables[] = {
+  {STRKEY("tmr_SYS_TIMER"), INT(sysid)},
+#ifdef HAS_TMR_MATCH_INT_PICOC
+  {STRKEY("tmr_INT_ONESHOT"), INT(oneshot)},
+  {STRKEY("tmr_INT_CYCLIC"), INT(cyclic)},
+#endif //#ifdef HAS_TMR_MATCH_INT
+  {NILKEY, NILVAL}
+};
+#endif
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE tmr_library[] = {
+  {FUNC(tmr_delay), PROTO("void tmr_delay(unsigned int, unsigned long);")},
+  {FUNC(tmr_read), PROTO("unsigned long tmr_read(unsigned int);")},
+  {FUNC(tmr_gettimediff), PROTO("unsigned long tmr_gettimediff(unsigned int, unsigned long, unsigned long);")},
+  {FUNC(tmr_getdiffnow), PROTO("unsigned long tmr_getdiffnow(unsigned int, unsigned long);")},
+  {FUNC(tmr_getmindelay), PROTO("unsigned long tmr_getmindelay(unsigned int);")},
+  {FUNC(tmr_getmaxdelay), PROTO("unsigned long tmr_getmaxdelay(unsigned int);")},
+  {FUNC(tmr_setclock), PROTO("unsigned long tmr_setclock(unsigned int, unsigned long);")},
+  {FUNC(tmr_getclock), PROTO("unsigned long tmr_getclock(unsigned int);")},
+  {FUNC(tmr_decode), PROTO("unsigned long tmr_decode(char *);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library. 
+extern void tmr_library_init(void)
+{
+  REGISTER("tmr.h", &tmr_lib_setup_func,
+	   &tmr_library[0]);
+}
 
 #else
 
@@ -160,7 +369,7 @@ static int tmr_getclock( lua_State* L )
   return 1;
 }
 
-#ifdef HAS_TMR_MATCH_INT
+#ifdef HAS_TMR_MATCH_INT_LUA
 // Lua: set_match_int( id, timeout, type )
 static int tmr_set_match_int( lua_State *L )
 {
@@ -178,7 +387,7 @@ static int tmr_set_match_int( lua_State *L )
     return luaL_error( L, "match interrupt cannot be set on this timer" );
   return 0;
 }
-#endif // #ifdef HAS_TMR_MATCH_INT
+#endif // #ifdef HAS_TMR_MATCH_INT_LUA
 
 #if VTMR_NUM_TIMERS > 0
 // __index metafunction for TMR
@@ -217,7 +426,7 @@ const LUA_REG_TYPE tmr_map[] =
   { LSTRKEY( "getmaxdelay" ), LFUNCVAL( tmr_getmaxdelay ) },
   { LSTRKEY( "setclock" ), LFUNCVAL( tmr_setclock ) },
   { LSTRKEY( "getclock" ), LFUNCVAL( tmr_getclock ) },
-#ifdef HAS_TMR_MATCH_INT
+#ifdef HAS_TMR_MATCH_INT_LUA
   { LSTRKEY( "set_match_int" ), LFUNCVAL( tmr_set_match_int ) },
 #endif  
 #if LUA_OPTIMIZE_MEMORY > 0 && VTMR_NUM_TIMERS > 0
@@ -248,10 +457,10 @@ LUALIB_API int luaopen_tmr( lua_State *L )
   lua_setmetatable( L, -2 );  
 #endif // #if VTMR_NUM_TIMERS > 0
   MOD_REG_NUMBER( L, "SYS_TIMER", PLATFORM_TIMER_SYS_ID );
-#ifdef HAS_TMR_MATCH_INT
+#ifdef HAS_TMR_MATCH_INT_LUA
   MOD_REG_NUMBER( L, "INT_ONESHOT", PLATFORM_TIMER_INT_ONESHOT );
   MOD_REG_NUMBER( L, "INT_CYCLIC", PLATFORM_TIMER_INT_CYCLIC );
-#endif //#ifdef HAS_TMR_MATCH_INT
+#endif //#ifdef HAS_TMR_MATCH_INT_LUA
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
