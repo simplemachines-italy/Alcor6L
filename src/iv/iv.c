@@ -147,7 +147,7 @@ int iv_main(int argc, char **argv)
 	fill_line_buffer(file_buffer, current_line);
 	while (!(exit_program |= process_command(file_buffer))) {
 		process_output(file_buffer, cmd_line);
-		while (input = term_getch_nt(TERM_INPUT_WAIT)) {
+		while ((input = term_getch_nt(TERM_INPUT_WAIT))) {
 			exit_program |= process_command(file_buffer); // handle pending activity
 			if (input == ESC)
 				break;
@@ -159,7 +159,7 @@ int iv_main(int argc, char **argv)
 		if (ESC == input) {
 			clear_cmd_line(cmd_line, &cmd_line_index);
 			cmd_line[cmd_line_index++] = input;
-			while (cmd_line[cmd_line_index] = term_getch_nt(TERM_INPUT_DONT_WAIT)) {
+			while ((cmd_line[cmd_line_index] = term_getch_nt(TERM_INPUT_DONT_WAIT))) {
 				cmd_line_index++;
 				if (cmd_line_index > MAX_CMD_LINE_SIZE)
 					clear_cmd_line(cmd_line, &cmd_line_index);
