@@ -37,10 +37,11 @@
 // ****************************************************************************
 // Timer module for PicoC.
 
-// In PicoC, we have a roval 'tmr_DEFAULT' -
-// This will be set as PLATFORM_TIMER_SYS_ID
-// in the rotable if memory optimizations
-// are on (optram=1).
+// In PicoC, we have a read-only value - tmr_DEFAULT
+// This will be set as PLATFORM_TIMER_SYS_ID in the
+// rotable if memory optimizations are on (optram=1).
+// This value could also be used in other modules
+// such as uart.
 
 // A few helper functions.
 
@@ -65,7 +66,7 @@ const int cyclic = PLATFORM_TIMER_INT_CYCLIC;
 extern void tmr_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_integer("tmr_SYS_TIMER", sysid);
+  picoc_def_integer("tmr_DEFAULT", sysid);
 #ifdef HAS_TMR_MATCH_INT_PICOC
   picoc_def_integer("tmr_INT_ONESHOT", oneshot);
   picoc_def_integer("tmr_INT_CYCLIC", cyclic);
@@ -259,7 +260,7 @@ static int tmrh_timer_op( lua_State* L, int op )
   MOD_CHECK_TIMER( id );
   res = platform_timer_op( id, op, 0 );
   lua_pushnumber( L, ( lua_Number )res );
-  return 1;  
+  return 1;
 }
 
 // Lua: delay( id, period )
