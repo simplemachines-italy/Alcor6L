@@ -234,6 +234,13 @@ else:
                       'standard',
                       allowed_values=[ 'standard' , 'luarpc' ] ) )
 
+# option for compilers running on the MCU
+if comp['lang'] == 'lua':
+  vars.AddVariables(
+    BoolVariable('luac',
+                 'Builds Lua compiler. It can then be used from the shell.',
+                 False))
+
 vars.Update(comp)
 
 if not GetOption( 'help' ):
@@ -397,7 +404,8 @@ if not GetOption( 'help' ):
   # Lua source files and include path
   lua_files = """lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c
     lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c
-    ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c"""
+    ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c
+    luac.c print.c"""
 
   lua_full_files = " " + " ".join( [ "src/lua/%s" % name for name in lua_files.split() ] )
 
@@ -436,13 +444,17 @@ if not GetOption( 'help' ):
   else:
     conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
 
+  # For (bytecode) compilers running on the MCU.
+  if comp['lang'] == 'lua':
+    conf.env.Append(CPPDEFINES = {"LUA_COMPILER" : ( comp['luac'] != 0 and 1 or 0 ) } )
+
   # Additional libraries
   local_libs = ''
 
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c src/shell/shell_luac.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c

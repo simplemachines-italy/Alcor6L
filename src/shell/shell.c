@@ -36,9 +36,10 @@ char* shell_prog;
 
 // Language specific shell functions.
 #ifdef ALCOR_LANG_PICOC
-SHELL_FUNC( shell_picoc );
+  SHELL_FUNC( shell_picoc );
 #else
-SHELL_FUNC( shell_lua );
+  SHELL_FUNC( shell_lua );
+  SHELL_FUNC( shell_luac );
 #endif
 
 // Extern implementations of shell functions
@@ -210,6 +211,7 @@ static const SHELL_COMMAND shell_commands[] =
   { "picoc", shell_picoc },
 #else
   { "lua", shell_lua },
+  { "luac", shell_luac },
 #endif
   { "help", shell_help },
   { "recv", shell_recv },

@@ -27,9 +27,10 @@ typedef struct
 
 // Language specific includes.
 #ifdef ALCOR_LANG_PICOC
-SHELL_HELP( picoc );
+  SHELL_HELP( picoc );
 #else
-SHELL_HELP( lua );
+  SHELL_HELP( lua );
+  SHELL_HELP( luac );
 #endif
 
 // Other shell commands.
@@ -64,6 +65,7 @@ static const SHELL_HELP_DATA shell_help_data[] =
   SHELL_INFO( picoc ),
 #else
   SHELL_INFO( lua ),
+  SHELL_INFO( luac ),
 #endif
   SHELL_INFO( ls ),
   SHELL_INFO_ALIAS( dir, ls ),

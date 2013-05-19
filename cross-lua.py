@@ -1,7 +1,7 @@
 import os, sys 
 
 output = 'luac.cross'
-cdefs = '-DLUA_CROSS_COMPILER'
+cdefs = '-DLUA_CROSS_COMPILER -DLUA_COMPILER=0'
 
 # Lua source files and include path
 lua_files = """lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c
