@@ -146,10 +146,10 @@ static void pterm_getcy(pstate *p, val *r, val **param, int n)
   r->Val->UnsignedInteger = term_get_cy();
 }
 
-// picoc: key = term_getchar([mode]);
+// picoc: key = term_getchar(mode);
 static void pterm_getchar(pstate *p, val *r, val **param, int n)
 {
-  int temp = TERM_INPUT_WAIT, res;
+  int temp, res;
 
   temp = param[0]->Val->Integer;
   res = term_getch(temp);
@@ -168,16 +168,19 @@ static void pterm_decode(pstate *p, val *r, val **param, int n)
   unsigned i, total = sizeof(term_key_names) / sizeof(char*);
 
   if (!key || *key != 'K') {
-    r->Val->Integer = -1;
-    return pmod_error("Invalid key.");
+    r->Val->Integer = 0;
+    return;
   }
   for (i = 0; i < total; i++)
     if (!strcmp(key, term_key_names[i]))
       break;
-  if (i == total)
+  if (i == total) {
     r->Val->Integer = 0;
-  else
+    return;
+  } else {
     r->Val->Integer = i + TERM_FIRST_KEY;
+    return;
+  }
 }
 
 #define MIN_OPT_LEVEL 2
