@@ -215,7 +215,7 @@ static void tmr_decode(pstate *p, val *r, val **param, int n)
 
 #if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE tmr_variables[] = {
-  {STRKEY("tmr_SYS_TIMER"), INT(sysid)},
+  {STRKEY("tmr_DEFAULT"), INT(sysid)},
 #ifdef HAS_TMR_MATCH_INT_PICOC
   {STRKEY("tmr_INT_ONESHOT"), INT(oneshot)},
   {STRKEY("tmr_INT_CYCLIC"), INT(cyclic)},
@@ -234,7 +234,9 @@ const PICOC_REG_TYPE tmr_library[] = {
   {FUNC(tmr_getmaxdelay), PROTO("unsigned long tmr_getmaxdelay(unsigned int);")},
   {FUNC(tmr_setclock), PROTO("unsigned long tmr_setclock(unsigned int, unsigned long);")},
   {FUNC(tmr_getclock), PROTO("unsigned long tmr_getclock(unsigned int);")},
+#if VTMR_NUM_TIMERS > 0
   {FUNC(tmr_decode), PROTO("unsigned long tmr_decode(char *);")},
+#endif
   {NILFUNC, NILPROTO}
 };
 
