@@ -156,6 +156,30 @@ static void write_rtc_regs(u8 *regs)
 // ****************************************************************************
 // RTC module for PicoC.
 
+// RTC variables.
+const int rtc_sec = SEC;
+const int rtc_min = MIN;
+const int rtc_hour = HOUR;
+const int rtc_wday = WDAY;
+const int rtc_day = DAY;
+const int rtc_month = MONTH;
+const int rtc_year = YEAR;
+
+// Library setup function
+extern void rtc_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_integer("mizar32_rtc_SEC", rtc_sec);
+  picoc_def_integer("mizar32_rtc_MIN", rtc_min);
+  picoc_def_integer("mizar32_rtc_HOUR", rtc_hour);
+  picoc_def_integer("mizar32_rtc_WDAY", rtc_wday);
+  picoc_def_integer("mizar32_rtc_DAY", rtc_day);
+  picoc_def_integer("mizar32_rtc_MONTH", rtc_month);
+  picoc_def_integer("mizar32_rtc_YEAR", rtc_year);
+#endif
+}
+
+// PicoC: field_value = mizar32_rtc_get(field);
 static void rtc_get(pstate *p,  val *r, val **param, int n)
 {
   u8 regs[7];
@@ -192,13 +216,88 @@ static void rtc_get(pstate *p,  val *r, val **param, int n)
 	+ ((regs[MONTH] & 0x80) ? 2000 : 1900);
       break;
     default:
-      pmod_error("Invalid RTC command.");
+      pmod_error("Invalid real-time clock field.");
   }
 }
 
+// PicoC: mizar32_rtc_set(field, value);
 static void rtc_set(pstate *p, val *r, val **param, int n)
 {
+  u8 buf[NFIELDS+1];	// I2C message: First byte is the register address
+  u8 *regs = buf + 1;	// The registers
+  int field;            // Which field are we handling (0-6)
+  unsigned value;
 
+  rtc_init();
+
+  if (rtc_type == RTC_SYSTEM) {
+    // Unimplemented as yet
+    return pmod_error("No real-time clock chip present");
+  }
+
+  field = param[0]->Val->Integer; // the field (0-6)
+  value = param[1]->Val->Integer; // field's set value.
+
+  if (value < minval[field] || value > maxval[field])
+    return pmod_error("Time value out of range.");
+
+  // Read the chip's registers into our buffer so that unspecified fields
+  // remain at the same value as before
+  read_rtc_regs(regs);
+
+  // Special cases for some fields
+  switch (field) {
+  case SEC: case MIN: case HOUR:
+  case WDAY: case DAY:
+    regs[field] = toBCD(value);
+    break;
+  case MONTH:
+    // Set new month but preserve century bit in case they don't set the year
+    regs[MONTH] = (regs[MONTH] & 0x80) | toBCD(value);
+    break;
+  case YEAR:
+    if (value < 2000) {
+      value -= 1900; regs[MONTH] &= 0x7F;
+    } else {
+      value -= 2000; regs[MONTH] |= 0x80;
+    }
+    regs[YEAR] = toBCD(value);
+    break;
+  default:
+    return pmod_error("Invalid real-time clock field.");
+  }
+
+  write_rtc_regs(regs);
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE term_variables[] = {
+  {STRKEY("mizar32_rtc_SEC"), INT(rtc_sec)},
+  {STRKEY("mizar32_rtc_MIN"), INT(rtc_min)},
+  {STRKEY("mizar32_rtc_HOUR"), INT(rtc_hour)},
+  {STRKEY("mizar32_rtc_WDAY"), INT(rtc_wday)},
+  {STRKEY("mizar32_rtc_DAY"), INT(rtc_day)},
+  {STRKEY("mizar32_rtc_MONTH"), INT(rtc_month)},
+  {STRKEY("mizar32_rtc_YEAR"), INT(rtc_year)},
+  {NILKEY, NILVAL}
+};
+#endif // #if PICOC_TINYRAM_ON
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE rtc_library[] = {
+  {FUNC(rtc_get), PROTO("int mizar32_rtc_get(int);")},
+  {FUNC(rtc_set), PROTO("void mizar32_rtc_set(int, int);")},
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void rtc_library_init(void)
+{
+  REGISTER("rtc.h", &rtc_lib_setup_func,
+	   &rtc_library[0]);
 }
 
 #else
