@@ -64,7 +64,7 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
   MOD_CHECK_ID(spi, id);
   is_master = param[1]->Val->UnsignedInteger;
   if (!is_master)
-    return pmod_error("invalid type (only spi.MASTER is supported)");
+    return pmod_error("invalid type (only spi_MASTER is supported)");
   clock = param[2]->Val->UnsignedLongInteger;
   cpol = param[3]->Val->UnsignedInteger;
   if ((cpol != 0) && (cpol != 1))
