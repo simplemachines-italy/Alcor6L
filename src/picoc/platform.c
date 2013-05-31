@@ -172,6 +172,10 @@ void ProgramFail(struct ParseState *Parser, const char *Message, ...)
     PlatformExit(1);
 }
 
+void pmod_error(char *msg) {
+  ProgramFail(NULL, msg);
+}
+
 /* like ProgramFail() but gives descriptive error messages for assignment */
 void AssignFail(struct ParseState *Parser, const char *Format, struct ValueType *Type1, struct ValueType *Type2, int Num1, int Num2, const char *FuncName, int ParamNo)
 {

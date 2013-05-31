@@ -9,12 +9,6 @@
 
 #include "interpreter.h"
 
-// An easy-to-type module
-// error function.
-void pmod_error(char *msg) {
-  ProgramFail(NULL, msg);
-}
-
 /* init protos */
 
 /* board & cpu functions */

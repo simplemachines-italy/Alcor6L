@@ -442,6 +442,7 @@ void LibPrintf(struct ParseState *Parser, struct Value *ReturnValue, struct Valu
  * void PicocPlatformScanFile(const char *FileName);
  * extern int PicocExitValue; */
 void ProgramFail(struct ParseState *Parser, const char *Message, ...);
+void pmod_error(char *msg);
 void AssignFail(struct ParseState *Parser, const char *Format, struct ValueType *Type1, struct ValueType *Type2, int Num1, int Num2, const char *FuncName, int ParamNo);
 void LexFail(struct LexState *Lexer, const char *Message, ...);
 void PlatformCleanup();
