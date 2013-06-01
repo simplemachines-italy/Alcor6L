@@ -37,12 +37,6 @@
 // ****************************************************************************
 // Timer module for PicoC.
 
-// In PicoC, we have a read-only value - tmr_DEFAULT
-// This will be set as PLATFORM_TIMER_SYS_ID in the
-// rotable if memory optimizations are on (optram=1).
-// This value could also be used in other modules
-// such as uart.
-
 // A few helper functions.
 
 static void get_timer_data(timer_data_type *d, val **param, int i)
@@ -66,7 +60,7 @@ const int cyclic = PLATFORM_TIMER_INT_CYCLIC;
 extern void tmr_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_integer("tmr_DEFAULT", sysid);
+  picoc_def_integer("tmr_SYS_TIMER", sysid);
 #ifdef HAS_TMR_MATCH_INT_PICOC
   picoc_def_integer("tmr_INT_ONESHOT", oneshot);
   picoc_def_integer("tmr_INT_CYCLIC", cyclic);
@@ -215,7 +209,7 @@ static void tmr_decode(pstate *p, val *r, val **param, int n)
 
 #if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE tmr_variables[] = {
-  {STRKEY("tmr_DEFAULT"), INT(sysid)},
+  {STRKEY("tmr_SYS_TIMER"), INT(sysid)},
 #ifdef HAS_TMR_MATCH_INT_PICOC
   {STRKEY("tmr_INT_ONESHOT"), INT(oneshot)},
   {STRKEY("tmr_INT_CYCLIC"), INT(cyclic)},
