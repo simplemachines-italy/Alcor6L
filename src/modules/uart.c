@@ -38,12 +38,345 @@ enum
 // ****************************************************************************
 // UART module for PicoC.
 
-// TODO:
+const int par_even = PLATFORM_UART_PARITY_EVEN;
+const int par_odd = PLATFORM_UART_PARITY_ODD;
+const int par_none = PLATFORM_UART_PARITY_NONE;
+const int stop_1 = PLATFORM_UART_STOPBITS_1;
+const int stop_1_5 = PLATFORM_UART_STOPBITS_1_5;
+const int stop_2 = PLATFORM_UART_STOPBITS_2;
+const int no_timeout = 0;
+const int inf_timeout = UART_INFINITE_TIMEOUT;
+const int flow_none = PLATFORM_UART_FLOW_NONE;
+const int flow_rts = PLATFORM_UART_FLOW_RTS;
+const int flow_cts = PLATFORM_UART_FLOW_CTS;
+
+// Library setup function
+extern void uart_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_integer("uart_PAR_EVEN", par_even);
+  picoc_def_integer("uart_PAR_ODD", par_odd);
+  picoc_def_integer("uart_PAR_NONE", par_none);
+  picoc_def_integer("uart_STOP_1", stop_1);
+  picoc_def_integer("uart_STOP_1_5", stop_1_5);
+  picoc_def_integer("uart_STOP_2", stop_2);
+  picoc_def_integer("uart_NO_TIMEOUT", no_timeout);
+  picoc_def_integer("uart_INF_TIMEOUT", inf_timeout);
+  picoc_def_integer("uart_FLOW_NONE", flow_none);
+  picoc_def_integer("uart_FLOW_RTS", flow_rts);
+  picoc_def_integer("uart_FLOW_CTS", flow_cts);
+#endif
+}
+
+// Helper to get timeout and timer_id values.
+static void uart_get_timeout_data(timer_data_type *timeout,
+				  unsigned *timer_id,
+				  val **param,
+				  int timeout_index,
+				  int timer_id_index)
+{
+  *timeout = param[timeout_index]->Val->UnsignedLongInteger;
+  if (*timeout < 0 || *timeout > PLATFORM_TIMER_INF_TIMEOUT)
+    pmod_error("invalid timeout value");
+  *timer_id = param[timer_id_index]->Val->UnsignedInteger;
+  if (*timer_id == PLATFORM_TIMER_SYS_ID &&
+      !platform_timer_sys_available())
+    pmod_error("the system timer is not implemented on this platform");
+}
+
+// PicoC: uart_setup(id, baud, databits, parity, stopbits);
+static void uart_setup(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, databits, parity, stopbits;
+  u32 baud, res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(uart, id);
+  if (id >= SERMUX_SERVICE_ID_FIRST)
+    return pmod_error("uart_setup can't be called on virtual UARTs");
+  baud = param[1]->Val->UnsignedLongInteger;
+  databits = param[2]->Val->UnsignedInteger;
+  parity = param[3]->Val->UnsignedInteger;
+   stopbits = param[4]->Val->UnsignedInteger;
+  res = platform_uart_setup(id, baud, databits, parity, stopbits);
+  r->Val->UnsignedLongInteger = res;
+}
+
+// PicoC: uart_write_num(id, ival);
+static void uart_write_num(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, nval;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(uart, id);
+  nval = param[1]->Val->UnsignedInteger;
+  if ((n < 0) || (n > 255))
+    return pmod_error("invalid number");
+  platform_uart_send(id, (u8)nval);
+}
+
+// PicoC: uart_write_str(id, str, len);
+static void uart_write_str(pstate *p, val *r, val **param, int n)
+{
+  unsigned id, len, i;
+  char *buf;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(uart, id);
+  buf = param[1]->Val->Identifier;
+  len = param[2]->Val->UnsignedInteger;
+
+  for (i = 0; i < len; i++)
+    platform_uart_send(id, buf[i]);
+}
+
+// PicoC: integer = uart_read_num(id, timeout, timer_id);
+static void uart_read_num(pstate *p, val *r, val **param, int n)
+{
+  int id, res, issign;
+  unsigned timer_id;
+  s32 count = 0;
+  char cres;
+  timer_data_type timeout;
+  
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(uart, id);
+
+  // Get timeout and timer id.
+  uart_get_timeout_data(&timeout, &timer_id, param, 1, 2);
+ 
+  // Read data.
+  while (1) {
+    if ((res = platform_uart_recv(id, timer_id, timeout)) == -1)
+      break;
+    cres = (char)res;
+    count++;
+    issign = (count == 1) && ((res == '-') || (res == '+'));
+    if (!isdigit(cres) && !issign)
+      break;
+  }
+  r->Val->Integer = res;
+}
+
+// PicoC: data = uart_readn(id, max_num, timeout, timer_id);
+static void uart_readn(pstate *p, val *r, val **param, int n)
+{
+  int id, res;
+  unsigned timer_id;
+  s32 maxsize = 0;
+  char cres; char *buf;
+  timer_data_type timeout;
+  FILE *buf_stream;
+  size_t buf_size;
+
+  buf_stream = open_memstream(&buf, &buf_size);
+
+  id = param[0]->Val->Integer;
+  MOD_CHECK_ID(uart, id);
+
+  // Get maxsize and check if it is valid.
+  maxsize = param[1]->Val->LongInteger;
+  if (maxsize < 0)
+    return pmod_error("invalid max size");
+
+  // Get timer and timeout information.
+  uart_get_timeout_data(&timeout, &timer_id, param, 1, 2);
+
+  // Read data.
+  while (1) {
+    if ((res = platform_uart_recv(id, timer_id, timeout)) == -1)
+      break;
+    cres = (char)res;
+    fprintf(buf_stream, "%c", cres);
+    if (buf_size == maxsize)
+      break;
+  }
+  fflush(buf_stream);
+  fclose(buf_stream);
+  r->Val->Identifier = buf;
+}
+
+// PicoC: data = uart_read_space(id, timeout, timer_id);
+static void uart_read_space(pstate *p, val *r, val **param, int n)
+{
+  int id, res;
+  unsigned timer_id;
+  timer_data_type timeout;
+  char cres = 0;
+
+  id = param[0]->Val->Integer;
+  MOD_CHECK_ID(uart, id);
+  uart_get_timeout_data(&timeout, &timer_id, param, 1, 2);
+
+  while (1) {
+    if ((res = platform_uart_recv(id, timer_id, timeout)) == -1)
+      break;
+    cres = (char)res;
+    if (isspace(cres))
+      break;
+  }
+  r->Val->Character = cres;
+}
+
+// PicoC: line = uart_read_line(id, timeout, timer_id);
+static void uart_read_line(pstate *p, val *r, val **param, int n)
+{
+  int id, res;
+  unsigned timer_id;
+  char cres; char *buf;
+  timer_data_type timeout;
+  FILE *buf_stream;
+  size_t buf_size;
+
+  buf_stream = open_memstream(&buf, &buf_size);
+
+  id = param[0]->Val->Integer;
+  MOD_CHECK_ID(uart, id);
+  uart_get_timeout_data(&timeout, &timer_id, param, 1, 2);
+
+  while (1) {
+    if ((res = platform_uart_recv(id, timer_id, timeout)) == -1)
+      break;
+    cres = (char)res;
+    // [TODO] this only works for lines that actually end
+    // with '\n', other line endings are not supported.
+    if (cres == '\n')
+      break;
+    fprintf(buf_stream, "%c", cres);
+  }
+  fflush(buf_stream);
+  fclose(buf_stream);
+  r->Val->Identifier = buf;
+}
+
+// PicoC: data = uart_getchar(id, timeout, timer_id);
+static void uart_getchar(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  int res;
+  unsigned timer_id = PLATFORM_TIMER_SYS_ID;
+  timer_data_type timeout;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_ID(uart, id);
+  uart_get_timeout_data(&timeout, &timer_id, param, 1, 2);
+
+  res = platform_uart_recv(id, timer_id, timeout);
+  if (res == -1)
+    r->Val->Character = 0;
+  else
+    r->Val->Character = res;
+}
+
+// PicoC: uart_set_buffer(id, size);
+static void uart_set_buffer(pstate *p, val *r, val **param, int n)
+{
+  int id = param[0]->Val->Integer;
+  u32 size = param[1]->Val->UnsignedLongInteger;
+  
+  MOD_CHECK_ID(uart, id);
+  if (size && (size & (size - 1)))
+    return pmod_error("the buffer size must be a power of 2 or 0");
+  if (size == 0 && id >= SERMUX_SERVICE_ID_FIRST)
+    return pmod_error("disabling buffers on virtual UARTs is not allowed");
+  if (platform_uart_set_buffer(id, intlog2(size) == PLATFORM_ERR))
+    return pmod_error("unable to set UART buffer");
+}
+
+// PicoC: uart_set_flow_control(id, type);
+static void uart_set_flow_control(pstate *p, val *r, val **param, int n)
+{
+  int id = param[0]->Val->Integer;
+  int type = param[1]->Val->Integer;
+  
+  MOD_CHECK_ID(uart, id);
+  if (platform_uart_set_flow_control(id, type) != PLATFORM_OK)
+    return ProgramFail(NULL, "unable to set the flow control on interface %d", id);
+}
+
+#ifdef BUILD_SERMUX
+
+#define MAX_VUART_NAME_LEN    6
+#define MIN_VUART_NAME_LEN    6
+
+static void uart_decode(pstate *p, val *r, val **param, int n)
+{
+  char *key = param[0]->Val->Identifier;
+  char *pend;
+  long res;
+
+  if (strlen(key) > MAX_VUART_NAME_LEN || strlen(key) < MIN_VUART_NAME_LEN) {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  if (strncmp(key, "VUART", 5)) {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  res = strtol(key + 5, &pend, 10);
+  if (*pend != '\0') {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  if (res >= SERMUX_NUM_VUART) {
+    r->Val->LongInteger = 0;
+    return;
+  }
+  r->Val->LongInteger = SERMUX_SERVICE_ID_FIRST + res;
+}
+
+#endif // #ifdef BUILD_SERMUX
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE uart_variables[] = {
+  {STRKEY("uart_PAR_EVEN"), INT(par_even)},
+  {STRKEY("uart_PAR_ODD"), INT(par_odd)},
+  {STRKEY("uart_PAR_NONE"), INT(par_none)},
+  {STRKEY("uart_STOP_1"), INT(stop_1)},
+  {STRKEY("uart_STOP_1_5"), INT(stop_1_5)},
+  {STRKEY("uart_STOP_2"), INT(stop_2)},
+  {STRKEY("uart_NO_TIMEOUT"), INT(no_timeout)},
+  {STRKEY("uart_INF_TIMEOUT"), INT(inf_timeout)},
+  {STRKEY("uart_FLOW_NONE"), INT(flow_none)},
+  {STRKEY("uart_FLOW_RTS"), INT(flow_rts)},
+  {STRKEY("uart_FLOW_CTS"), INT(flow_cts)},
+  {NILKEY, NILVAL}
+};
+#endif
+
+// List of all library functions and their prototypes
+const PICOC_REG_TYPE uart_library[] = {
+  {FUNC(uart_setup), PROTO("unsigned long uart_setup(unsigned int, unsigned long,"
+			   "unsigned int, unsigned int, unsigned int);")},
+  {FUNC(uart_write_num), PROTO("void uart_write_num(unsigned int, unsigned int);")},
+  {FUNC(uart_write_str), PROTO("void uart_write_str(unsigned int, char *, unsigned int);")},
+  {FUNC(uart_read_num), PROTO("int uart_read_num(int, unsigned long, unsigned int);")},
+  {FUNC(uart_readn), PROTO("char *uart_readn(int, long, unsigned long, unsigned int);")},
+  {FUNC(uart_read_space), PROTO("char uart_read_space(int, unsigned long, unsigned int);")},
+  {FUNC(uart_read_line), PROTO("char *uart_read_line(int, unsigned long, unsigned int);")},
+  {FUNC(uart_getchar), PROTO("char uart_getchar(unsigned int, unsigned long, unsigned int);")},
+  {FUNC(uart_set_buffer), PROTO("void uart_set_buffer(unsigned int, unsigned long);")},
+  {FUNC(uart_set_flow_control), PROTO("void uart_set_flow_control(int, int);")},
+#ifdef BUILD_SERMUX
+  {FUNC(uart_decode), PROTO("unsigned long uart_decode(char *);")},
+#endif
+  {NILFUNC, NILPROTO}
+};
+
+// Init library.
+extern void uart_library_init(void)
+{
+  REGISTER("uart.h", uart_lib_setup_func,
+	   &uart_library[0]);
+}
 
 #else
 
 // ****************************************************************************
-// RTC module for Lua.
+// UART module for Lua.
 
 // Helper function, the same as cmn_get_timeout_data() but with the
 // parameters in the order required by the uart module.
