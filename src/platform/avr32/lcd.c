@@ -4,6 +4,7 @@
 #ifdef ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
+# include "rotable.h"
 #else
 # include "lua.h"
 # include "lualib.h"
@@ -243,60 +244,61 @@ static void lcd_buttons(pstate *p, val *r, val **param , int n)
   r->Val->Identifier = string;
 }
 
-// Move all these handy variables in
-// a rotable. One can then do this:
-// mizar32_disp_cursor(lcd_BLOCK);
-const int lcd_none = LCD_CMD_CURSOR_NONE;
-const int lcd_block = LCD_CMD_CURSOR_BLOCK;
-const int lcd_line = LCD_CMD_CURSOR_LINE;
-const int lcd_left = LCD_CMD_SHIFT_CURSOR_LEFT;
-const int lcd_right = LCD_CMD_SHIFT_CURSOR_RIGHT;
-const int lcd_off = LCD_CMD_DISPLAY_OFF;
+// cursor and command specific values.
+const int lcd_cur_none = LCD_CMD_CURSOR_NONE;
+const int lcd_cur_block = LCD_CMD_CURSOR_BLOCK;
+const int lcd_cur_line = LCD_CMD_CURSOR_LINE;
+const int lcd_cur_left = LCD_CMD_SHIFT_CURSOR_LEFT;
+const int lcd_cur_right = LCD_CMD_SHIFT_CURSOR_RIGHT;
+const int lcd_cmd_off = LCD_CMD_DISPLAY_OFF;
+const int lcd_cmd_on = 1;
+const int lcd_cmd_lshift = LCD_CMD_SHIFT_DISPLAY_LEFT;
+const int lcd_cmd_rshift = LCD_CMD_SHIFT_DISPLAY_RIGHT;
 
 // "Display on/off control" functions
 static void lcd_cursor(pstate *p, val *r, val **param, int n)
 {
   switch (param[0]->Val->Integer) {
-    case LCD_CMD_CURSOR_NONE:
-      set_cursor(LCD_CMD_CURSOR_NONE);
-      break;
-    case LCD_CMD_CURSOR_BLOCK:
-      set_cursor(LCD_CMD_CURSOR_BLOCK);
-      break;
-    case LCD_CMD_CURSOR_LINE:
-      set_cursor(LCD_CMD_CURSOR_LINE);
-      break;
-    case LCD_CMD_SHIFT_CURSOR_LEFT:
-      send_command(LCD_CMD_SHIFT_CURSOR_LEFT);
-      break;
-    case LCD_CMD_SHIFT_CURSOR_RIGHT:
-      send_command(LCD_CMD_SHIFT_CURSOR_RIGHT);
-      break;
-    default:
-      return pmod_error("Invslid LCD cursor command.");
+  case LCD_CMD_CURSOR_NONE:
+    set_cursor(LCD_CMD_CURSOR_NONE);
+    break;
+  case LCD_CMD_CURSOR_BLOCK:
+    set_cursor(LCD_CMD_CURSOR_BLOCK);
+    break;
+  case LCD_CMD_CURSOR_LINE:
+    set_cursor(LCD_CMD_CURSOR_LINE);
+    break;
+  case LCD_CMD_SHIFT_CURSOR_LEFT:
+    send_command(LCD_CMD_SHIFT_CURSOR_LEFT);
+    break;
+  case LCD_CMD_SHIFT_CURSOR_RIGHT:
+    send_command(LCD_CMD_SHIFT_CURSOR_RIGHT);
+    break;
+  default:
+    return pmod_error("invslid LCD cursor command.");
   }
 }
 
-// Perform display operations, selected by a string parameter.
+// Perform display operations, selected by an integer parameter.
 static void lcd_display(pstate *p, val *r, val **param, int n)
 {
   switch (param[0]->Val->Integer) {
-    case 0:
-      display_is_off = 1;
-      send_command(LCD_CMD_DISPLAY_OFF);
-      break;
-    case 1:
-      display_is_off = 0;
-      send_command(cursor_type);       
-      break;
-    case 2:
-      send_command(LCD_CMD_SHIFT_DISPLAY_LEFT);
-      break;
-    case 3:
-      send_command(LCD_CMD_SHIFT_DISPLAY_RIGHT);
-      break;
-    default:
-      return pmod_error("Invalid LCD display command.");
+  case LCD_CMD_DISPLAY_OFF:
+    display_is_off = 1;
+    send_command(LCD_CMD_DISPLAY_OFF);
+    break;
+  case 1:
+    display_is_off = 0;
+    send_command(cursor_type);
+    break;
+  case LCD_CMD_SHIFT_DISPLAY_LEFT:
+    send_command(LCD_CMD_SHIFT_DISPLAY_LEFT);
+    break;
+  case LCD_CMD_SHIFT_DISPLAY_RIGHT:
+    send_command(LCD_CMD_SHIFT_DISPLAY_RIGHT);
+    break;
+  default:
+    return pmod_error("invalid LCD display command.");
   }
 }
 
@@ -337,13 +339,15 @@ static void lcd_definechar(pstate *p, val *r, val **param, int n)
 
 #if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE lcd_variables[] = {
-  {STRKEY("lcd_NONE"), INT(lcd_none)},
-  {STRKEY("lcd_BLOCK"), INT(lcd_block)},
-  {STRKEY("lcd_LINE"), INT(lcd_line)},
-  {STRKEY("lcd_LEFT"), INT(lcd_left)},
-  {STRKEY("lcd_RIGHT"), INT(lcd_right)},
-  {STRKEY("lcd_OFF"), INT(lcd_off)},
-  {STRKEY("lcd_ON"), INT(lcd_on)},
+  {STRKEY("lcd_CUR_NONE"), INT(lcd_cur_none)},
+  {STRKEY("lcd_CUR_BLOCK"), INT(lcd_cur_block)},
+  {STRKEY("lcd_CUR_LINE"), INT(lcd_cur_line)},
+  {STRKEY("lcd_CUR_LEFT"), INT(lcd_cur_left)},
+  {STRKEY("lcd_CUR_RIGHT"), INT(lcd_cur_right)},
+  {STRKEY("lcd_CMD_OFF"), INT(lcd_cmd_off)},
+  {STRKEY("lcd_CMD_ON"), INT(lcd_cmd_on)},
+  {STRKEY("lcd_CMD_LSHIFT"), INT(lcd_cmd_lshift)},
+  {STRKEY("lcd_CMD_RSHIFT"), INT(lcd_cmd_rshift)},
   {NILKEY, NILVAL}
 };
 #endif
@@ -368,13 +372,15 @@ const PICOC_REG_TYPE lcd_disp_library[] = {
 extern void lcd_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_integer("lcd_NONE", lcd_none);
-  picoc_def_integer("lcd_BLOCK", lcd_block);
-  picoc_def_integer("lcd_LINE", lcd_line);
-  picoc_def_integer("lcd_LEFT", lcd_left);
-  picoc_def_integer("lcd_RIGHT", lcd_right);
-  picoc_def_integer("lcd_OFF", lcd_off);
-  picoc_def_integer("lcd_ON", lcd_none);
+  picoc_def_integer("lcd_CUR_NONE", lcd_cur_none);
+  picoc_def_integer("lcd_CUR_BLOCK", lcd_cur_block);
+  picoc_def_integer("lcd_CUR_LINE", lcd_cur_line);
+  picoc_def_integer("lcd_CUR_LEFT", lcd_cur_left);
+  picoc_def_integer("lcd_CUR_RIGHT", lcd_cur_right);
+  picoc_def_integer("lcd_CMD_OFF", lcd_cmd_off);
+  picoc_def_integer("lcd_CMD_ON", lcd_cmd_on);
+  picoc_def_integer("lcd_CMD_LSHIFT", lcd_cmd_lshift);
+  picoc_def_integer("lcd_CMD_RSHIFT", lcd_cmd_rshift);
 #endif
 }
 
