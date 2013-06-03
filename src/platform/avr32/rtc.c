@@ -274,7 +274,7 @@ static void rtc_set(pstate *p, val *r, val **param, int n)
 #include "rodefs.h"
 
 #if PICOC_TINYRAM_ON
-const PICOC_RO_TYPE term_variables[] = {
+const PICOC_RO_TYPE rtc_variables[] = {
   {STRKEY("mizar32_rtc_SEC"), INT(rtc_sec)},
   {STRKEY("mizar32_rtc_MIN"), INT(rtc_min)},
   {STRKEY("mizar32_rtc_HOUR"), INT(rtc_hour)},
