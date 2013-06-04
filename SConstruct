@@ -423,6 +423,12 @@ if not GetOption( 'help' ):
     comp.Append(CPPPATH = ['src/lua'])
 
   comp.Append(CPPPATH = [ 'src/iv' ])
+  
+  # 'target' options.
+  if comp['lang'] == 'picoc':
+    if comp['target'] == 'no_fp':
+      conf.env.Append(CPPDEFINES = ['NO_FP'])
+
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
