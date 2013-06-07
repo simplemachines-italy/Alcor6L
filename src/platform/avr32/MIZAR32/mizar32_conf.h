@@ -109,10 +109,78 @@
 // ****************************************************************************
 // Language configurations: PicoC.
 
-// stack and heap config
-// values are set after experimentation. Needs validation.
-#define HEAP_SIZE             (48*1024)
-#define PICOC_STACK_SIZE      (42*1024)
+#ifndef NO_FP
+# define MATHLINE _ROM(PICOC_CORE_LIB_MATH, &MathSetupFunc, &MathFunctions[0], NULL)
+#else
+# define MATHLINE
+#endif
+
+#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+/* core library functions */
+#define PICOC_CORE_LIBS_ROM\
+  MATHLINE\
+  _ROM(PICOC_CORE_LIB_STDIO, &StdioSetupFunc, &StdioFunctions[0], StdioDefs)\
+  _ROM(PICOC_CORE_LIB_CTYPE, NULL, &StdCtypeFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STDBOOL, &StdboolSetupFunc, NULL, StdboolDefs)\
+  _ROM(PICOC_CORE_LIB_STDLIB, &StdlibSetupFunc, &StdlibFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STRING, &StringSetupFunc, &StringFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_ERRNO, &StdErrnoSetupFunc, NULL, NULL)
+#endif
+
+#ifdef BUILD_ADC
+# define ADCLINE _ROM(PICOC_PLAT_LIB_ADC, NULL, &adc_library[0], NULL)
+#else
+# define ADCLINE
+#endif
+
+/* platform library functions */
+#define PICOC_PLATFORM_LIBS_ROM\
+  _ROM(PICOC_PLAT_LIB_PD, NULL, &pd_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TERM, NULL, &term_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_CPU, NULL, &cpu_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_ELUA, NULL, &elua_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_UART, NULL, &uart_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_PWM, NULL, &pwm_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TMR, NULL, &tmr_library[0], NULL)\
+  ADCLINE\
+  _ROM(PICOC_PLAT_LIB_I2C, NULL, &i2c_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_SPI, NULL, &spi_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_RTC, NULL, &rtc_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_LCD, NULL, &lcd_disp_library[0], NULL)
+
+#ifndef NO_FP
+# define MATHLINE_VAR _ROM(PICOC_CORE_VAR_MATH, &math_variables[0])
+#else
+# define MATHLINE_VAR
+#endif
+
+/* core system variables */
+#define PICOC_CORE_VARS_ROM\
+  _ROM(PICOC_CORE_VAR_ERRNO, &errno_variables[0])\
+  MATHLINE_VAR\
+  _ROM(PICOC_CORE_VAR_STDBOOL, &stdbool_variables[0])\
+  _ROM(PICOC_CORE_VAR_STDIO, &stdio_variables[0])
+
+#ifdef BUILD_TERM
+# define TERMLINE_VAR _ROM(PICOC_PLAT_VAR_TERM, &term_variables[0])
+#else
+# define TERMLINE_VAR
+#endif
+
+/* platform variables */
+#define PICOC_PLATFORM_VARS_ROM\
+  TERMLINE_VAR\
+  _ROM(PICOC_PLAT_VAR_UART, &uart_variables[0])\
+  _ROM(PICOC_PLAT_VAR_I2C, &i2c_variables[0])\
+  _ROM(PICOC_PLAT_VAR_SPI, &spi_variables[0])\
+  _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])\
+  _ROM(PICOC_PLAT_VAR_LCD, &lcd_variables[0])\
+  _ROM(PICOC_PLAT_VAR_RTC, &rtc_variables[0])
+
+// PicoC stack and heap configurations.
+// Needs validation.
+#define HEAP_SIZE             (1024*1024)
+#define PICOC_STACK_SIZE      (1024*1024)
 
 #else
 
