@@ -25,6 +25,9 @@
 #define PICOC_LIB_INIT(mod)\
   void mod ## _library_init(void)
 
+#define PICOC_LIB_INIT_CALL(mod)\
+  mod ## _library_init();
+
 #define PICOC_LIB_SETUP_FUNC(mod)\
   void mod ## _lib_setup_func(void)
 
