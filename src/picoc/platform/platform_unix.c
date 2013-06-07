@@ -81,7 +81,7 @@ char *PlatformReadFile(const char *FileName)
     fsize = (unsigned int) ftell(InFile);
     rewind(InFile);
 
-    ReadText = HeapAllocMem(fsize + 1);
+    ReadText = (char *)malloc(fsize + 1);
     if (ReadText == NULL) {
 	printf("\ncannot allocate: %d bytes\n", fsize);
         ProgramFail(NULL, "out of memory\n");
@@ -89,7 +89,7 @@ char *PlatformReadFile(const char *FileName)
 
     BytesRead = fread(ReadText, 1, fsize, InFile);
     if (BytesRead == 0)
-        ProgramFail(NULL, "can't read file %s\n", FileName);
+        ProgramFail(NULL, "can't read file `%s'\n", FileName);
 
     ReadText[BytesRead] = '\0';
     fclose(InFile);
@@ -101,7 +101,6 @@ char *PlatformReadFile(const char *FileName)
 void PicocPlatformScanFile(const char *FileName)
 {
     char *SourceStr = PlatformReadFile(FileName);
-
     PicocParse(FileName, SourceStr, strlen(SourceStr), TRUE, FALSE, TRUE);
 }
 
