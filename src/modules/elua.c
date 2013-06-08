@@ -44,7 +44,8 @@ static void elua_save_history(pstate *p, val *r, val **param, int n)
 {
 #ifdef BUILD_LINENOISE
   const char *fname = param[0]->Val->Identifier;
-  
+  int res;
+ 
   res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
   if (res == 0)
     printf("History saved to %s.\n", fname);
