@@ -95,10 +95,12 @@ static void adc_setsmoothing(pstate *p, val *r, val **param, int n)
   length = param[1]->Val->UnsignedInteger;
   if (!(length & (length - 1))) {
     res = platform_adc_set_smoothing(id, length);
-    if (res == PLATFORM_ERR)
+    if (res == PLATFORM_ERR) {
       return pmod_error("Buffer allocation failed.");
-    else
+    } else {
+      r->Val->UnsignedInteger = res;
       return;
+    }      
   } else {
     return pmod_error("Length must be power of 2");
   }
@@ -218,11 +220,11 @@ static void adc_insertsamples(pstate *p, val *r, val **param, int n)
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE adc_library[] = {
-  {FUNC(adc_maxval), PROTO("unsigned long adc_maxval(void);")},
+  {FUNC(adc_maxval), PROTO("unsigned long adc_maxval(unsigned int);")},
   {FUNC(adc_setclock), PROTO("unsigned long adc_setclock(unsigned int, long, unsigned int);")},
   {FUNC(adc_isdone), PROTO("unsigned int adc_isdone(unsigned int);")},
   {FUNC(adc_setblocking), PROTO("void adc_setblocking(unsigned int, unsigned int);")},
-  {FUNC(adc_setsmoothing), PROTO("void adc_setsmoothing(void);")},
+  {FUNC(adc_setsmoothing), PROTO("unsigned int adc_setsmoothing(unsigned int, unsigned int);")},
   {FUNC(adc_sample), PROTO("int adc_sample(unsigned int, unsigned int);")},
   {FUNC(adc_getsample), PROTO("int adc_getsample(unsigned int);")},
 #if defined (BUF_ENABLE_ADC)
