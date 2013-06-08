@@ -158,8 +158,8 @@ void platform_timer_sys_disable_int();
 // eLua CAN ID types
 enum
 {
-  ALCOR_CAN_ID_STD = 0,
-  ALCOR_CAN_ID_EXT
+  ELUA_CAN_ID_STD = 0,
+  ELUA_CAN_ID_EXT
 };
 
 int platform_can_exists( unsigned id );
