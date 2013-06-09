@@ -3,7 +3,12 @@
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#include "auxmods.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc_mod.h"
+#else
+# include "auxmods.h"
+#endif
+
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 #include "stacks.h"
@@ -14,38 +19,39 @@
 
 // *****************************************************************************
 // Define here what components you want for this platform
-//#if !defined( ELUA_BOARD_SOLDERCORE )
+//#if !defined( ALCOR_BOARD_SOLDERCORE )
   #define BUILD_XMODEM
   #define BUILD_TERM
 //#endif
 
 #define BUILD_SHELL
 #define BUILD_ROMFS
-#ifndef ELUA_BOARD_EKLM3S9D92
+#ifndef ALCOR_BOARD_EKLM3S9D92
 #define BUILD_MMCFS
 #endif
 
-#if defined( ELUA_BOARD_SOLDERCORE )
+#if defined( ALCOR_BOARD_SOLDERCORE )
   #define BUILD_USB_CDC
 #endif
 
-#if !defined( FORLM3S1968 ) && !defined( ELUA_BOARD_EKLM3S9D92 )
-  #define BUILD_UIP
-  #define BUILD_DHCPC
-  #define BUILD_DNS
+#if !defined( FORLM3S1968 ) && !defined( ALCOR_BOARD_EKLM3S9D92 )
+//  #define BUILD_UIP
+//  #define BUILD_DHCPC
+//  #define BUILD_DNS
 #endif
 
 #define BUILD_LINENOISE
 
 #define BUILD_ADC
 #define BUILD_RPC
-//#if defined( ELUA_BOARD_SOLDERCORE )
+#define BUILD_EDITOR_IV
+//#if defined( ALCOR_BOARD_SOLDERCORE )
 //  #define BUILD_CON_TCP
 //#else
   #define BUILD_CON_GENERIC
 //#endif
 #define BUILD_C_INT_HANDLERS
-#ifdef ELUA_BOARD_EKLM3S9D92
+#ifdef ALCOR_BOARD_EKLM3S9D92
 #define BUILD_LUA_INT_HANDLERS
 #define PLATFORM_INT_QUEUE_LOG_SIZE 5
 #endif
@@ -65,7 +71,7 @@
 // *****************************************************************************
 // UART/Timer IDs configuration data (used in main.c)
 
-#if defined( ELUA_BOARD_SOLDERCORE )
+#if defined( ALCOR_BOARD_SOLDERCORE )
 #define CON_UART_ID         CDC_UART_ID
 #else
 #define CON_UART_ID           0
@@ -75,8 +81,115 @@
 #define TERM_LINES            25
 #define TERM_COLS             80
 
-// *****************************************************************************
 // Auxiliary libraries that will be compiled for this platform
+
+#ifdef ALCOR_LANG_PICOC
+
+// *****************************************************************************
+// Language configurations: PicoC.
+
+#ifndef NO_FP
+# define MATHLINE _ROM(PICOC_CORE_LIB_MATH, &MathSetupFunc, &MathFunctions[0], NULL)
+#else
+# define MATHLINE
+#endif
+
+#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+/* core library functions */
+#define PICOC_CORE_LIBS_ROM\
+  MATHLINE\
+  _ROM(PICOC_CORE_LIB_STDIO, &StdioSetupFunc, &StdioFunctions[0], StdioDefs)\
+  _ROM(PICOC_CORE_LIB_CTYPE, NULL, &StdCtypeFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STDBOOL, &StdboolSetupFunc, NULL, StdboolDefs)\
+  _ROM(PICOC_CORE_LIB_STDLIB, &StdlibSetupFunc, &StdlibFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STRING, &StringSetupFunc, &StringFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_ERRNO, &StdErrnoSetupFunc, NULL, NULL)
+#endif
+
+#ifdef BUILD_ADC
+# define ADCLINE _ROM(PICOC_PLAT_LIB_ADC, NULL, &adc_library[0], NULL)
+#else
+# define ADCLINE
+#endif
+
+#if defined (ENABLE_DISP) || defined (ENABLE_LM3S_GPIO)
+# define PS_LIB_TABLE_NAME   "lm3s"
+#endif
+
+#if defined (FORLM3S8962) || defined (FORLM3S9B92) || defined (FORLM3S9D92)
+# define CANLINE  _ROM(PICOC_PLAT_LIB_CAN, NULL, &can_library[0], NULL)
+# define BUILD_CAN
+#else
+# define CANLINE
+#endif
+
+#ifdef FORLM3S6918
+# define PWMLINE
+#else
+# define PWMLINE  _ROM(PICOC_PLAT_LIB_PWM, NULL, &pwm_library[0], NULL)
+#endif
+
+#ifdef BUILD_UIP
+# define NETLINE  _ROM(PICOC_PLAT_LIB_NET, NULL, &net_library, NULL)
+#else
+# define NETLINE
+#endif
+
+#ifdef BUILD_TERM
+# define TERMLINE _ROM(PICOC_PLAT_LIB_TERM, NULL, &term_library[0], NULL)
+#else
+# define TERMLINE
+#endif
+
+/* platform library functions */
+#define PICOC_PLATFORM_LIBS_ROM\
+  TERMLINE\
+  PWMLINE\
+  NETLINE\
+  ADCLINE\
+  _ROM(PICOC_PLAT_LIB_PD, NULL, &pd_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_CPU, NULL, &cpu_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_ELUA, NULL, &elua_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_UART, NULL, &uart_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TMR, NULL, &tmr_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_SPI, NULL, &spi_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_DISP, NULL, &lm3s_disp_library[0], NULL)
+
+
+#ifndef NO_FP
+# define MATHLINE_VAR _ROM(PICOC_CORE_VAR_MATH, &math_variables[0])
+#else
+# define MATHLINE_VAR
+#endif
+
+/* core system variables */
+#define PICOC_CORE_VARS_ROM\
+  _ROM(PICOC_CORE_VAR_ERRNO, &errno_variables[0])\
+  MATHLINE_VAR\
+  _ROM(PICOC_CORE_VAR_STDBOOL, &stdbool_variables[0])\
+  _ROM(PICOC_CORE_VAR_STDIO, &stdio_variables[0])
+
+#ifdef BUILD_TERM
+# define TERMLINE_VAR _ROM(PICOC_PLAT_VAR_TERM, &term_variables[0])
+#else
+# define TERMLINE_VAR
+#endif
+
+/* platform variables */
+#define PICOC_PLATFORM_VARS_ROM\
+  TERMLINE_VAR\
+  _ROM(PICOC_PLAT_VAR_UART, &uart_variables[0])\
+  _ROM(PICOC_PLAT_VAR_SPI, &spi_variables[0])\
+  _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])
+
+// PicoC stack and heap configurations.
+// Needs validation.
+#define PICOC_STACK_SIZE      (16*1024)
+
+#else
+
+// ****************************************************************************
+// Language configurations: Lua.
 
 // The name of the platform specific libs table
 // FIXME: should handle partial or no inclusion of platform specific modules per conf.py
@@ -152,6 +265,8 @@
   RPCLINE\
   _ROM( LUA_MATHLIBNAME, luaopen_math, math_map )\
   PLATLINE
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // *****************************************************************************
 // Configuration data
@@ -236,22 +351,22 @@
 #define RPC_UART_ID           CON_UART_ID
 #define RPC_UART_SPEED        CON_UART_SPEED
 
-#if defined( ELUA_BOARD_EKLM3S6965 )
+#if defined( ALCOR_BOARD_EKLM3S6965 )
   // EK-LM3S6965
   #define MMCFS_CS_PORT                3
   #define MMCFS_CS_PIN                 0
   #define MMCFS_SPI_NUM                0
-#elif defined( ELUA_BOARD_EKLM3S8962 )
+#elif defined( ALCOR_BOARD_EKLM3S8962 )
   // EK-LM3S8962
   #define MMCFS_CS_PORT                6
   #define MMCFS_CS_PIN                 0
   #define MMCFS_SPI_NUM                0
-#elif defined( ELUA_BOARD_EAGLE100 )
+#elif defined( ALCOR_BOARD_EAGLE100 )
   // Eagle-100
   #define MMCFS_CS_PORT                6
   #define MMCFS_CS_PIN                 1
   #define MMCFS_SPI_NUM                0
-#elif defined( ELUA_BOARD_SOLDERCORE )
+#elif defined( ALCOR_BOARD_SOLDERCORE )
   // Soldercore
   #define MMCFS_CS_PORT                6
   #define MMCFS_CS_PIN                 7
@@ -287,13 +402,13 @@
 #endif
 
 // Flash data (only for LM3S8962 for now)
-#ifdef ELUA_CPU_LM3S8962
+#ifdef ALCOR_CPU_LM3S8962
 #define INTERNAL_FLASH_SIZE             ( 256 * 1024 )
 #define INTERNAL_FLASH_WRITE_UNIT_SIZE  4
 #define INTERNAL_FLASH_SECTOR_SIZE      1024
 #define INTERNAL_FLASH_START_ADDRESS    0
 #define BUILD_WOFS
-#endif // #ifdef ELUA_CPU_LM3S8962
+#endif // #ifdef ALCOR_CPU_LM3S8962
 
 // Allocator data: define your free memory zones here in two arrays
 // (start address and end address)
