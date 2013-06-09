@@ -107,7 +107,7 @@ const PICOC_REG_TYPE lm3s_disp_library[] = {
   {FUNC(disp_clear), PROTO("void lm3s_disp_clear(void);")},
   {FUNC(disp_print), PROTO("void lm3s_disp_print(char *, unsigned long,"
 			   "unsigned long, char);")},
-  {FUNC(disp_image_draw), PROTO("void lm3s_disp_draw(char *, unsigned long"
+  {FUNC(disp_image_draw), PROTO("void lm3s_disp_draw(char *, unsigned long,"
 				"unsigned long, unsigned long, char);")},
   {NILFUNC, NILPROTO}
 };
