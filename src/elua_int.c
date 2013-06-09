@@ -18,17 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 
-// Interrupt queue read and write indexes
-static volatile u8 elua_int_read_idx, elua_int_write_idx;
-// The interrupt queue
-static elua_int_element elua_int_queue[ 1 << PLATFORM_INT_QUEUE_LOG_SIZE ];
-// Interrupt enabled/disabled flags
-static u32 elua_int_flags[ LUA_INT_MAX_SOURCES / 32 ];
-
-// Masking for read/write indexes
-#define INT_IDX_SHIFT                   ( PLATFORM_INT_QUEUE_LOG_SIZE )
-#define INT_IDX_MASK                    ( ( 1 << INT_IDX_SHIFT ) - 1 )
-
 #ifdef ALCOR_LANG_PICOC
 
 // ****************************************************************************
@@ -53,6 +42,17 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 // Interrupt handlers for Lua.
 
 #if defined (BUILD_LUA_INT_HANDLERS)
+
+// Interrupt queue read and write indexes
+static volatile u8 elua_int_read_idx, elua_int_write_idx;
+// The interrupt queue
+static elua_int_element elua_int_queue[ 1 << PLATFORM_INT_QUEUE_LOG_SIZE ];
+// Interrupt enabled/disabled flags
+static u32 elua_int_flags[ LUA_INT_MAX_SOURCES / 32 ];
+
+// Masking for read/write indexes
+#define INT_IDX_SHIFT                   ( PLATFORM_INT_QUEUE_LOG_SIZE )
+#define INT_IDX_MASK                    ( ( 1 << INT_IDX_SHIFT ) - 1 )
 
 // Our hook function (called by the Lua VM)
 static void elua_int_hook( lua_State *L, lua_Debug *ar )
