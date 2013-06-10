@@ -145,6 +145,7 @@
   ADCLINE\
   _ROM(PICOC_PLAT_LIB_I2C, NULL, &i2c_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_SPI, NULL, &spi_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_PIO, NULL, &pio_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_RTC, NULL, &rtc_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_LCD, NULL, &lcd_disp_library[0], NULL)
 
@@ -174,6 +175,7 @@
   _ROM(PICOC_PLAT_VAR_I2C, &i2c_variables[0])\
   _ROM(PICOC_PLAT_VAR_SPI, &spi_variables[0])\
   _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])\
+  _ROM(PICOC_PLAT_VAR_PIO, &pio_variables[0])\
   _ROM(PICOC_PLAT_VAR_LCD, &lcd_variables[0])\
   _ROM(PICOC_PLAT_VAR_RTC, &rtc_variables[0])
 
