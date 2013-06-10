@@ -37,7 +37,7 @@ void PicocInitialise(int StackSize)
 #ifdef BUILD_ADC
     PICOC_LIB_INIT_CALL(adc);
 #endif
-    // PICOC_LIB_INIT_CALL(pio);
+    PICOC_LIB_INIT_CALL(pio);
     PICOC_LIB_INIT_CALL(term);
     PICOC_LIB_INIT_CALL(spi);
     PICOC_LIB_INIT_CALL(uart);
