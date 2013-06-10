@@ -60,7 +60,7 @@ static int pio_value_parse(char *key);
 // Platform variables.
 const int input = PIO_DIR_INPUT;
 const int output = PIO_DIR_OUTPUT;
-const int pull_up = PLATFORM_IO_PIN_PULLUP;;
+const int pull_up = PLATFORM_IO_PIN_PULLUP;
 const int pull_down = PLATFORM_IO_PIN_PULLDOWN;
 const int no_pull = PLATFORM_IO_PIN_NOPULL;
 
