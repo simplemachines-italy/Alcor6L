@@ -6,7 +6,7 @@
 
 #include "type.h"
 
-#define SHELL_WELCOMEMSG                "\nAlcor6L %s  Copyright (C) 2013 simplemachines-italy\n\n"
+#define SHELL_WELCOMEMSG                "\nAlcor6L %s  Copyright (C) 2013 simplemachines-italy\n"
 #define SHELL_PROMPT                    "alcor# "
 #define SHELL_ERRMSG                    "Invalid command, type 'help' for help\n"
 #define SHELL_MAXSIZE                   50
