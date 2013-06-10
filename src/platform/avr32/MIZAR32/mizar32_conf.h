@@ -181,7 +181,6 @@
 
 // PicoC stack and heap configurations.
 // Needs validation.
-#define HEAP_SIZE             (1024*1024)
 #define PICOC_STACK_SIZE      (1024*1024)
 
 #else
