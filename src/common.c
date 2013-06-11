@@ -614,6 +614,26 @@ const char* cmn_str64( u64 x )
   return nr + l + 1;
 }
 
+#ifdef ALCOR_LANG_PICOC
+
+// Helper to get timeout and timer_id values.
+void cmn_get_timeout_data(timer_data_type *timeout,
+			  unsigned *timer_id,
+			  val **param,
+			  int timeout_index,
+			  int timer_id_index)
+{
+  *timeout = param[timeout_index]->Val->UnsignedLongInteger;
+  if (*timeout < 0 || *timeout > PLATFORM_TIMER_INF_TIMEOUT)
+    pmod_error("invalid timeout value");
+  *timer_id = param[timer_id_index]->Val->UnsignedInteger;
+  if (*timer_id == PLATFORM_TIMER_SYS_ID &&
+      !platform_timer_sys_available())
+    pmod_error("the system timer is not implemented on this platform");
+}
+
+#else
+
 // Read a timeout spec from the user and return it
 // The timeout spec has the format [timer_id, timeout]. Both arguments are optional: 
 // If none is specified -> defaults to infinite timeout
@@ -621,8 +641,6 @@ const char* cmn_str64( u64 x )
 // If timeout is PLATFORM_TIMER_INF_TIMEOUT -> also infinite timeout (independent of timer_id)
 // If both are specified -> wait the specified timeout on the specified timer_id
 // If timer_id is 'nil' the system timer will be used
-
-#ifdef ALCOR_LANG_LUA
 
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout )
 {
@@ -641,4 +659,4 @@ void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_typ
     luaL_error( L, "the system timer is not implemented on this platform" );
 }
 
-#endif
+#endif // #ifdef ALCOR_LANG_PICOC

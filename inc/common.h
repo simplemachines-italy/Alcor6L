@@ -65,9 +65,20 @@ char lastchar( const char *s );
 char firstchar( const char *s );
 const char* cmn_str64( u64 x );
 
-#ifdef ALCOR_LANG_LUA
+#ifdef ALCOR_LANG_PICOC
+
+#include "interpreter.h"
+
+void cmn_get_timeout_data(timer_data_type *timeout,
+			  unsigned *timer_id,
+			  val **param,
+			  int timeout_index,
+			  int timer_id_index);
+#else
+
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout );
-#endif
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 #endif // #ifndef __COMMON_H__
 
