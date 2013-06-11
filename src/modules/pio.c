@@ -128,7 +128,7 @@ static int pio_gen_setdir(int v, int optype, int op)
   return 0;
 }
 
-int pio_gen_setpull(int v, int optype, int op)
+static int pio_gen_setpull(int v, int optype, int op)
 {
   if ((op != PLATFORM_IO_PIN_PULLUP) &&
       (op != PLATFORM_IO_PIN_PULLDOWN) &&
@@ -154,6 +154,9 @@ static int pio_gen_setval(int v, int optype, pio_type val)
     pioh_set_port(v, val == 1 ? PLATFORM_IO_PIN_SET : PLATFORM_IO_PIN_CLEAR, val);
   return 0;
 }
+
+// ****************************************************************************
+// Pin operations
 
 // PicoC: pin_setdir(dir, "pin");
 static void pio_pin_setdir(pstate *p, val *r, val **param, int n)
