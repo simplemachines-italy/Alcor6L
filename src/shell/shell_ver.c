@@ -29,6 +29,6 @@ void shell_ver( int argc, char **argv )
     return;
   }
   printf( "Alcor6L version %s\n", ELUA_STR_VERSION );
-  printf( "For more information visit www.simplemachines.it and github.com/simplemachines-italy\n" );
+  printf( "For more information visit www.simplemachines.it\n" );
 }
 
