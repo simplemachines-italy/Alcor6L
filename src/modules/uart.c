@@ -180,7 +180,7 @@ static void uart_readn(pstate *p, val *r, val **param, int n)
     return pmod_error("invalid max size");
 
   // Get timer and timeout information.
-  uart_get_timeout_data(&timeout, &timer_id, param, 1, 2);
+  uart_get_timeout_data(&timeout, &timer_id, param, 2, 3);
 
   // Read data.
   while (1) {
