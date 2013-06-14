@@ -18,9 +18,15 @@
 #include "common.h"
 #include "buf.h"
 #include "utils.h"
-#include "lua.h"
-#include "lauxlib.h"
-#include "lrotable.h"
+
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+#else
+# include "lua.h"
+# include "lauxlib.h"
+# include "lrotable.h"
+#endif
 
 // Platform specific includes
 #include "stm32f10x.h"
@@ -1313,6 +1319,8 @@ int platform_flash_erase_sector( u32 sector_id )
 // ****************************************************************************
 // Platform specific modules go here
 
+#ifdef ALCOR_LANG_LUA
+
 #ifdef ENABLE_ENC
 
 #define MIN_OPT_LEVEL 2
@@ -1352,3 +1360,4 @@ LUALIB_API int luaopen_platform( lua_State *L )
 
 #endif // #ifdef ENABLE_ENC
 
+#endif // #ifdef ALCOR_LANG_LUA
