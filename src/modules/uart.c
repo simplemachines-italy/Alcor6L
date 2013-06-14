@@ -77,11 +77,11 @@ static void uart_get_timeout_data(timer_data_type *timeout,
 {
   *timeout = param[timeout_index]->Val->UnsignedLongInteger;
   if (*timeout < 0 || *timeout > PLATFORM_TIMER_INF_TIMEOUT)
-    pmod_error("invalid timeout value");
+    return pmod_error("invalid timeout value");
   *timer_id = param[timer_id_index]->Val->UnsignedInteger;
   if (*timer_id == PLATFORM_TIMER_SYS_ID &&
       !platform_timer_sys_available())
-    pmod_error("the system timer is not implemented on this platform");
+    return pmod_error("the system timer is not implemented on this platform");
 }
 
 // PicoC: uart_setup(id, baud, databits, parity, stopbits);
