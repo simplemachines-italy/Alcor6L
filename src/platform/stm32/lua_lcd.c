@@ -1,12 +1,21 @@
 // Module to interface with the LCD on the STM3210E board.
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "picoc_mod.h"
+# include "rotable.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "lrotable.h"
+# include "auxmods.h"
+# include "modcommon.h"
+#endif
+
 #include "platform.h"
-#include "auxmods.h"
-#include "modcommon.h"
-#include "lrotable.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -14,6 +23,89 @@
 #include "lcd.h"
 
 #ifdef FORSTM3210E_EVAL
+
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// LCD module (for STM3201E_EVAL) for PicoC.
+
+// PicoC: lcd_init();
+static void lcd_init(pstate *p, val *r, val **param, int n)
+{
+  STM3210E_LCD_Init();
+}
+
+// PicoC: lcd_setforecolor(color);
+static void lcd_setforecolor(pstate *p, val *r, val **param, int n)
+{
+  u16 color = param[0]->Val->UnsignedShortInteger;
+  LCD_SetTextColor(color);
+}
+
+// PicoC: lcd_setbackcolor(color);
+static void lcd_setbackcolor(pstate *p, val *r, val **param, int n)
+{
+  u16 color = param[0]->Val->UnsignedShortInteger;
+  LCD_SetBackColor(color);
+}
+
+// PicoC: lcd_clear(color);
+static int lcd_clear(pstate *p, val *r, val **param, int n)
+{
+  LCD_Clear(param[0]->Val->UnsignedShortInteger);
+}
+
+// PicoC: lcd_clearline(val);
+static int lcd_clearline(pstate *p, val *r, val **param, int n)
+{
+  u8 line = param[0]->Val->Character;
+  LCD_ClearLine(line);
+}
+
+// PicoC: lcd_print(line, str);
+static int lcd_print(pstate *p, val *r, val **param, int n)
+{
+  u8 line = param[0]->Val->Character;
+  u8 *text = param[1]->Val->Identifier;
+
+  LCD_DisplayStringLine(line, text);
+}
+
+// PicoC: val = lcd_decode(str);
+static void lcd_decode(pstate *p, val *r, val **param, int n)
+{
+  char *key = param[0]->Val->Identifier;
+  int linedata[] = {Line0, Line1, Line2, Line3, Line4, Line5, Line6, Line7, Line8, Line9};
+  
+  if (strlen(key) != 5 || strncmp(key, "Line", 4) || !isdigit(key[4])) 
+    return 0;
+  lua_pushinteger( L, linedata[ key[ 4 ] - '0' ] );
+  return 1;
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+const PICOC_REG_TYPE lcd_library[] = {
+  {FUNC(lcd_init), PROTO("void lcd_init(void);")},
+  {FUNC(lcd_setforecolor), PROTO("void lcd_setforecolor(unsigned short);")},
+  {FUNC(lcd_setbackcolor), PROTO("void lcd_setbackcolor(unsigned short);")},
+  {FUNC(lcd_clear), PROTO("void lcd_clear(unsigned short);")},
+  {FUNC(lcd_clearline), PROTO("void lcd_clearline(char);")},
+  {FUNC(lcd_print), PROTO("void lcd_print(char, char *);")},
+  {FUNC(lcd_decode), PROTO("void lcd_decode(char *);")},
+  {NILFUNC, NILPROTO}
+};
+
+extern void lcd_library_init(void)
+{
+  REGISTER("lcd.h", NULL, &lcd_library[0]);
+}
+
+#else
+
+// ****************************************************************************
+// LCD module (for STM3201E_EVAL) for Lua.
 
 static int lcd_init(lua_State * L)
 {
@@ -115,5 +207,7 @@ LUALIB_API int luaopen_lcd(lua_State * L)
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 #endif // #ifdef FORSTM3210E_EVAL
