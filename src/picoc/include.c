@@ -11,14 +11,14 @@
 struct IncludeLibrary
 {
     const char *IncludeName;
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     void (* const SetupFunction)(void);
 #else
     void (*SetupFunction)(void);
 #endif
     const struct LibraryFunction *FuncList;
     const char *SetupCSource;
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     const struct IncludeLibrary *NextLib;
 #else
     struct IncludeLibrary *NextLib;
@@ -26,7 +26,7 @@ struct IncludeLibrary
 };
 
 /* libraries */
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
 
 PICOC_PLAT_LIB_DEFINE(pio);
 PICOC_PLAT_LIB_DEFINE(can);
@@ -129,7 +129,7 @@ const picoc_rt picoc_rotable[] = {
 /* the classical list */
 struct IncludeLibrary *IncludeLibList = NULL;
 
-#endif /* #if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB)) */
+#endif // #if PICOC_TINYRAM_ON
 
 /**
  * This is probably not going to be used without the Picoc Tiny
@@ -158,7 +158,7 @@ void IncludeInit(void)
 /* clean up space used by the include system */
 void IncludeCleanup(void)
 {
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_OFF
     struct IncludeLibrary *ThisInclude = IncludeLibList;
     struct IncludeLibrary *NextInclude;
     
@@ -170,11 +170,11 @@ void IncludeCleanup(void)
     }
 
     IncludeLibList = NULL;
-#endif /* #if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB)) */
+#endif // PICOC_TINYRAM_OFF
 }
 
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
 /* register a new build-in include file */
+#if PICOC_TINYRAM_OFF
 void IncludeRegister(const char *IncludeName, void (*SetupFunction)(void),
 		const struct LibraryFunction *FuncList, const char *SetupCSource)
 {
@@ -186,12 +186,12 @@ void IncludeRegister(const char *IncludeName, void (*SetupFunction)(void),
     NewLib->NextLib = IncludeLibList;
     IncludeLibList = NewLib;
 }
-#endif /* #if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB)) */
+#endif // PICOC_TINYRAM_OFF
 
 /* include all of the system headers */
 void PicocIncludeAllSystemHeaders(void)
 {
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined(BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     const struct IncludeLibrary *ThisInclude = &IncludeLibList[0];
     for (ThisInclude = &IncludeLibList[0]; ThisInclude->IncludeName != NULL; ThisInclude++)
         IncludeFile(TableStrRegister(ThisInclude->IncludeName));
@@ -207,7 +207,7 @@ void IncludeFile(const char *FileName)
 {
     const struct IncludeLibrary *LInclude;
 /* scan for the include file name to see if it's in our list of predefined includes */
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     for (LInclude = &IncludeLibList[0]; LInclude->IncludeName != NULL; LInclude++)
 #else
     for (LInclude = IncludeLibList; LInclude != NULL; LInclude = LInclude->NextLib)
