@@ -21,12 +21,12 @@ void PicocInitialise(int StackSize)
 #endif
     /* global init for libraries */
     LibraryInit();
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_OFF
     LibraryAdd(&GlobalTable, "c library", &CLibrary[0]);
     CLibraryInit();
 #endif
     PlatformLibraryInit();
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_OFF
     // Please note: The few modules (like CAN) aren't
     // available on every target platform. (For example:
     // Mizar32). They are defined in platform_picoc.h
