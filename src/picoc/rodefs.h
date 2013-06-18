@@ -4,8 +4,8 @@
 #undef PICOC_RO_TYPE
 #undef FUNC
 #undef PROTO
-#undef NIL_FUNC
-#undef NIL_PROTO
+#undef NILFUNC
+#undef NILPROTO
 #undef REGISTER
 
 #define PICOC_REG_TYPE              struct LibraryFunction
