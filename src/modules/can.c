@@ -19,8 +19,8 @@ const int id_ext = ELUA_CAN_ID_EXT;
 extern void can_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_tinyram_off("can_ID_STD", id_std);
-  picoc_tinyram_off("can_ID_EXT", id_ext);
+  picoc_def_integer("can_ID_STD", id_std);
+  picoc_def_integer("can_ID_EXT", id_ext);
 #endif
 }
 
