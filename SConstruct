@@ -475,7 +475,7 @@ if not GetOption( 'help' ):
   comp.Append(CPPPATH = ['src/uip'])
 
   # FatFs files
-  app_files = app_files + "src/elua_mmc.c src/mmcfs.c src/fatfs/ff.c src/fatfs/ccsbcs.c "
+  app_files = app_files + "src/elua_mmc.c src/elua_mmc_sim.c src/common_fs.c src/mmcfs.c src/fatfs/ff.c src/fatfs/ccsbcs.c "
   comp.Append(CPPPATH = ['src/fatfs'])
 
   # Alcor6L module files
