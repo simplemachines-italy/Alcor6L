@@ -382,6 +382,16 @@ int _kill( int pid, int sig )
 {
   return -1;
 }
+
+#ifdef ALCOR_SIMULATOR
+
+int kill( int pid, int sig )
+{
+  return -1;
+}
+
+#endif
+
 #endif
 
 // If LUA_NUMBER_INTEGRAL is defined, "redirect" printf/scanf calls to their 

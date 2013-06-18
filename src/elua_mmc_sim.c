@@ -3,7 +3,7 @@
 /*-----------------------------------------------------------------------*/
 
 #include "platform_conf.h"
-#if defined( BUILD_MMCFS ) && defined( ELUA_SIMULATOR )
+#if defined( BUILD_MMCFS ) && defined( ALCOR_SIMULATOR )
 #include "platform.h"
 #include "hostif.h"
 #include "diskio.h"
@@ -218,5 +218,5 @@ DWORD get_fattime (void)
             ;
 
 }
-#endif // #if defined( BUILD_MMCFS ) && defined( ELUA_SIMULATOR )
+#endif // #if defined( BUILD_MMCFS ) && defined( ALCOR_SIMULATOR )
 

@@ -6,7 +6,7 @@
 // web site by Jesus Alvarez & James Snyder for eLua.
  
 #include "platform_conf.h"
-#if defined( BUILD_MMCFS ) && !defined( ELUA_SIMULATOR )
+#if defined( BUILD_MMCFS ) && !defined( ALCOR_SIMULATOR )
 #include "platform.h"
 #include "diskio.h"
 #include "mmcfs.h"
