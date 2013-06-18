@@ -2,6 +2,7 @@
 #include "interpreter.h"
 #include "picoc_mod.h"
 #include "platform_conf.h"
+#include "rotable.h"
 
 /* the value passed to exit() */
 int PicocExitValue = 0;
