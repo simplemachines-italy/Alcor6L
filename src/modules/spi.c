@@ -29,8 +29,8 @@ const int slave = PLATFORM_SPI_SLAVE;
 extern void spi_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_integer("spi_WAIT", master);
-  picoc_def_integer("spi_NOWAIT", slave);
+  picoc_def_integer("spi_MASTER", master);
+  picoc_def_integer("spi_SLAVE", slave);
 #endif
 }
 
