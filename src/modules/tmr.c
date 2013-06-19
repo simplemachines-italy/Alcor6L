@@ -50,10 +50,10 @@ static void set_timer_data(val *r, timer_data_type res)
 }
 
 // globals.
-const int sysid = PLATFORM_TIMER_SYS_ID;
+static const int sysid = PLATFORM_TIMER_SYS_ID;
 #ifdef HAS_TMR_MATCH_INT_PICOC
-const int oneshot = PLATFORM_TIMER_INT_ONESHOT;
-const int cyclic = PLATFORM_TIMER_INT_CYCLIC;
+static const int oneshot = PLATFORM_TIMER_INT_ONESHOT;
+static const int cyclic = PLATFORM_TIMER_INT_CYCLIC;
 #endif
 
 // Library setup function

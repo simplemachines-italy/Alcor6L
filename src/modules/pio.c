@@ -58,11 +58,11 @@ static int pio_value_parse(char *key);
     return pmod_error("Invalid port/pin");
 
 // Platform variables.
-const int input = PIO_DIR_INPUT;
-const int output = PIO_DIR_OUTPUT;
-const int pull_up = PLATFORM_IO_PIN_PULLUP;
-const int pull_down = PLATFORM_IO_PIN_PULLDOWN;
-const int no_pull = PLATFORM_IO_PIN_NOPULL;
+static const int input = PIO_DIR_INPUT;
+static const int output = PIO_DIR_OUTPUT;
+static const int pull_up = PLATFORM_IO_PIN_PULLUP;
+static const int pull_down = PLATFORM_IO_PIN_PULLDOWN;
+static const int no_pull = PLATFORM_IO_PIN_NOPULL;
 
 extern void pio_lib_setup_func(void)
 {

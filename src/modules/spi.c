@@ -22,8 +22,8 @@
 // SPI module for PicoC.
 
 // Platform variables
-const int master = PLATFORM_SPI_MASTER;
-const int slave = PLATFORM_SPI_SLAVE;
+static const int master = PLATFORM_SPI_MASTER;
+static const int slave = PLATFORM_SPI_SLAVE;
 
 // Library setup function
 extern void spi_lib_setup_func(void)

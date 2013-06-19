@@ -38,17 +38,17 @@ enum
 // ****************************************************************************
 // UART module for PicoC.
 
-const int par_even = PLATFORM_UART_PARITY_EVEN;
-const int par_odd = PLATFORM_UART_PARITY_ODD;
-const int par_none = PLATFORM_UART_PARITY_NONE;
-const int stop_1 = PLATFORM_UART_STOPBITS_1;
-const int stop_1_5 = PLATFORM_UART_STOPBITS_1_5;
-const int stop_2 = PLATFORM_UART_STOPBITS_2;
-const int no_timeout = 0;
-const int inf_timeout = UART_INFINITE_TIMEOUT;
-const int flow_none = PLATFORM_UART_FLOW_NONE;
-const int flow_rts = PLATFORM_UART_FLOW_RTS;
-const int flow_cts = PLATFORM_UART_FLOW_CTS;
+static const int par_even = PLATFORM_UART_PARITY_EVEN;
+static const int par_odd = PLATFORM_UART_PARITY_ODD;
+static const int par_none = PLATFORM_UART_PARITY_NONE;
+static const int stop_1 = PLATFORM_UART_STOPBITS_1;
+static const int stop_1_5 = PLATFORM_UART_STOPBITS_1_5;
+static const int stop_2 = PLATFORM_UART_STOPBITS_2;
+static const int no_timeout = 0;
+static const int inf_timeout = UART_INFINITE_TIMEOUT;
+static const int flow_none = PLATFORM_UART_FLOW_NONE;
+static const int flow_rts = PLATFORM_UART_FLOW_RTS;
+static const int flow_cts = PLATFORM_UART_FLOW_CTS;
 
 // Library setup function
 extern void uart_lib_setup_func(void)

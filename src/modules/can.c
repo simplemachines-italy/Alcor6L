@@ -12,8 +12,8 @@
 #include "rotable.h"
 
 // Platform variables
-const int id_std = ELUA_CAN_ID_STD;
-const int id_ext = ELUA_CAN_ID_EXT;
+static const int id_std = ELUA_CAN_ID_STD;
+static const int id_ext = ELUA_CAN_ID_EXT;
 
 // Library setup function */
 extern void can_lib_setup_func(void)

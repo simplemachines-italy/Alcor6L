@@ -24,10 +24,10 @@
 // I2C module for PicoC.
 
 // A few platform constants.
-const int fast = PLATFORM_I2C_SPEED_FAST;
-const int slow = PLATFORM_I2C_SPEED_SLOW;
-const int trans = PLATFORM_I2C_DIRECTION_TRANSMITTER;
-const int rec = PLATFORM_I2C_DIRECTION_RECEIVER;
+static const int fast = PLATFORM_I2C_SPEED_FAST;
+static const int slow = PLATFORM_I2C_SPEED_SLOW;
+static const int trans = PLATFORM_I2C_DIRECTION_TRANSMITTER;
+static const int rec = PLATFORM_I2C_DIRECTION_RECEIVER;
 
 // Library setup function
 extern void i2c_lib_setup_func(void)

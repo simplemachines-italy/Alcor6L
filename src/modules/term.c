@@ -30,8 +30,8 @@ static const char* term_key_names[] = {TERM_KEYCODES};
 // Terminal module for PicoC.
 
 // Platform variables
-const int no_wait = TERM_INPUT_DONT_WAIT;
-const int wait = TERM_INPUT_WAIT;
+static const int no_wait = TERM_INPUT_DONT_WAIT;
+static const int wait = TERM_INPUT_WAIT;
 
 // Library setup function
 extern void term_lib_setup_func(void)
