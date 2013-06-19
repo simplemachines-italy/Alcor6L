@@ -33,6 +33,7 @@ void PicocInitialise(int StackSize)
     // Mizar32). They are defined in platform_picoc.h
     // All such platform-specific modules will then be
     // included here with PLATFORM_SPECIFIC_INIT_CALLS;
+    PICOC_LIB_INIT_CALL(cpu);
     PICOC_LIB_INIT_CALL(pwm);
     PICOC_LIB_INIT_CALL(tmr);
 #ifdef BUILD_ADC
