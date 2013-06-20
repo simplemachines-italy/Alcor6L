@@ -28,6 +28,7 @@ void PicocInitialise(int StackSize)
 #endif
     PlatformLibraryInit();
 #if PICOC_TINYRAM_OFF
+#if !defined (ALCOR_SIMULATOR) && !defined (ALCOR_PLATFORM_I386)
     // Please note: The few modules (like CAN) aren't
     // available on every target platform. (For example:
     // Mizar32). They are defined in platform_picoc.h
@@ -47,6 +48,7 @@ void PicocInitialise(int StackSize)
     PICOC_LIB_INIT_CALL(elua);
     PLATFORM_SPECIFIC_INIT_CALLS;
 #endif
+#endif // #if PICOC_TINYRAM_OFF 
 
 #if defined (PICOC_PLATFORM_LIBS_REG)
     /* nothing here yet */
