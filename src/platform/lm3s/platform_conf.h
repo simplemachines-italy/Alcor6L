@@ -1,4 +1,5 @@
 // eLua platform configuration
+// Modified to include support for PicoC.
 
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
@@ -180,8 +181,7 @@
   _ROM(PICOC_PLAT_VAR_SPI, &spi_variables[0])\
   _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])
 
-// PicoC stack and heap configurations.
-// Needs validation.
+// PicoC stack configuration.
 #define PICOC_STACK_SIZE      (16*1024)
 
 #else

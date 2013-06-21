@@ -1,4 +1,5 @@
 // eLua platform configuration
+// Modified to include support for PicoC.
 
 // Simplemachines.it Mizar32 board has 128Kbytes of flash with 8kb of bootloader
 // To fit in 120K, build using:
@@ -177,9 +178,8 @@
   _ROM(PICOC_PLAT_VAR_LCD, &lcd_variables[0])\
   _ROM(PICOC_PLAT_VAR_RTC, &rtc_variables[0])
 
-// PicoC stack and heap configurations.
-// Needs validation.
-#define PICOC_STACK_SIZE      (1024*1024)
+// PicoC stack configuration.
+#define PICOC_STACK_SIZE      (32*1024)
 
 #else
 

@@ -119,8 +119,7 @@
   _ROM(PICOC_PLAT_VAR_PIO, &pio_variables[0])
   // _ROM(PICOC_PLAT_VAR_LCD, &lcd_variables[0])
 
-// PicoC stack and heap configurations.
-// Needs validation.
+// PicoC stack configuration.
 #define PICOC_STACK_SIZE      (16*1024)
 
 #else

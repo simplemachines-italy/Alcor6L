@@ -85,8 +85,7 @@
   TERMLINE_VAR\
   _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])
 
-// PicoC stack and heap configurations.
-// Needs validation.
+// PicoC stack configuration.
 #define PICOC_STACK_SIZE      (16*1024)
 
 #else
