@@ -251,7 +251,7 @@ if not GetOption( 'help' ):
   #           cpu = <cpuname>
   #           board = <board> cpu=<cpuname>
   if comp['board'] == 'auto' and comp['cpu'] == 'auto':
-    print "Must specifiy board, cpu, or both"
+    print "Must specify board, cpu, or both"
     Exit( -1 )
   elif comp['board'] != 'auto' and comp['cpu'] != 'auto':
     # Check if the board, cpu pair is correct
