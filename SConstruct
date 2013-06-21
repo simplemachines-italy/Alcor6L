@@ -359,7 +359,7 @@ if not GetOption( 'help' ):
     print
     print "*********************************"
     print "Compiling Alcor6L ..."
-    print "Language        ", comp['lang']
+    print "Language:       ", comp['lang']
     print "CPU:            ", comp['cpu']
     print "Board:          ", comp['board']
     print "Platform:       ", platform
