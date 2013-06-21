@@ -94,7 +94,6 @@
 # define MATHLINE
 #endif
 
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
 /* core library functions */
 #define PICOC_CORE_LIBS_ROM\
   MATHLINE\
@@ -104,7 +103,6 @@
   _ROM(PICOC_CORE_LIB_STDLIB, &StdlibSetupFunc, &StdlibFunctions[0], NULL)\
   _ROM(PICOC_CORE_LIB_STRING, &StringSetupFunc, &StringFunctions[0], NULL)\
   _ROM(PICOC_CORE_LIB_ERRNO, &StdErrnoSetupFunc, NULL, NULL)
-#endif
 
 #ifdef BUILD_ADC
 # define ADCLINE _ROM(PICOC_PLAT_LIB_ADC, NULL, &adc_library[0], NULL)
