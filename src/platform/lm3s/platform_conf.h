@@ -152,6 +152,7 @@
   _ROM(PICOC_PLAT_LIB_UART, NULL, &uart_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_TMR, NULL, &tmr_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_SPI, NULL, &spi_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_PIO, NULL, &pio_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_DISP, NULL, &lm3s_disp_library[0], NULL)
 
 
