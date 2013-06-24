@@ -17,9 +17,9 @@
 #include "elua_int.h"
 #include "sermux.h"
 
-#if defined (ALCOR_LANG_MPLISP)
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined (ALCOR_LANG_PICOC)
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 #else
 # include "lua.h"
