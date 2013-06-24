@@ -26,7 +26,9 @@ typedef struct
 } SHELL_HELP_DATA;
 
 // Language specific includes.
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+  SHELL_HELP( picolisp );
+#elif defined ALCOR_LANG_PICOC
   SHELL_HELP( picoc );
 #else
   SHELL_HELP( lua );
@@ -61,7 +63,9 @@ static const char shell_help_summary_exit[] = "exit the shell";
 static const SHELL_HELP_DATA shell_help_data[] = 
 {
   SHELL_INFO( help ),
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+  SHELL_INFO( picolisp ),
+#elif defined ALCOR_LANG_PICOC
   SHELL_INFO( picoc ),
 #else
   SHELL_INFO( lua ),
