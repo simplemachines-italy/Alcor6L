@@ -194,7 +194,7 @@ vars.AddVariables(
   MatchEnumVariable('lang',
                     'Build Alcor6L with support for the specified language',
                     'lua',
-                    allowed_values=[ 'lua', 'picoc', 'miniPicoLisp' ] ),
+                    allowed_values=[ 'lua', 'picoc', 'picolisp' ] ),
   BoolVariable(     'optram',
                     'enables Tiny RAM enhancements',
                     True ),
@@ -206,13 +206,19 @@ vars.AddVariables(
 vars.Update(comp)
 
 # Target config variables.
-if comp['lang'] == 'picoc':
+if comp['lang'] == 'picolisp':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float miniPicoLisp',
+                      'fp',
+                      allowed_values = [ 'fp' ] ) )
+elif comp['lang'] == 'picoc':
   vars.AddVariables(
     MatchEnumVariable('target',
                       'build "regular" float picoc or integer-only',
                       'fp',
                       allowed_values = [ 'fp', 'nofp' ] ) )
-else:
+elif comp['lang'] == 'lua':
   vars.AddVariables(
     MatchEnumVariable('target',
                       'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
@@ -221,13 +227,13 @@ else:
 
 # Boot config variables.
 # For picoc, the only boot option for now is 'standard'
-if comp['lang'] == 'picoc':
+if comp['lang'] == 'picoc' or comp['lang'] == 'picolisp':
   vars.AddVariables(
     MatchEnumVariable('boot',
                       'boot mode, standard will boot to shell',
                       'standard',
                       allowed_values = [ 'standard' ] ) )
-else:
+elif comp['lang'] == 'lua':
   vars.AddVariables(
     MatchEnumVariable('boot',
                       'boot mode, standard will boot to shell, luarpc boots to an rpc server',
@@ -372,11 +378,11 @@ if not GetOption( 'help' ):
     print "*********************************"
     print
 
-  output = 'alcor_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
+  output = 'Alcor6L_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
 
   # Language specific defines.
-  if comp['lang'] == 'miniPicoLisp':
-    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_MPLISP'])
+  if comp['lang'] == 'picolisp':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOLISP'])
   elif comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOC'])
   else:
@@ -418,14 +424,14 @@ if not GetOption( 'help' ):
 
   picoc_full_files = " " + " ".join( [ "src/picoc/%s" % name for name in picoc_files.split() ] )
 
-  # miniPicoLisp source files and include path.
-  mplisp_files = """apply.c flow.c gc.c io.c main.c math.c subr.c sym.c tab.c"""
+  # picolisp source files and include path.
+  picolisp_files = """apply.c flow.c gc.c io.c main.c math.c subr.c sym.c tab.c"""
   
-  mplisp_full_files = " " + " ".join( [ "src/miniPicoLisp/src/%s" % name for name in mplisp_files.split() ] )
+  picolisp_full_files = " " + " ".join( [ "src/picolisp/src/%s" % name for name in picolisp_files.split() ] )
 
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
-  if comp['lang'] == 'miniPicoLisp':
-    comp.Append(CPPPATH = ['src/miniPicoLisp/src'])
+  if comp['lang'] == 'picolisp':
+    comp.Append(CPPPATH = ['src/picolisp/src'])
   elif comp['lang'] == 'picoc':
     comp.Append(CPPPATH = ['src/picoc'])
   else:
@@ -451,8 +457,8 @@ if not GetOption( 'help' ):
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
 
   # Tiny RAM optimizations.
-  if comp['lang'] == 'miniPicoLisp':
-    conf.env.Append(CPPDEFINES = {"MPLISP_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  if comp['lang'] == 'picolisp':
+    conf.env.Append(CPPDEFINES = {"PICOLISP_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
   elif comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = {"PICOC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
     if comp['optram'] == 0:
@@ -471,7 +477,7 @@ if not GetOption( 'help' ):
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c src/shell/shell_luac.c src/shell/shell_mplisp.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c src/shell/shell_luac.c src/shell/shell_picolisp.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c
@@ -516,8 +522,8 @@ if not GetOption( 'help' ):
   source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
 
   # Language specific files.
-  if comp['lang'] == 'miniPicoLisp':
-    source_files += Split( mplisp_full_files )
+  if comp['lang'] == 'picolisp':
+    source_files += Split( picolisp_full_files )
   elif comp['lang'] == 'picoc':
     source_files += Split( picoc_full_files )
   else:
