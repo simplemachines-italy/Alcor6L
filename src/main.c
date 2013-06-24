@@ -11,7 +11,9 @@
 #include "shell.h"
 
 // Language specific includes.
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 #else
 # include "lua.h"
@@ -37,8 +39,11 @@
 // Define here your autorun/boot files,
 // in the order you want eLua to search for them
 char *boot_order[] = {
-#if defined (BUILD_MMCFS)
-#ifdef ALCOR_LANG_PICOC
+#if defined BUILD_MMCFS
+#if defined ALCOR_LANG_PICOLISP
+  "/mmc/autorun.l",
+  "/mmc/autorun.lc",
+#elif defined ALCOR_LANG_PICOC
   "/mmc/autorun.c",
   "/mmc/autorun.pc",
 #else
@@ -46,8 +51,11 @@ char *boot_order[] = {
   "/mmc/autorun.lc",
 #endif
 #endif
-#if defined(BUILD_ROMFS)
-#ifdef ALCOR_LANG_PICOC
+#if defined BUILD_ROMFS
+#if defined ALCOR_LANG_PICOLISP
+  "/rom/autorun.l",
+  "/rom/autorun.lc",
+#elif defined ALCOR_LANG_PICOC
   "/rom/autorun.c",
   "/rom/autorun.pc",
 #else
@@ -127,7 +135,10 @@ int main( void )
     if( ( fp = fopen( boot_order[ i ], "r" ) ) != NULL )
     {
       fclose( fp );
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+      char* picolisp_argv[] = { "picolisp", boot_order[i], NULL };
+      picolisp_main( 2, picolisp_argv );
+#elif defined ALCOR_LANG_PICOC
       char* picoc_argv[] = { "picoc", boot_order[i], NULL };
       picoc_main( 2, picoc_argv );
 #else
@@ -145,7 +156,10 @@ int main( void )
   // Run the shell
   if( shell_init() == 0 )
   {
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+    char* picolisp_argv[] = { "picolisp", NULL };
+    picolisp_main( 1, picolisp_argv );
+#elif defined ALCOR_LANG_PICOC
     char* picoc_argv[] = { "picoc", NULL };
     picoc_main( 1, picoc_argv );
 #else
