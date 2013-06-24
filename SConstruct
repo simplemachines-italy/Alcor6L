@@ -194,7 +194,7 @@ vars.AddVariables(
   MatchEnumVariable('lang',
                     'Build Alcor6L with support for the specified language',
                     'lua',
-                    allowed_values=[ 'lua', 'picoc' ] ),
+                    allowed_values=[ 'lua', 'picoc', 'miniPicoLisp' ] ),
   BoolVariable(     'optram',
                     'enables Tiny RAM enhancements',
                     True ),
@@ -375,7 +375,9 @@ if not GetOption( 'help' ):
   output = 'alcor_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
 
   # Language specific defines.
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'miniPicoLisp':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_MPLISP'])
+  elif comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOC'])
   else:
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_LUA'])
@@ -416,8 +418,15 @@ if not GetOption( 'help' ):
 
   picoc_full_files = " " + " ".join( [ "src/picoc/%s" % name for name in picoc_files.split() ] )
 
+  # miniPicoLisp source files and include path.
+  mplisp_files = """apply.c flow.c gc.c io.c main.c math.c subr.c sym.c tab.c"""
+  
+  mplisp_full_files = " " + " ".join( [ "src/miniPicoLisp/src/%s" % name for name in mplisp_files.split() ] )
+
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'miniPicoLisp':
+    comp.Append(CPPPATH = ['src/miniPicoLisp/src'])
+  elif comp['lang'] == 'picoc':
     comp.Append(CPPPATH = ['src/picoc'])
   else:
     comp.Append(CPPPATH = ['src/lua'])
@@ -442,7 +451,9 @@ if not GetOption( 'help' ):
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
 
   # Tiny RAM optimizations.
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'miniPicoLisp':
+    conf.env.Append(CPPDEFINES = {"MPLISP_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  elif comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = {"PICOC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
     if comp['optram'] == 0:
       conf.env.Append(CPPDEFINES = ['BUILTIN_MINI_STDLIB'])
@@ -505,7 +516,9 @@ if not GetOption( 'help' ):
   source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
 
   # Language specific files.
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'miniPicoLisp':
+    source_files += Split( mplisp_full_files )
+  elif comp['lang'] == 'picoc':
     source_files += Split( picoc_full_files )
   else:
     source_files += Split( lua_full_files )
