@@ -681,7 +681,7 @@ static void spi_init_master( unsigned controller )
     .pcs_decode = FALSE,
     .delay = 0,
   };
-  static bool spi_is_master[ (NUM_SPI + 3) / 4];  // initialized as 0
+  static avr32_bool spi_is_master[ (NUM_SPI + 3) / 4];  // initialized as 0
 
   if ( ! spi_is_master[controller] ) {
     spi_initMaster(
