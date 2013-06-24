@@ -4,7 +4,9 @@
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc_mod.h"
 #else
 # include "auxmods.h"
