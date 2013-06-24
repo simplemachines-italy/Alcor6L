@@ -1,7 +1,9 @@
 // eLua module for Mizar2 Real Time Clock hardware
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "rotable.h"
@@ -151,7 +153,12 @@ static void write_rtc_regs(u8 *regs)
   i2c_send(rtc_slave_address, regs - 1, NFIELDS+1, true);
 }
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// RTC module for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // RTC module for PicoC.
@@ -433,4 +440,4 @@ const LUA_REG_TYPE rtc_map[] =
   { LNILKEY, LNILVAL }
 };
 
-#endif // ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
