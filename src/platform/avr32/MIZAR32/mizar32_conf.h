@@ -1,5 +1,5 @@
 // eLua platform configuration
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
 // Simplemachines.it Mizar32 board has 128Kbytes of flash with 8kb of bootloader
 // To fit in 120K, build using:
@@ -39,7 +39,9 @@
 // # define BUILD_UIP
 
 // Interrupt handler support
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# define BUILD_PICOLISP_INT_HANDLERS
+#elif defined ALCOR_LANG_PICOC
 # define BUILD_PICOC_INT_HANDLERS
 #else
 # define BUILD_LUA_INT_HANDLERS
@@ -105,7 +107,14 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Language configurations: miniPicoLisp
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Language configurations: PicoC.
@@ -246,7 +255,7 @@
 
 #endif
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #if defined ALCOR_LANG_PICOLISP
 
 // *****************************************************************************
 // Configuration data
