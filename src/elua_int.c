@@ -1,10 +1,11 @@
 // eLua interrupt support
-// Modified for the Alcor system of
-// multiple languages.
+// Modified to include support for Alcor6L.
 
 #include "elua_int.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 #else
@@ -18,23 +19,27 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef ALCOR_LANG_PICOC
+// A reference required in common_tmr.c.
+int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
+{
+  return PLATFORM_ERR;
+}
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Interrupt handlers for miniPicoLisp.
+
+// TODO:
+// Interrupt handler mechanism for PicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Interrupt handlers for PicoC.
 
 // TODO:
 // Interrupt handler mechanism for PicoC.
-
-// For now, BUILD_PICOC_INT_HANDLERS doesn't make
-// much sense. However, we can include this macro
-// in platform_conf.
-
-// A reference required in common_tmr.c.
-int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
-{
-  return PLATFORM_ERR;
-}
 
 #else
 
