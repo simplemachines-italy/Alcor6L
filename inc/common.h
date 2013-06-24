@@ -74,11 +74,14 @@ void cmn_get_timeout_data(timer_data_type *timeout,
 			  val **param,
 			  int timeout_index,
 			  int timer_id_index);
-#else
+
+#endif // #ifdef ALCOR_LANG_PICOC
+
+#ifdef ALCOR_LANG_LUA
 
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout );
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
 
 #endif // #ifndef __COMMON_H__
 

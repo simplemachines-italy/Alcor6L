@@ -17,7 +17,9 @@
 #include "elua_int.h"
 #include "sermux.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined (ALCOR_LANG_MPLISP)
+# include "pico.h"
+#elif defined (ALCOR_LANG_PICOC)
 # include "picoc.h"
 #else
 # include "lua.h"
@@ -632,7 +634,9 @@ void cmn_get_timeout_data(timer_data_type *timeout,
     pmod_error("the system timer is not implemented on this platform");
 }
 
-#else
+#endif // #ifdef ALCOR_LANG_PICOC
+
+#ifdef ALCOR_LANG_LUA
 
 // Read a timeout spec from the user and return it
 // The timeout spec has the format [timer_id, timeout]. Both arguments are optional: 
@@ -659,4 +663,4 @@ void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_typ
     luaL_error( L, "the system timer is not implemented on this platform" );
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
