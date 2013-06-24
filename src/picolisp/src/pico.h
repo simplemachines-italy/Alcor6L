@@ -2,6 +2,9 @@
  * (c) Software Lab. Alexander Burger
  */
 
+#ifndef __MPLISP_H__
+#define __MPLISP_H__
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -11,8 +14,8 @@
 #include <setjmp.h>
 #include <stdint.h>
 
-#define WORD ((int)sizeof(long))
-#define BITS (8*WORD)
+#define PICOLISP_WORD ((int)sizeof(long))
+#define BITS (8*PICOLISP_WORD)
 #define CELLS (1024*1024/sizeof(cell))
 
 typedef unsigned long word;
@@ -126,9 +129,9 @@ typedef struct catchFrame {
 #define isNil(x)        ((x)==Nil)
 #define isTxt(x)        (num(x)&1)
 #define isNum(x)        (num(x)&2)
-#define isSym(x)        (num(x)&WORD)
-#define isSymb(x)       ((num(x)&(WORD+2))==WORD)
-#define isCell(x)       (!(num(x)&(2*WORD-1)))
+#define isSym(x)        (num(x)&PICOLISP_WORD)
+#define isSymb(x)       ((num(x)&(PICOLISP_WORD+2))==PICOLISP_WORD)
+#define isCell(x)       (!(num(x)&(2*PICOLISP_WORD-1)))
 
 /* Evaluation */
 #define EVAL(x)         (isNum(x)? x : isSym(x)? val(x) : evList(x))
@@ -159,6 +162,7 @@ extern any Nil, Meth, Quote, T, At, At2, At3, This;
 extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
 
 /* Prototypes */
+int picolisp_main(int argc, char *argv[]);
 void *alloc(void*,size_t);
 any apply(any,any,bool,int,cell*);
 void argError(any,any) __attribute__ ((noreturn));
@@ -621,3 +625,5 @@ static inline any run(any x) {
    val(At) = Pop(at);
    return y;
 }
+
+#endif // #define __MPLISP_H__
