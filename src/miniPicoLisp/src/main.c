@@ -695,7 +695,7 @@ any loadAll(any ex) {
 }
 
 /*** Main ***/
-int main(int ac, char *av[]) {
+int mplisp_main(int ac, char *av[]) {
    char *p;
 
    AV0 = *av++;
