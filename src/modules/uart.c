@@ -1,7 +1,9 @@
 // Module for interfacing with UART
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -33,7 +35,12 @@ enum
 
 #define UART_INFINITE_TIMEOUT PLATFORM_TIMER_INF_TIMEOUT
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// UART module for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // UART module for PicoC.
@@ -651,4 +658,4 @@ LUALIB_API int luaopen_uart( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

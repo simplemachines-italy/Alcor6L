@@ -1,11 +1,17 @@
 // Module for interfacing with platform data
+// Modified to include support for Alcor6L.
 
 #include "platform.h"
 
 #define MACRO_NAME( x ) MACRO_AGAIN( x )
 #define MACRO_AGAIN( x ) #x
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Platform module for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Platform module for PicoC.
@@ -97,4 +103,4 @@ LUALIB_API int luaopen_pd( lua_State* L )
   LREGISTER( L, AUXLIB_PD, pd_map );
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

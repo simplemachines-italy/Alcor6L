@@ -1,8 +1,14 @@
 // Module for interfacing Lua code with a Controller Area Network (CAN)
+// Modified to include support for Alcor6L.
 
 #include "platform.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// CAN for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // CAN for PicoC.
@@ -201,4 +207,4 @@ LUALIB_API int luaopen_can( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

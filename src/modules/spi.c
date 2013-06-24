@@ -1,7 +1,9 @@
 // Module for interfacing with Lua SPI code
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -16,7 +18,12 @@
 
 #include "platform.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// SPI module for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // SPI module for PicoC.
@@ -272,4 +279,4 @@ LUALIB_API int luaopen_spi( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

@@ -1,8 +1,16 @@
 // Module for interfacing with PWM
+// Modified to include support for Alcor6L.
 
 #include "platform.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Pulse width modulation module for miniPicoLisp.
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Pulse width modulation module for PicoC.
@@ -199,4 +207,4 @@ LUALIB_API int luaopen_pwm( lua_State *L )
   LREGISTER( L, AUXLIB_PWM, pwm_map );
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

@@ -1,7 +1,9 @@
 // Module for interfacing with network functions (elua_net.h)
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -23,7 +25,18 @@
 
 #include "platform_conf.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Net module for miniPicoLisp.
+
+#ifdef BUILD_UIP
+
+#else
+
+#endif
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Net module for PicoC.
@@ -262,4 +275,4 @@ LUALIB_API int luaopen_net( lua_State *L )
 
 #endif // #ifdef BUILD_UIP
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

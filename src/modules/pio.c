@@ -1,8 +1,9 @@
 // Module for interfacing with PIO
-// Modified to include support for
-// PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -44,7 +45,14 @@ static void pioh_clear_masks(void)
     pio_masks[i] = 0;
 }
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// PIO module for miniPicoLisp.
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // PIO module for PicoC.
@@ -915,4 +923,4 @@ LUALIB_API int luaopen_pio( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP

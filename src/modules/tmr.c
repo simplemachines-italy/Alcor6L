@@ -1,7 +1,9 @@
 // Module for interfacing with timers
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -32,7 +34,12 @@
 #define HAS_TMR_MATCH_INT_PICOC
 #endif
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Timer module for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Timer module for PicoC.
@@ -462,4 +469,4 @@ LUALIB_API int luaopen_tmr( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

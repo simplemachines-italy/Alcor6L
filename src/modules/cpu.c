@@ -1,7 +1,9 @@
 // Module for interfacing with CPU
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -36,7 +38,12 @@ static const cpu_const_t cpu_constants[] =
 };
 #endif
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// CPU module for miniPicoLisp.
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // CPU module for PicoC.
@@ -424,4 +431,4 @@ LUALIB_API int luaopen_cpu( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP

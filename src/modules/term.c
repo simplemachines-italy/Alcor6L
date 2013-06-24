@@ -1,7 +1,9 @@
 // Module for interfacing with terminal functions
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -24,7 +26,14 @@
 #define _D(x) #x
 static const char* term_key_names[] = {TERM_KEYCODES};
 
-#if defined (ALCOR_LANG_PICOC) && defined (BUILD_TERM)
+#if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
+
+// ****************************************************************************
+// Terminal module for miniPicoLisp.
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOC && defined BUILD_TERM
 
 // ****************************************************************************
 // Terminal module for PicoC.
@@ -431,4 +440,4 @@ LUALIB_API int luaopen_term( lua_State* L )
 #endif // #ifdef BUILD_TERM  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM

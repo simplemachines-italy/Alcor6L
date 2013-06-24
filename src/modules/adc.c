@@ -1,7 +1,9 @@
 // Module for interfacing with ADC
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
@@ -21,7 +23,14 @@
 
 #ifdef BUILD_ADC
 
-#ifdef ALCOR_LANG_PICOC
+// ****************************************************************************
+// ADC (Analog to digital converter) module for miniPicoLisp.
+
+#if defined ALCOR_LANG_PICOLISP
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for PicoC.
@@ -488,4 +497,4 @@ LUALIB_API int luaopen_adc( lua_State *L )
 
 #endif
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_PICOLISP
