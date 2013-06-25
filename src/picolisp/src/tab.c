@@ -7,6 +7,9 @@
 typedef struct symInit {fun code; char *name;} symInit;
 
 static symInit Symbols[] = {
+   {pd_platform, "platform"},
+   {pd_cpu, "cpu"},
+   {pd_board, "board"},
    {doAbs, "abs"},
    {doAdd, "+"},
    {doAll, "all"},

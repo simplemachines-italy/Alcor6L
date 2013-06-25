@@ -161,6 +161,11 @@ extern any ApplyArgs, ApplyBody;
 extern any Nil, Meth, Quote, T, At, At2, At3, This;
 extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
 
+// Alcor6L platform modules.
+any pd_platform(any x);
+any pd_cpu(any x);
+any pd_board(any x);
+
 /* Prototypes */
 int picolisp_main(int argc, char *argv[]);
 void *alloc(void*,size_t);

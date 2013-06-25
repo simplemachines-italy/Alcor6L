@@ -11,6 +11,26 @@
 // ****************************************************************************
 // Platform module for miniPicoLisp.
 
+#include "pico.h"
+
+any pd_platform(any x) {
+   return mkStr(MACRO_NAME(ALCOR_PLATFORM));
+}
+
+any pd_cpu(any x) {
+   return mkStr(MACRO_NAME(ALCOR_CPU));
+}
+
+any pd_board(any x) {
+   return mkStr(MACRO_NAME(ALCOR_BOARD));
+}
+
+// platform functions
+#define PICOLISP_PD_MODULE\
+   {pd_platform, "platform"},\
+   {pd_cpu, "cpu"},\
+   {pd_board, "board"}
+ 
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
