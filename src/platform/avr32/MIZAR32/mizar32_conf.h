@@ -112,7 +112,10 @@
 // ****************************************************************************
 // Language configurations: miniPicoLisp
 
-// TODO:
+// platform library functions
+#define PICOLISP_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(TERM)\
 
 #elif defined ALCOR_LANG_PICOC
 
