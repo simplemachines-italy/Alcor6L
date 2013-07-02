@@ -3,13 +3,17 @@
  */
 
 #include "pico.h"
+#include "platform_conf.h"
 
 typedef struct symInit {fun code; char *name;} symInit;
 
 static symInit Symbols[] = {
-   {pd_platform, "platform"},
-   {pd_cpu, "cpu"},
-   {pd_board, "board"},
+#if defined PICOLISP_PLATFORM_LIBS_ROM
+#  undef _ROM
+#  define _ROM(module)\
+   PICOLISP_MOD_##module
+   PICOLISP_PLATFORM_LIBS_ROM
+#endif
    {doAbs, "abs"},
    {doAdd, "+"},
    {doAll, "all"},
