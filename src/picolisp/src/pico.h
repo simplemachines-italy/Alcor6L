@@ -166,6 +166,23 @@ any pd_platform(any x);
 any pd_cpu(any x);
 any pd_board(any x);
 
+// Terminal module.
+any plisp_term_clrscr(any x);
+any plisp_term_clreol(any x);
+any plisp_term_moveto(any x);
+any plisp_term_moveup(any x);
+any plisp_term_movedown(any x);
+any plisp_term_moveleft(any x);
+any plisp_term_moveright(any x);
+any plisp_term_getlines(any x);
+any plisp_term_getcols(any x);
+any plisp_term_print(any x);
+any plisp_term_getcx(any x);
+any plisp_term_getcy(any x);
+any plisp_term_getchar(any x);
+any plisp_term_getchar_nowait(any x);
+any plisp_term_decode(any x);
+
 /* Prototypes */
 int picolisp_main(int argc, char *argv[]);
 void *alloc(void*,size_t);
