@@ -101,7 +101,7 @@ any plisp_term_moveleft(any ex) {
   NeedNum(ex,y);
   n = unBox(y);
   term_left(n);
-  return T;
+  return Nil;
 }
 
 // (term-moveright 'num) -> bool
