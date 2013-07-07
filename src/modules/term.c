@@ -33,184 +33,185 @@ static const char* term_key_names[] = {TERM_KEYCODES};
 
 // (term-clrscr) -> Nil
 any plisp_term_clrscr(any x) {
-   term_clrscr();
-   return Nil;
+  term_clrscr();
+  return Nil;
 }
 
 // (term-clreol) -> Nil
 any plisp_term_clreol(any x) {
-   term_clreol();
-   return Nil;
+  term_clreol();
+  return Nil;
 }
 
 // (term-moveto 'num 'num) -> bool
-any plisp_term_moveto(any ex) {
-   any x, y;
-   long n1, n2;
-
-   x = cdr(ex);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n1 = unBox(y);
-   x = cdr(x);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n2 = unBox(y);
-   term_gotoxy(n1,n2);
-   return Nil;
+any plisp_term_moveto(any ex) { 
+  any x, y;
+  long n1, n2;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n1 = unBox(y);
+  x = cdr(x);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n2 = unBox(y);
+  term_gotoxy(n1,n2);
+  return Nil;
 }
 
 // (term-moveup 'num) -> bool
 any plisp_term_moveup(any ex) {
-   any x, y;
-   long n;
-
-   x = cdr(ex);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n = unBox(y);
-   term_up(n);
-   return Nil;
+  any x, y;
+  long n;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n = unBox(y);
+  term_up(n);
+  return Nil;
 }
 
 // (term-movedown 'num) -> bool
 any plisp_term_movedown(any ex) {
-   any x, y;
-   long n;
-
-   x = cdr(ex);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n = unBox(y);
-   term_down(n);
-   return Nil;
+  any x, y;
+  long n;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n = unBox(y);
+  term_down(n);
+  return Nil;
 }
 
 // (term-moveleft 'num) -> bool
 any plisp_term_moveleft(any ex) {
-   any x, y;
-   long n;
-
-   x = cdr(ex);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n = unBox(y);
-   term_left(n);
-   return T;
+  any x, y;
+  long n;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n = unBox(y);
+  term_left(n);
+  return T;
 }
 
 // (term-moveright 'num) -> bool
 any plisp_term_moveright(any ex) {
-   any x, y;
-   long n;
-
-   x = cdr(ex);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n = unBox(y);
-   term_right(n);
-   return Nil;
+  any x, y;
+  long n;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n = unBox(y);
+  term_right(n);
+  return Nil;
 }
 
 // (term-getlines) -> num
 any plisp_term_getlines(any x) {
-   x = box(term_get_lines());
-   return x;
+  x = box(term_get_lines());
+  return x;
 }
 
 // (term-getcols) -> num
 any plisp_term_getcols(any x) {
-   x = box(term_get_cols());
-   return x;
+  x = box(term_get_cols());
+  return x;
 }
 
 // (term-print 'num 'num 'sym) -> bool
 any plisp_term_print(any ex) {
-   any x, y;
-   long n1, n2;
-   int n, i, c;
-   word w;
-
-   x = cdr(ex);
-   if (isNil(y = EVAL(car(x))))
+  any x, y;
+  long n1, n2;
+  int n, i, c;
+  word w;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n1 = unBox(y);
+  x = cdr(x);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  n2 = unBox(y);
+  term_gotoxy(n1,n2);
+  x = EVAL(cadr(x));
+  if (isSym(x)) {
+    if (isNil(x))
       return Nil;
-   NeedNum(ex,y);
-   n1 = unBox(y);
-   x = cdr(x);
-   if (isNil(y = EVAL(car(x))))
-      return Nil;
-   NeedNum(ex,y);
-   n2 = unBox(y);
-   term_gotoxy(n1,n2);
-   x = EVAL(cadr(x));
-   if (isSym(x)) {
-      if (isNil(x))
-         return Nil;
-      x = name(x);
-      for (n = 0, c = getByte1(&i, &w, &x); c; ++n, c = getByte(&i, &w, &x))
-         term_putch(c);
-   }
-   return Nil;
+    x = name(x);
+    for (n = 0, c = getByte1(&i, &w, &x);
+	 c; ++n, c = getByte(&i, &w, &x))
+      term_putch(c);
+  }
+  return Nil;
 }
 
 // (term-getcx) -> num
 any plisp_term_getcx(any x) {
-   x = box(term_get_cx());
-   return x;
+  x = box(term_get_cx());
+  return x;
 }
 
 // (term-getcy) -> num
 any plisp_term_getcy(any x) {
-   x = box(term_get_cy());
-   return x;
+  x = box(term_get_cy());
+  return x;
 }
 
 // (term-getchar) -> num
 any plisp_term_getchar(any ex) {
-   ex = box(term_getch(TERM_INPUT_WAIT));
-   return ex;
+  ex = box(term_getch(TERM_INPUT_WAIT));
+  return ex;
 }
 
 // (term-getchar-nowait) -> num
 any plisp_term_getchar_nowait(any ex) {
-   ex = box(term_getch(TERM_INPUT_DONT_WAIT));
-   return ex;
+  ex = box(term_getch(TERM_INPUT_DONT_WAIT));
+  return ex;
 }
 
 // (term-decode 'sym) -> num|Nil
 any plisp_term_decode(any ex) {
-   any x;
-   int n, i, c;
-   word w;
-   /* should hold the longest entry in TERM_KEYCODES */
-   char key[15];
-   for (i = 0; i < 15; i++) key[i] = 0;
-   unsigned total = sizeof(term_key_names)/sizeof(char*);
-
-   x = EVAL(cadr(ex));
-   if (isSym(x)) {
-      if (isNil(x))
-         return Nil;
-      x = name(x);
-      for (n = 0, c = getByte1(&i, &w, &x); c; ++n, c = getByte(&i, &w, &x))
-         key[n] = c;
-      if (!key[0] || key[0] != 'K')
-	err(NULL, ex, "Key invalid. Parse error");
-      for (i = 0; i < total; i++)
-         if (!strcmp(key, term_key_names[i]))
-            break;
-      if (i == total)
-         return Zero;
-      else
-         return box(i + TERM_FIRST_KEY);
-   }
-   return Nil;
+  any x;
+  int n, i, c;
+  word w;
+  /* should hold the longest entry in TERM_KEYCODES */
+  char key[15];
+  for (i = 0; i < 15; i++) key[i] = 0;
+  unsigned total = sizeof(term_key_names)/sizeof(char*);
+  
+  x = EVAL(cadr(ex));
+  if (isSym(x)) {
+    if (isNil(x))
+      return Nil;
+    x = name(x);
+    for (n = 0, c = getByte1(&i, &w, &x); c; ++n, c = getByte(&i, &w, &x))
+      key[n] = c;
+    if (!key[0] || key[0] != 'K')
+      err(NULL, ex, "Key invalid. Parse error");
+    for (i = 0; i < total; i++)
+      if (!strcmp(key, term_key_names[i]))
+	break;
+    if (i == total)
+      return Zero;
+    else
+      return box(i + TERM_FIRST_KEY);
+  }
+  return Nil;
 }
 
 #elif defined ALCOR_LANG_PICOC && defined BUILD_TERM
