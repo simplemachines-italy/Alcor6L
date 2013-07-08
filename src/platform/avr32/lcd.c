@@ -134,12 +134,83 @@ static int set_cursor( u8 command_byte )
 // ****************************************************************************
 // LCD display module for miniPicoLisp.
 
+// PicoLisp: (lcd-reset) -> Nil
+any lcd_reset(any ex) {
+  cursor_type = DEFAULT_CURSOR_TYPE;
+  display_is_off = 0;
+  
+  send_command(LCD_CMD_RESET);
+  return Nil;
+}
+
+// PicoLisp: (lcd-setup shift_disp r-to-l) -> Nil
+any lcd_setup(any ex) {
+  any x, y;
+  long shift_disp, r_to_l;
+
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  shift_disp = unBox(y);
+  x = cdr(x);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  r_to_l = unBox(y);
+
+  send_command(LCD_CMD_ENTRYMODE + (unsigned)shift_disp +
+	       (!(unsigned)r_to_l) * 2);
+  return Nil;
+}
+
+// PicoLisp: (lcd-clear) -> Nil
+// Clear the display, reset its shiftedness and put the cursor at 1,1
+any lcd_clear(any ex) {
+  send_command(LCD_CMD_CLEAR);
+  return Nil;
+}
+
+// PicoLisp: (lcd-home) -> Nil
+// Reset the display's shiftedness and put the cursor at 1,1
+any lcd_home(any ex) {
+  send_command(LCD_CMD_HOME);
+  return Nil;
+}
+
+// PicoLisp: (lcd-goto row col) -> Nil
+// Move the cursor to the specified row (1 or 2) and
+// column (1-40) in the character memory.
+any lcd_goto(any ex) {
+  any x, y;
+  unsigned row, col, address;
+  
+  x = cdr(ex);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  row = (unsigned)unBox(y);
+  x = cdr(x);
+  if (isNil(y = EVAL(car(x))))
+    return Nil;
+  NeedNum(ex,y);
+  col = (unsigned)unBox(y);
+  
+  if (row < 1 || row > 2 || col < 1 || col > 40)
+    err(NULL, ex, "row/column must be 1-2 and 1-40");
+  
+  address = (row - 1) * 0x40 + (col - 1);
+  send_command((u8) (LCD_CMD_DDADDR + address));
+    
+  return Nil;
+}
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // LCD display module for PicoC.
 
-// picoc: mizar32_disp_reset();
+// picoc: mizar32_lcd_reset();
 static void lcd_reset(pstate *p, val *r, val **param, int n)
 {
   cursor_type = DEFAULT_CURSOR_TYPE;
@@ -148,7 +219,7 @@ static void lcd_reset(pstate *p, val *r, val **param, int n)
   send_command(LCD_CMD_RESET);
 }
 
-// PicoC: mizar32_disp_setup(shift_display, right-to-left);
+// PicoC: mizar32_lcd_setup(shift_display, right-to-left);
 // Set right-to-left mode,
 static void lcd_setup(pstate *p, val *r, val **param, int n)
 {
@@ -159,21 +230,21 @@ static void lcd_setup(pstate *p, val *r, val **param, int n)
 	       (! right_to_left) * 2);
 }
 
-// PicoC: mizar32_disp_clear();
+// PicoC: mizar32_lcd_clear();
 // Clear the display, reset its shiftedness and put the cursor at 1,1
 static void lcd_clear(pstate *p, val *r, val **param, int n)
 {
   send_command(LCD_CMD_CLEAR);
 }
 
-// PicoC: mizar32_disp_home();
+// PicoC: mizar32_lcd_home();
 // Reset the display's shiftedness and put the cursor at 1,1
 static void lcd_home(pstate *p, val *r, val **param, int n)
 {
   send_command(LCD_CMD_HOME);
 }
 
-// PicoC: mizar32_disp_goto(row, col);
+// PicoC: mizar32_lcd_goto(row, col);
 // Move the cursor to the specified row (1 or 2) and
 // column (1-40) in the character memory.
 static void lcd_goto(pstate *p, val *r, val **param, int n)
@@ -193,7 +264,7 @@ static void lcd_goto(pstate *p, val *r, val **param, int n)
 // seperate function for PicoC - one for printing
 // strings and the other for printing integers.
 
-// PicoC: mizar32_disp_print_str(str);
+// PicoC: mizar32_lcd_print_str(str);
 // TODO: Convert this into a variadic
 // function.
 static void lcd_print_string(pstate *p, val *r, val **param, int n)
@@ -205,7 +276,7 @@ static void lcd_print_string(pstate *p, val *r, val **param, int n)
   r->Val->Integer = len;
 }
 
-// PicoC: mizar32_disp_print_int(i);
+// PicoC: mizar32_lcd_print_int(i);
 // TODO: Convert this into a variadic
 // function.
 static void lcd_print_integer(pstate *p, val *r, val **param, int n)
@@ -218,7 +289,7 @@ static void lcd_print_integer(pstate *p, val *r, val **param, int n)
 
 // For some info, check the Lua version of the
 // same function.
-// PicoC: mizar32_disp_getpos(&row, &col);
+// PicoC: mizar32_lcd_getpos(&row, &col);
 static void lcd_getpos(pstate *p, val *r, val **param, int n)
 {
   u8 addr = recv_address_counter();
@@ -233,7 +304,7 @@ static void lcd_getpos(pstate *p, val *r, val **param, int n)
 // U, D or an empty string if none are currently held
 // down.
 
-// PicoC: mizar32_disp_buttons();
+// PicoC: mizar32_lcd_buttons();
 static void lcd_buttons(pstate *p, val *r, val **param , int n)
 {
   u8 code;                // bit code for buttons held
@@ -309,7 +380,7 @@ static void lcd_display(pstate *p, val *r, val **param, int n)
   }
 }
 
-// PicoC: mizar32_disp_definechar(code, arr, len_arr);
+// PicoC: mizar32_lcd_definechar(code, arr, len_arr);
 static void lcd_definechar(pstate *p, val *r, val **param, int n)
 {
   int code;        // The character code we are defining, 0-7
@@ -360,18 +431,18 @@ const PICOC_RO_TYPE lcd_variables[] = {
 #endif
 
 const PICOC_REG_TYPE lcd_disp_library[] = {
-  {FUNC(lcd_reset), PROTO("void mizar32_disp_reset(void);")},
-  {FUNC(lcd_setup), PROTO("void mizar32_disp_setup(unsigned int, unsigned int);")},
-  {FUNC(lcd_clear), PROTO("void mizar32_disp_clear(void);")},
-  {FUNC(lcd_home), PROTO("void mizar32_disp_home(void);")},
-  {FUNC(lcd_goto), PROTO("void mizar32_disp_goto(unsigned int, unsigned int);")},
-  {FUNC(lcd_print_string), PROTO("int mizar32_disp_print_str(char *);")},
-  {FUNC(lcd_print_integer), PROTO("int mizar32_disp_print_char(int);")},
-  {FUNC(lcd_getpos), PROTO("int mizar32_disp_getpos(int *, int *);")},
-  {FUNC(lcd_buttons), PROTO("char* mizar32_disp_buttons(void);")},
-  {FUNC(lcd_cursor), PROTO("void mizar32_disp_cursor(int);")},
-  {FUNC(lcd_display), PROTO("void mizar32_disp_display(int);")},
-  {FUNC(lcd_definechar), PROTO("void mizar32_disp_definechar(int, int *, int);")},
+  {FUNC(lcd_reset), PROTO("void mizar32_lcd_reset(void);")},
+  {FUNC(lcd_setup), PROTO("void mizar32_lcd_setup(unsigned int, unsigned int);")},
+  {FUNC(lcd_clear), PROTO("void mizar32_lcd_clear(void);")},
+  {FUNC(lcd_home), PROTO("void mizar32_lcd_home(void);")},
+  {FUNC(lcd_goto), PROTO("void mizar32_lcd_goto(unsigned int, unsigned int);")},
+  {FUNC(lcd_print_string), PROTO("int mizar32_lcd_print_str(char *);")},
+  {FUNC(lcd_print_integer), PROTO("int mizar32_lcd_print_char(int);")},
+  {FUNC(lcd_getpos), PROTO("int mizar32_lcd_getpos(int *, int *);")},
+  {FUNC(lcd_buttons), PROTO("char* mizar32_lcd_buttons(void);")},
+  {FUNC(lcd_cursor), PROTO("void mizar32_lcd_cursor(int);")},
+  {FUNC(lcd_display), PROTO("void mizar32_lcd_display(int);")},
+  {FUNC(lcd_definechar), PROTO("void mizar32_lcd_definechar(int, int *, int);")},
   {NILFUNC, NILPROTO}
 };
 
