@@ -134,7 +134,7 @@ static int set_cursor( u8 command_byte )
 // ****************************************************************************
 // LCD display module for miniPicoLisp.
 
-// PicoLisp: (lcd-reset) -> Nil
+// (lcd-reset) -> Nil
 any lcd_reset(any ex) {
   cursor_type = DEFAULT_CURSOR_TYPE;
   display_is_off = 0;
@@ -143,7 +143,7 @@ any lcd_reset(any ex) {
   return Nil;
 }
 
-// PicoLisp: (lcd-setup shift_disp r-to-l) -> Nil
+// (lcd-setup shift_disp r-to-l) -> Nil
 any lcd_setup(any ex) {
   any x, y;
   long shift_disp, r_to_l;
@@ -164,21 +164,21 @@ any lcd_setup(any ex) {
   return Nil;
 }
 
-// PicoLisp: (lcd-clear) -> Nil
+// (lcd-clear) -> Nil
 // Clear the display, reset its shiftedness and put the cursor at 1,1
 any lcd_clear(any ex) {
   send_command(LCD_CMD_CLEAR);
   return Nil;
 }
 
-// PicoLisp: (lcd-home) -> Nil
+// (lcd-home) -> Nil
 // Reset the display's shiftedness and put the cursor at 1,1
 any lcd_home(any ex) {
   send_command(LCD_CMD_HOME);
   return Nil;
 }
 
-// PicoLisp: (lcd-goto row col) -> Nil
+// (lcd-goto row col) -> Nil
 // Move the cursor to the specified row (1 or 2) and
 // column (1-40) in the character memory.
 any lcd_goto(any ex) {
@@ -204,6 +204,170 @@ any lcd_goto(any ex) {
     
   return Nil;
 }
+
+// Helpers for picoLisp LCD print function.
+static void outString_lcd(char *s) {
+  while (*s)
+    send_data((const u8 *)s++, 1);
+}
+
+static void outNum_lcd(long n) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_lcd(buf);
+}
+
+static void lcdh_prin(any x) {
+  if (!isNil(x)) {
+    if (isNum(x))
+      outNum_lcd(unBox(x));
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      u8 byte;
+
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+	if (c != '^') {
+	  byte = c;
+	  send_data(&byte, 1);
+	}
+	else if (!(c = getByte(&i, &w, &x))) {
+	  byte = '^';
+	  send_data(&byte, 1);
+	} 
+	else if (c == '?') {
+	  byte = 127;
+	  send_data(&byte, 1);
+	}
+	else {
+	  c &= 0x1F;
+	  byte = (u8)c;
+	  send_data(&byte, 1);
+	}
+      }
+    }
+    else {
+      while (lcdh_prin(car(x)), !isNil(x = cdr(x))) {
+	if (!isCell(x)) {
+	  lcdh_prin(x);
+	  break;
+	}
+      }
+    }
+  }
+}
+
+// (mizar32-lcd-prinl 'any ..) -> any
+any lcd_prinl(any x) {
+  any y = Nil;
+
+  while (isCell(x = cdr(x)))
+    lcdh_prin(y = EVAL(car(x)));
+  return y;
+}
+
+// (mizar32-lcd-getpos) -> lst
+any lcd_getpos(any x) {
+  u8 addr = recv_address_counter();
+  any y;
+  cell c1;
+
+  Push(c1, y = cons(box(((addr & 0x40) ? 2 : 1)), Nil));
+  Push(c1, y = cons(box(((addr & 0x3F) + 1)), y));
+
+  return Pop(c1);
+}
+
+// (mizar32-lcd-buttons) -> sym
+any lcd_buttons(any x) {
+  u8 code;                // bit code for buttons held
+  char string[6];         // Up to 5 buttons and a \0
+  char *stringp = string; // Where to write the next character;
+  
+  code = recv_buttons();
+  if(code & LCD_BUTTON_SELECT) *stringp++ = 'S';
+  if(code & LCD_BUTTON_LEFT) *stringp++ = 'L';
+  if(code & LCD_BUTTON_RIGHT) *stringp++ = 'R';
+  if(code & LCD_BUTTON_UP) *stringp++ = 'U';
+  if(code & LCD_BUTTON_DOWN) *stringp++ = 'D';
+  *stringp = '\0';
+
+  return mkStr(string);
+}
+
+// Perform cursor operations selected by a
+// string (a transient symbol in picoLisp)
+// parameter.
+//
+// (mizar32-lcd-cursor 'sym) -> Nil
+any lcd_cursor(any x) {
+  static const char const *args[] = {
+    "none",
+    "block",
+    "line",
+    "left",
+    "right",
+    NULL
+  };
+  
+  any y;
+  x = cdr(x);
+  y = EVAL(car(x));
+  
+  if (equal(mkStr(args[0]), y))
+    set_cursor(LCD_CMD_CURSOR_NONE);
+  else if (equal(mkStr(args[1]), y))
+    set_cursor(LCD_CMD_CURSOR_BLOCK);
+  else if (equal(mkStr(args[2]), y))
+    set_cursor(LCD_CMD_CURSOR_LINE);
+  else if (equal(mkStr(args[3]), y))
+    set_cursor(LCD_CMD_SHIFT_CURSOR_LEFT);
+  else if (equal(mkStr(args[4]), y))
+    set_cursor(LCD_CMD_SHIFT_CURSOR_RIGHT);
+  else
+    err(NULL, x, "invalid cursor argument");
+
+  return Nil;
+}
+
+// Perform display operations,
+// selected by a string parameter.
+//
+// (mizar32-lcd-display 'sym) -> Nil
+any lcd_display(any x) {
+  static const char const *args[] = {
+    "off",
+    "on",
+    "left",
+    "right",
+    NULL
+  };
+
+  any y;
+  x = cdr(x);
+  y = EVAL(car(x));
+
+  if (equal(mkStr(args[0]), y)) {
+    display_is_off = 1;
+    send_command(LCD_CMD_DISPLAY_OFF);
+  }
+  else if (equal(mkStr(args[1]), y)) {
+    display_is_off = 0;
+    send_command(cursor_type);
+  }
+  else if (equal(mkStr(args[2]), y))
+    send_command(LCD_CMD_SHIFT_DISPLAY_LEFT);
+  else if (equal(mkStr(args[3]), y))
+    send_command(LCD_CMD_SHIFT_DISPLAY_RIGHT);
+  else
+    err(NULL, x, "invalid display argument");
+
+  return Nil;
+}
+
+// TODO:
+// any lcd_definechar(any ex) {}
 
 #elif defined ALCOR_LANG_PICOC
 
@@ -263,6 +427,7 @@ static void lcd_goto(pstate *p, val *r, val **param, int n)
 // We split lcd_print function (for Lua) into two
 // seperate function for PicoC - one for printing
 // strings and the other for printing integers.
+
 
 // PicoC: mizar32_lcd_print_str(str);
 // TODO: Convert this into a variadic
