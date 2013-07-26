@@ -442,7 +442,7 @@ any mkSym(byte *s) {
 }
 
 /* Make string */
-any mkStr(char *s) {return s && *s? mkSym((byte*)s) : Nil;}
+any mkStr(const char *s) {return s && *s? mkSym((byte*)s) : Nil;}
 
 bool isBlank(any x) {
    int i, c;
