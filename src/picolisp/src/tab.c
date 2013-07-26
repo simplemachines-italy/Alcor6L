@@ -13,6 +13,9 @@ static symInit Symbols[] = {
 #  define _ROM(module)\
    PICOLISP_MOD_##module
    PICOLISP_PLATFORM_LIBS_ROM
+#if defined PICOLISP_TARGET_SPECIFIC_LIBS
+   PICOLISP_TARGET_SPECIFIC_LIBS
+#endif
 #endif
    {doAbs, "abs"},
    {doAdd, "+"},
