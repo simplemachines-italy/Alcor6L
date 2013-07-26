@@ -183,6 +183,14 @@ any plisp_term_getchar(any x);
 any plisp_term_getchar_nowait(any x);
 any plisp_term_decode(any x);
 
+#include "platform_picolisp.h"
+
+// Include prototypes for target/
+// platform specific modules.
+#ifdef PICOLISP_TARGET_SPECIFIC_PROTOS
+  PICOLISP_TARGET_SPECIFIC_PROTOS
+#endif
+
 /* Prototypes */
 int picolisp_main(int argc, char *argv[]);
 void *alloc(void*,size_t);
@@ -229,7 +237,7 @@ any method(any);
 any mkChar(int);
 any mkChar2(int,int);
 any mkSym(byte*);
-any mkStr(char*);
+any mkStr(const char*);
 any mkTxt(int);
 any name(any);
 int numBytes(any);
