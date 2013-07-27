@@ -718,5 +718,5 @@ int picolisp_main(int ac, char *av[]) {
       loadAll(NULL);
    while (!feof(stdin))
       load(NULL, ':', Nil);
-   bye(0);
+   return 0;
 }
