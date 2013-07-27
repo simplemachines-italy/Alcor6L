@@ -116,6 +116,7 @@
 #define PICOLISP_PLATFORM_LIBS_ROM\
   _ROM(PD)\
   _ROM(TERM)\
+  _ROM(MIZAR32_LCD)
 
 #elif defined ALCOR_LANG_PICOC
 
