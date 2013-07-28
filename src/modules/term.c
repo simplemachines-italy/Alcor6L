@@ -130,13 +130,66 @@ any plisp_term_getcols(any x) {
   return x;
 }
 
-// (term-print 'num 'num 'sym) -> bool
+// Helpers for picoLisp terminal print
+// function.
+static void outString_term(char *s) {
+  while (*s)
+    term_putch((u8)*s++);
+}
+
+static void outNum_term(long n) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_term(buf);
+}
+
+static void ptermh_prin(any x) {
+  if (!isNil(x)) {
+    if (isNum(x))
+      outNum_term(unBox(x));
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      u8 byte;
+      
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+        if (c != '^') {
+          byte = c;
+	  term_putch(byte);
+	}
+        else if (!(c = getByte(&i, &w, &x))) {
+	  byte = '^';
+          term_putch(byte);
+        }
+        else if (c == '?') {
+          byte = 127;
+	  term_putch(byte);
+        }
+        else {
+          c &= 0x1F;
+          byte = (u8)c;
+	  term_putch(byte);
+	}
+      }
+    }
+    else {
+      while (ptermh_prin(car(x)), !isNil(x = cdr(x))) {
+	if (!isCell(x)) {
+	  ptermh_prin(x);
+          break;
+	}
+      }
+    }
+  }
+}
+
+// (term-print 'num 'num 'any ..) -> any
 any plisp_term_print(any ex) {
   any x, y;
   long n1, n2;
-  int n, i, c;
-  word w;
   
+  // get coordinates.
   x = cdr(ex);
   if (isNil(y = EVAL(car(x))))
     return Nil;
@@ -148,16 +201,12 @@ any plisp_term_print(any ex) {
   NeedNum(ex,y);
   n2 = unBox(y);
   term_gotoxy(n1,n2);
-  x = EVAL(cadr(x));
-  if (isSym(x)) {
-    if (isNil(x))
-      return Nil;
-    x = name(x);
-    for (n = 0, c = getByte1(&i, &w, &x);
-	 c; ++n, c = getByte(&i, &w, &x))
-      term_putch(c);
-  }
-  return Nil;
+
+  // and now, print.
+  x = cdr(x);
+  y = EVAL(car(x));
+  ptermh_prin(y);
+  return y;
 }
 
 // (term-getcx) -> num
