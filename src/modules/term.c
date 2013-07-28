@@ -222,15 +222,18 @@ any plisp_term_getcy(any x) {
 }
 
 // (term-getchar) -> num
-any plisp_term_getchar(any ex) {
-  ex = box(term_getch(TERM_INPUT_WAIT));
-  return ex;
-}
+any plisp_term_getchar(any x) {
+  any y;
+  x = cdr(x);
+  y = EVAL(car(x));
 
-// (term-getchar-nowait) -> num
-any plisp_term_getchar_nowait(any ex) {
-  ex = box(term_getch(TERM_INPUT_DONT_WAIT));
-  return ex;
+  if (equal(mkStr("wait"), y) || isNil(y))
+    x = box(term_getch(TERM_INPUT_WAIT));
+  else if (equal(mkStr("nowait"), y))
+    x = box(term_getch(TERM_INPUT_DONT_WAIT));
+  else
+    err(NULL, x, "invalid parameter");
+  return x;
 }
 
 // (term-decode 'sym) -> num|Nil
