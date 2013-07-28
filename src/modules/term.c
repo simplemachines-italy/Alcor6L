@@ -29,7 +29,7 @@ static const char* term_key_names[] = {TERM_KEYCODES};
 #if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
 
 // ****************************************************************************
-// Terminal module for miniPicoLisp.
+// Terminal module for picoLisp.
 
 // (term-clrscr) -> Nil
 any plisp_term_clrscr(any x) {
@@ -43,7 +43,7 @@ any plisp_term_clreol(any x) {
   return Nil;
 }
 
-// (term-moveto 'num 'num) -> bool
+// (term-moveto 'num 'num) -> Nil
 any plisp_term_moveto(any ex) { 
   any x, y;
   long n1, n2;
@@ -62,7 +62,7 @@ any plisp_term_moveto(any ex) {
   return Nil;
 }
 
-// (term-moveup 'num) -> bool
+// (term-moveup 'num) -> Nil
 any plisp_term_moveup(any ex) {
   any x, y;
   long n;
@@ -76,7 +76,7 @@ any plisp_term_moveup(any ex) {
   return Nil;
 }
 
-// (term-movedown 'num) -> bool
+// (term-movedown 'num) -> Nil
 any plisp_term_movedown(any ex) {
   any x, y;
   long n;
@@ -90,7 +90,7 @@ any plisp_term_movedown(any ex) {
   return Nil;
 }
 
-// (term-moveleft 'num) -> bool
+// (term-moveleft 'num) -> Nil
 any plisp_term_moveleft(any ex) {
   any x, y;
   long n;
@@ -104,7 +104,7 @@ any plisp_term_moveleft(any ex) {
   return Nil;
 }
 
-// (term-moveright 'num) -> bool
+// (term-moveright 'num) -> Nil
 any plisp_term_moveright(any ex) {
   any x, y;
   long n;
@@ -221,7 +221,8 @@ any plisp_term_getcy(any x) {
   return x;
 }
 
-// (term-getchar) -> num
+// (term-getchar) -> num OR
+// (term-getchar 'sym) -> num
 any plisp_term_getchar(any x) {
   any y;
   x = cdr(x);
