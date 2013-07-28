@@ -33,7 +33,59 @@
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
-// eLua core module for miniPicoLisp.
+// eLua core module for picoLisp.
+
+any elua_version(any x) {
+  return mkStr(ELUA_STR_VERSION);
+}
+
+any elua_save_history(any x) {
+#ifdef BUILD_LINENOISE
+  char fname[14]; // file name
+  int res;        // holds result.
+  any y;          // cdr(x)
+  
+  y = cdr(x);
+  y = EVAL(car(y));
+  NeedSym(x, y);
+  bufString(y, fname);
+  res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
+  if (res == 0)
+    printf("History saved to %s.\n", fname);
+  else if (res == LINENOISE_HISTORY_NOT_ENABLED)
+    outString("linenoise not enabled for picoLisp.\n");
+  else if (res = LINENOISE_HISTORY_EMPTY)
+    outString("History empty, nothing to save.\n");
+  else
+    printf("Unable to save history to %s.\n", fname);
+  return y;
+#else
+  err(NULL, NULL, "linenoise support not enabled.");
+#endif
+}
+
+// (elua-shell 'sym) -> sym|Nil
+any elua_shell(any x) {
+  any y = cdr(x);
+  char pcmd[SHELL_MAXSIZE];
+  char *cmdcpy;
+  const SHELL_COMMAND *t;
+
+  y = EVAL(car(y));
+  NeedSym(x, y);
+  bufString(y, pcmd);
+  // "+2" below comes from the string terminator (+1) and the '\n'
+  // that will be added by the shell code (+1)
+  if ((cmdcpy = (char *)malloc(strlen(pcmd) + 2)) == NULL)
+    err(NULL, NULL, "not enough memory for elua-shell");
+  strcpy(cmdcpy, pcmd);
+  t = shellh_execute_command(cmdcpy, 0);
+  free(cmdcpy);
+  if (!t)
+    return Nil;
+  else
+    return mkStr(t->cmd);
+}
 
 #elif defined ALCOR_LANG_PICOC
 

@@ -38,6 +38,12 @@
   PICOLISP_LIB_DEFINE(plisp_term_getchar, term-getchar),\
   PICOLISP_LIB_DEFINE(plisp_term_decode, term-decode),
 
+// eLua module.
+#define PICOLISP_MOD_ELUA\
+  PICOLISP_LIB_DEFINE(elua_version, elua-version),\
+  PICOLISP_LIB_DEFINE(elua_save_history, elua-save-history),\
+  PICOLISP_LIB_DEFINE(elua_shell, elua-shell),
+
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)

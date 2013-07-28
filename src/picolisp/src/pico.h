@@ -182,6 +182,11 @@ any plisp_term_getcy(any x);
 any plisp_term_getchar(any x);
 any plisp_term_decode(any x);
 
+// eLua module.
+any elua_version(any x);
+any elua_save_history(any x);
+any elua_shell(any x);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/
