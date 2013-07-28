@@ -32,11 +32,10 @@
   PICOLISP_LIB_DEFINE(plisp_term_moveright, term-moveright),\
   PICOLISP_LIB_DEFINE(plisp_term_getlines, term-getlines),\
   PICOLISP_LIB_DEFINE(plisp_term_getcols, term-getcols),\
-  PICOLISP_LIB_DEFINE(plisp_term_print, term-prinl),\
+  PICOLISP_LIB_DEFINE(plisp_term_prinl, term-prinl),\
   PICOLISP_LIB_DEFINE(plisp_term_getcx, term-getcx),\
   PICOLISP_LIB_DEFINE(plisp_term_getcy, term-getcy),\
   PICOLISP_LIB_DEFINE(plisp_term_getchar, term-getchar),\
-  PICOLISP_LIB_DEFINE(plisp_term_getchar_nowait, term-getchar-nowait),\
   PICOLISP_LIB_DEFINE(plisp_term_decode, term-decode),
 
 #define MOD_CHECK_ID(pvar, mod, id)					\

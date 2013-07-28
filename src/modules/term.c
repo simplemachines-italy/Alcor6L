@@ -184,8 +184,8 @@ static void ptermh_prin(any x) {
   }
 }
 
-// (term-print 'num 'num 'any ..) -> any
-any plisp_term_print(any ex) {
+// (term-prinl 'num 'num 'any ..) -> any
+any plisp_term_prinl(any ex) {
   any x, y;
   long n1, n2;
   

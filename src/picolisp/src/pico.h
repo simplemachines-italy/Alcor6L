@@ -176,11 +176,10 @@ any plisp_term_moveleft(any x);
 any plisp_term_moveright(any x);
 any plisp_term_getlines(any x);
 any plisp_term_getcols(any x);
-any plisp_term_print(any x);
+any plisp_term_prinl(any x);
 any plisp_term_getcx(any x);
 any plisp_term_getcy(any x);
 any plisp_term_getchar(any x);
-any plisp_term_getchar_nowait(any x);
 any plisp_term_decode(any x);
 
 #include "platform_picolisp.h"
