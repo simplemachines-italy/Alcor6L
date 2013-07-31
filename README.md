@@ -5,11 +5,15 @@ Alcor6L is a Multilanguage Interactive Embedded System
 for 32 bit Microcontrollers with RAD &amp; fast prototyping.
 
 It currently supports the languages:
+
 * Lua using eLua
 * C using PicoC
 * Lisp using PicoLisp
+
 and runs on the following hardware:
-* Mizar32 models A and B
+
+* Mizar32 models A and B from simplemachines.it
+* LM3S and STM32 ARM boards
 
 The source code is available from:
 https://github.com/simplemachines-italy/Alcor6L
