@@ -44,6 +44,15 @@
   PICOLISP_LIB_DEFINE(elua_save_history, elua-save-history),\
   PICOLISP_LIB_DEFINE(elua_shell, elua-shell),
 
+#define PICOLISP_MOD_CPU\
+  PICOLISP_LIB_DEFINE(cpu_w32, cpu-w32),\
+  PICOLISP_LIB_DEFINE(cpu_r32, cpu-r32),\
+  PICOLISP_LIB_DEFINE(cpu_w16, cpu-w16),\
+  PICOLISP_LIB_DEFINE(cpu_r16, cpu-r16),\
+  PICOLISP_LIB_DEFINE(cpu_w8, cpu-w8),\
+  PICOLISP_LIB_DEFINE(cpu_r8, cpu-r8),\
+  PICOLISP_LIB_DEFINE(cpu_clock, cpu-clock),
+
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)

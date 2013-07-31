@@ -187,6 +187,15 @@ any elua_version(any x);
 any elua_save_history(any x);
 any elua_shell(any x);
 
+// cpu module.
+any cpu_w32(any x);
+any cpu_r32(any x);
+any cpu_w16(any x);
+any cpu_r16(any x);
+any cpu_w8(any x);
+any cpu_r8(any x);
+any cpu_clock(any x);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/

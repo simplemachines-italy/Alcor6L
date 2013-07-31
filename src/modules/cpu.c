@@ -41,7 +41,91 @@ static const cpu_const_t cpu_constants[] =
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
-// CPU module for miniPicoLisp.
+// CPU module for picoLisp.
+
+// helpers.
+#define get_addr_data(a, d)			\
+  x = cdr(ex);					\
+  if (isNil(y = EVAL(car(x))))			\
+    err(NULL, y, "address cannot be NIL");	\
+  NeedNum(ex,y);				\
+  a = unBox(y);					\
+  x = cdr(x);					\
+  if (isNil(y = EVAL(car(x))))			\
+    err(NULL, y, "data cannot be NIL");		\
+  NeedNum(ex,y);				\
+  d = unBox(y)
+
+#define get_addr(a)				\
+  x = cdr(ex);					\
+  if (isNil(y = EVAL(car(x))))			\
+    err(NULL, y, "address cannot be NIL");	\
+  NeedNum(ex,y);				\
+  a = unBox(y)
+
+// (cpu-w32 'addr 'data) -> num
+any cpu_w32(any ex) {
+  u32 addr, data;
+  any x, y;
+
+  get_addr_data(addr, data);
+  *(U32 *)addr = data;
+  return box(data);
+}
+
+// (cpu-r32 'addr) -> data
+any cpu_r32(any ex) {
+  u32 addr;
+  any x, y;
+
+  get_addr(addr);
+  return box(*(u32 *)addr);
+}
+
+// (cpu-w16 'addr 'data) -> num
+any cpu_w16(any ex) {
+  u32 addr;
+  u16 data;
+  any x, y;
+  
+  get_addr_data(addr, data);
+  *(u16 *)addr = data;
+  return box(data);
+}
+
+// (cpu-r16 'addr) -> data
+any cpu_r16(any ex) {
+  u32 addr;
+  any x, y;
+
+  get_addr(addr);
+  return box(*(u16 *)addr);
+}
+
+// (cpu-w8 'addr 'data) -> num
+any cpu_w8(any ex) {
+  u32 addr;
+  u8 data;
+  any x, y;
+
+  get_addr_data(addr, data);
+  *(u8 *)addr = data;
+  return box(data);
+}
+
+// (cpu-r8 'addr) -> data 
+any cpu_r8(any ex) {
+  u32 addr;
+  any x, y;
+  
+  get_addr(addr);
+  return box(*(u8 *)addr);
+}
+
+// (cpu-clock) -> num
+any cpu_clock(any ex) {
+  return box(platform_cpu_get_frequency());
+}
 
 #elif defined ALCOR_LANG_PICOC
 
