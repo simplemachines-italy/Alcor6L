@@ -41,12 +41,13 @@ any elua_version(any x) {
 
 any elua_save_history(any x) {
 #ifdef BUILD_LINENOISE
-  char fname[14]; // file name
-  int res;        // holds result.
-  any y;          // cdr(x)
+  int res; // holds result.
+  any y;   // cdr(x)
   
   y = cdr(x);
   y = EVAL(car(y));
+  // holds file name.
+  char fname[bufSize(y)];
   NeedSym(x, y);
   bufString(y, fname);
   res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
@@ -67,11 +68,11 @@ any elua_save_history(any x) {
 // (elua-shell 'sym) -> sym|Nil
 any elua_shell(any x) {
   any y = cdr(x);
-  char pcmd[SHELL_MAXSIZE];
   char *cmdcpy;
   const SHELL_COMMAND *t;
 
   y = EVAL(car(y));
+  char pcmd[bufSize(y)];
   NeedSym(x, y);
   bufString(y, pcmd);
   // "+2" below comes from the string terminator (+1) and the '\n'
