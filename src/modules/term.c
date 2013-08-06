@@ -48,17 +48,13 @@ any plisp_term_moveto(any ex) {
   any x, y;
   long n1, n2;
   
-  x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
   n1 = unBox(y);
-  x = cdr(x);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
   n2 = unBox(y);
-  term_gotoxy(n1,n2);
+  term_gotoxy(n1, n2);
   return Nil;
 }
 
@@ -67,10 +63,8 @@ any plisp_term_moveup(any ex) {
   any x, y;
   long n;
   
-  x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
   n = unBox(y);
   term_up(n);
   return Nil;
@@ -81,10 +75,8 @@ any plisp_term_movedown(any ex) {
   any x, y;
   long n;
   
-  x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
   n = unBox(y);
   term_down(n);
   return Nil;
@@ -95,10 +87,8 @@ any plisp_term_moveleft(any ex) {
   any x, y;
   long n;
   
-  x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
   n = unBox(y);
   term_left(n);
   return Nil;
@@ -109,10 +99,8 @@ any plisp_term_moveright(any ex) {
   any x, y;
   long n;
   
-  x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
   n = unBox(y);
   term_right(n);
   return Nil;
@@ -190,21 +178,16 @@ any plisp_term_prinl(any ex) {
   long n1, n2;
   
   // get coordinates.
-  x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
   n1 = unBox(y);
-  x = cdr(x);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
   n2 = unBox(y);
-  term_gotoxy(n1,n2);
+  term_gotoxy(n1, n2);
 
   // and now, print.
-  x = cdr(x);
-  y = EVAL(car(x));
+  x = cdr(x), y = EVAL(car(x));
   ptermh_prin(y);
   return y;
 }
@@ -221,12 +204,11 @@ any plisp_term_getcy(any x) {
   return x;
 }
 
-// (term-getchar) -> num OR
+// (term-getchar) -> num
 // (term-getchar 'sym) -> num
 any plisp_term_getchar(any x) {
   any y;
-  x = cdr(x);
-  y = EVAL(car(x));
+  x = cdr(x), y = EVAL(car(x));
 
   if (equal(mkStr("wait"), y) || isNil(y))
     x = box(term_getch(TERM_INPUT_WAIT));
