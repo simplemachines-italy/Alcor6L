@@ -5,8 +5,99 @@
 
 #if defined ALCOR_LANG_PICOLISP
 
+#include "pico.h"
+
 // ****************************************************************************
-// CAN for miniPicoLisp.
+// CAN for picoLisp.
+
+// (can-setup id clock) -> clock
+any can_setup(any ex) {
+  unsigned id;
+  u32 clock;
+  any x, y;
+
+  // get id.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, can, id);
+  
+  // get clock value.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  clock = unBox(y);
+
+  return box(platform_can_setup(id, clock));
+}
+
+// (can-send id canid canidtype 'message) -> message
+any can_send(any ex) {
+  size_t len;
+  int id, canid, idtype;
+  any x, y;
+
+  static const char const *args[] = {
+    "id-ext",
+    "id-std",
+    NULL
+  };
+
+  // get id.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, can, id);
+
+  // get can id.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  canid = unBox(y);
+
+  // get id type (picoLisp symbol).
+  x = cdr(x), y = EVAL(car(x));
+  if (equal(mkStr(args[0]), y))
+    idtype = ELUA_CAN_ID_EXT;
+  else if (equal(mkStr(args[1]), y))
+    idtype = ELUA_CAN_ID_STD;
+  else
+    err(NULL, x, "invalid CAN idtype");
+
+  // get can data.
+  x = cdr(x);
+  len = bufSize(y = EVAL(car(x)));
+  char data[len];
+  NeedSym(ex, y);
+  bufString(y, data);
+  
+  if (len > PLATFORM_CAN_MAXLEN)
+    err(NULL, x, "message exceeds max length");
+
+  platform_can_send(id, canid, idtype, len, (const u8 *)data);
+  return mkStr(data);
+}
+
+// (can-recv id) -> str
+any can_recv(any ex) {
+  u8 len, idtype, data[8];
+  int id;
+  u32 canid;
+  any x, y;
+
+  // get id.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, can, id);
+
+  if (platform_can_recv(id,
+			&canid,
+			&idtype,
+			&len,
+			data) == PLATFORM_OK)
+    return mkStr((char *)data);
+  else
+    return Nil;
+}
 
 #elif defined ALCOR_LANG_PICOC
 
