@@ -20,10 +20,15 @@
 #include <string.h>
 
 // A reference required in common_tmr.c.
+
+#ifndef ALCOR_LANG_LUA
+
 int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 {
   return PLATFORM_ERR;
 }
+
+#endif
 
 #if defined ALCOR_LANG_PICOLISP
 
