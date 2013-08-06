@@ -196,6 +196,11 @@ any cpu_w8(any x);
 any cpu_r8(any x);
 any cpu_clock(any x);
 
+// can module.
+any can_setup(any x);
+any can_send(any x);
+any can_recv(any x);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/
