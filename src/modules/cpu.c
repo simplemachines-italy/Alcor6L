@@ -46,21 +46,15 @@ static const cpu_const_t cpu_constants[] =
 // helpers.
 #define get_addr_data(a, d)			\
   x = cdr(ex);					\
-  if (isNil(y = EVAL(car(x))))			\
-    err(NULL, y, "address cannot be NIL");	\
-  NeedNum(ex,y);				\
+  NeedNum(ex, y = EVAL(car(x)));		\
   a = unBox(y);					\
   x = cdr(x);					\
-  if (isNil(y = EVAL(car(x))))			\
-    err(NULL, y, "data cannot be NIL");		\
-  NeedNum(ex,y);				\
+  NeedNum(ex, y = EVAL(car(x)));		\
   d = unBox(y)
 
 #define get_addr(a)				\
   x = cdr(ex);					\
-  if (isNil(y = EVAL(car(x))))			\
-    err(NULL, y, "address cannot be NIL");	\
-  NeedNum(ex,y);				\
+  NeedNum(ex, y = EVAL(car(x)));		\
   a = unBox(y)
 
 // (cpu-w32 'addr 'data) -> num
