@@ -149,14 +149,10 @@ any lcd_setup(any ex) {
   long shift_disp, r_to_l;
 
   x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  NeedNum(ex, y = EVAL(car(x)));
   shift_disp = unBox(y);
   x = cdr(x);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  NeedNum(ex, y = EVAL(car(x)));
   r_to_l = unBox(y);
 
   send_command(LCD_CMD_ENTRYMODE + (unsigned)shift_disp +
@@ -186,14 +182,11 @@ any lcd_goto(any ex) {
   unsigned row, col, address;
   
   x = cdr(ex);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  NeedNum(ex, y = EVAL(car(x)));
   row = (unsigned)unBox(y);
+  
   x = cdr(x);
-  if (isNil(y = EVAL(car(x))))
-    return Nil;
-  NeedNum(ex,y);
+  NeedNum(ex, y = EVAL(car(x)));
   col = (unsigned)unBox(y);
   
   if (row < 1 || row > 2 || col < 1 || col > 40)
@@ -312,8 +305,7 @@ any lcd_cursor(any x) {
   };
   
   any y;
-  x = cdr(x);
-  y = EVAL(car(x));
+  x = cdr(x), y = EVAL(car(x));
   
   if (equal(mkStr(args[0]), y))
     set_cursor(LCD_CMD_CURSOR_NONE);
@@ -345,8 +337,7 @@ any lcd_display(any x) {
   };
 
   any y;
-  x = cdr(x);
-  y = EVAL(car(x));
+  x = cdr(x), y = EVAL(car(x));
 
   if (equal(mkStr(args[0]), y)) {
     display_is_off = 1;
