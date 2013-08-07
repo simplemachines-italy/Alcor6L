@@ -25,4 +25,4 @@ To report bugs, please use our issue tracker:
 https://github.com/simplemachines-italy/Alcor6L/issues
 
 To enter discussion about it, please join our mailing list:
-https://groups.google.com/forum/#!forum/alcor6
+https://groups.google.com/forum/#!forum/alcor6l
