@@ -13,17 +13,17 @@
 
 #include "pico.h"
 
-// (pd-platform) -> Nil
+// (pd-platform) -> sym
 any pd_platform(any x) {
    return mkStr(MACRO_NAME(ALCOR_PLATFORM));
 }
 
-// (pd-cpu) -> Nil
+// (pd-cpu) -> sym
 any pd_cpu(any x) {
    return mkStr(MACRO_NAME(ALCOR_CPU));
 }
 
-// (pd-board) -> Nil
+// (pd-board) -> sym
 any pd_board(any x) {
    return mkStr(MACRO_NAME(ALCOR_BOARD));
 }
