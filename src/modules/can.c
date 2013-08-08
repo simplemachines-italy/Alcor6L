@@ -82,6 +82,7 @@ any can_recv(any ex) {
   int id;
   u32 canid;
   any x, y;
+  cell c1;
 
   // get id.
   x = cdr(ex);
@@ -93,10 +94,14 @@ any can_recv(any ex) {
 			&canid,
 			&idtype,
 			&len,
-			data) == PLATFORM_OK)
-    return mkStr((char *)data);
-  else
+			data) == PLATFORM_OK) {
+    Push(c1, y = cons(mkStr((char *)data), Nil));
+    Push(c1, y = cons(box(idtype), y));
+    Push(c1, y = cons(box(canid), y));
+    return Pop(c1);
+  } else {
     return Nil;
+  }
 }
 
 #elif defined ALCOR_LANG_PICOC
