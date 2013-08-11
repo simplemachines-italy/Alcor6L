@@ -3,7 +3,14 @@
 
 #include "platform.h"
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// CAN for my-basic.
+
+#include "my_basic.h"
+
+#elif defined ALCOR_LANG_PICOLISP
 
 #include "pico.h"
 

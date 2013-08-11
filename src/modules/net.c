@@ -1,7 +1,9 @@
 // Module for interfacing with network functions (elua_net.h)
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -25,10 +27,21 @@
 
 #include "platform_conf.h"
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// Net module for miniPicoLisp.
+// Net module for my-basic.
+
+#ifdef BUILD_UIP
+
+#else
+
+#endif
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Net module for picoLisp.
 
 #ifdef BUILD_UIP
 

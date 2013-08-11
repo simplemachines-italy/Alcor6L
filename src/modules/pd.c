@@ -6,10 +6,17 @@
 #define MACRO_NAME( x ) MACRO_AGAIN( x )
 #define MACRO_AGAIN( x ) #x
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// Platform module for miniPicoLisp.
+// Platform module for my-basic.
+
+#include "my_basic.h"
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Platform module for picoLisp.
 
 #include "pico.h"
 

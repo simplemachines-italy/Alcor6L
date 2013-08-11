@@ -1,7 +1,9 @@
 // Module for interfacing with timers
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -34,10 +36,35 @@
 #define HAS_TMR_MATCH_INT_PICOC
 #endif
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// Timer module for miniPicoLisp.
+// Timer module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Timer module for picoLisp.
+
+// (tmr-delay id period) -> period
+any tmr_delay(any ex) {
+  timer_data_type period;
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  if (isSymb(y)) {
+    if (equal(y, mkStr("sys-timer")))
+      id = PLATFORM_TIMER_SYS_ID;
+  } else {
+    NeedNum(ex, y);
+    id = unBox(y);
+  }
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  get_timer_data(&period, param, 1);
+  platform_timer_delay(id, period);
+}
 
 #elif defined ALCOR_LANG_PICOC
 

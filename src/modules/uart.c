@@ -1,7 +1,9 @@
 // Module for interfacing with UART
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -35,10 +37,15 @@ enum
 
 #define UART_INFINITE_TIMEOUT PLATFORM_TIMER_INF_TIMEOUT
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// UART module for miniPicoLisp.
+// UART module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// UART module for picoLisp.
 
 #elif defined ALCOR_LANG_PICOC
 

@@ -1,7 +1,9 @@
 // Module for interfacing with ADC
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -23,10 +25,17 @@
 
 #ifdef BUILD_ADC
 
-// ****************************************************************************
-// ADC (Analog to digital converter) module for miniPicoLisp.
+#if defined ALCOR_LANG_MYBASIC
 
-#if defined ALCOR_LANG_PICOLISP
+// ****************************************************************************
+// ADC (Analog to digital converter) module for my-basic.
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// ADC (Analog to digital converter) module for picoLisp.
 
 // TODO:
 

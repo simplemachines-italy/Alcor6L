@@ -1,7 +1,9 @@
 // Module for interfacing with terminal functions
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -26,7 +28,12 @@
 #define _D(x) #x
 static const char* term_key_names[] = {TERM_KEYCODES};
 
-#if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
+#if defined ALCOR_LANG_MYBASIC && defined BUILD_TERM
+
+// ****************************************************************************
+// Terminal module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
 
 // ****************************************************************************
 // Terminal module for picoLisp.

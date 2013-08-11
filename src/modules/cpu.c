@@ -1,7 +1,9 @@
 // Module for interfacing with CPU
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -38,7 +40,12 @@ static const cpu_const_t cpu_constants[] =
 };
 #endif
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// CPU module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // CPU module for picoLisp.

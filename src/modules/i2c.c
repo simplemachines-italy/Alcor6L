@@ -1,7 +1,9 @@
 // Module for interfacing with the I2C interface
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -20,10 +22,78 @@
 #include <string.h>
 #include <ctype.h>
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// I2C module for miniPicoLisp.
+// I2C module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// I2C module for picoLisp.
+
+// (i2c-setup id speed) -> num
+any i2c_setup(any ex) {
+  any x, y;
+  unsigned id;
+  s32 speed;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  MOD_CHECK_ID(ex, i2c, id);
+
+  x = cdr(x);
+  NeedNum(x, y = EVAL(car(x)));
+  if (speed <= 0)
+    err(NULL, y, "frequency must be > 0");
+
+  return box(platform_i2c_setup(id, (u32)speed));
+}
+
+// (i2c-start id) -> Nil
+any i2c_start(any ex) {
+  unsigned id;
+  any x, y;
+
+  lisp_getnum(ex, id);
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  MOD_CHECK_ID(ex, i2c, id);
+  platform_i2c_send_start(id);
+
+  return Nil;
+}
+
+// (i2c-stop id) -> Nil
+any i2c_stop(any ex) {
+  unsigned id;
+  any x, y;
+
+  lisp_getnum(ex, id);
+  MOD_CHECK_ID(ex, i2c, id);
+  platform_i2c_send_stop(id);
+
+  return Nil;
+}
+
+// (i2c-address id addr dir) -> num
+any i2c_address(any ex) {
+  unsigned id;
+  int add, dir;
+  any x, y;
+
+  lisp_getnum(ex, id); // id.
+  MOD_CHECK_ID(ex, i2c, id);
+  lisp_getnum(x, add); // address.
+  lisp_getnum(x, dir); // direction.
+  
+  if (add < 0 || add > 127)
+    err(NULL, ex, "slave address must be from 0 to 127");
+
+  return box(platform_i2c_send_address(id,
+				       (u16)add,
+				       dir));
+}
 
 #elif defined ALCOR_LANG_PICOC
 

@@ -1,7 +1,9 @@
 // Module for interfacing with PIO
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -45,10 +47,17 @@ static void pioh_clear_masks(void)
     pio_masks[i] = 0;
 }
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// PIO module for miniPicoLisp.
+// PIO module for my-basic.
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// PIO module for picoLisp.
 
 // TODO:
 

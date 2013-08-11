@@ -3,10 +3,17 @@
 
 #include "platform.h"
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+
+// **************************************************************************** 
+// Pulse width modulation module for my-basic.
+
+// TODO:
+
+#elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
-// Pulse width modulation module for miniPicoLisp.
+// Pulse width modulation module for picoLisp.
 
 // TODO:
 

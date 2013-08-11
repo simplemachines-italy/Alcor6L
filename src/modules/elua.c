@@ -1,7 +1,9 @@
 // Interface with core services
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -30,7 +32,12 @@
 #include "version.h"
 #endif
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// eLua core module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // eLua core module for picoLisp.
