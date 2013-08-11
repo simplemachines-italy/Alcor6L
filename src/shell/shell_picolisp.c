@@ -36,4 +36,4 @@ void shell_picolisp( int argc, char **argv )
   clearerr( stdin );
 }
 
-#endif // #ifdef ALCOR_LANG_MPLISP
+#endif // #ifdef ALCOR_LANG_PICOLISP
