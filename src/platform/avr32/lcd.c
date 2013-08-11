@@ -1,7 +1,9 @@
 // eLua module for Mizar32 LCD character display
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -129,7 +131,12 @@ static int set_cursor( u8 command_byte )
     return send_command( cursor_type );
 }
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// LCD display module for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // LCD display module for miniPicoLisp.
