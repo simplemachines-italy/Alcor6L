@@ -421,8 +421,6 @@ int mybasic_main(int argc, char* argv[]) {
 	_CrtSetBreakAlloc(0);
 #endif /* _MSC_VER && !_WIN64 */
 
-	atexit(_on_exit);
-
 	_on_startup();
 
 	if(argc == 1) {
@@ -438,6 +436,8 @@ int mybasic_main(int argc, char* argv[]) {
 		printf("Unknown arguments\n");
 		_show_tip();
 	}
+
+	_on_exit();
 
 	return 0;
 }
