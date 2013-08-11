@@ -3,7 +3,9 @@
 
 #include "elua_int.h"
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #elif defined ALCOR_LANG_PICOC
 # include "picoc.h"
@@ -30,13 +32,21 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 
 #endif
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
-// Interrupt handlers for miniPicoLisp.
+// Interrupt handlers for my-basic
 
 // TODO:
-// Interrupt handler mechanism for PicoLisp.
+// Interrupt handler mechanism for my-basic.
+
+#elif defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Interrupt handlers for picoLisp.
+
+// TODO:
+// Interrupt handler mechanism for picoLisp.
 
 #elif defined ALCOR_LANG_PICOC
 
