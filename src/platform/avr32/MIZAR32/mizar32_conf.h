@@ -107,10 +107,15 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
-#if defined ALCOR_LANG_PICOLISP
+#if defined ALCOR_LANG_MYBASIC
+
+// **************************************************************************** 
+// Language configurations: my-basic
+
+#elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
-// Language configurations: miniPicoLisp
+// Language configurations: picoLisp.
 
 // platform library functions
 #define PICOLISP_PLATFORM_LIBS_ROM\
