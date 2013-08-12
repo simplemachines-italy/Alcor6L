@@ -231,6 +231,8 @@ MBAPI const char* mb_get_error_desc(mb_error_e err);
 MBAPI int mb_set_error_handler(mb_interpreter_t* s, mb_error_handler_t h);
 MBAPI int mb_set_printer(mb_interpreter_t* s, mb_print_func_t p);
 
+void* mb_malloc(size_t s);
+
 int mybasic_main(int agrc, char *argv[]);
 
 #ifdef MB_COMPACT_MODE

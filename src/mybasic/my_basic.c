@@ -568,7 +568,7 @@ static volatile size_t _mb_allocated = 0;
 static volatile size_t _mb_allocated = (size_t)(~0);
 #endif /* _MB_ENABLE_ALLOC_STAT */
 
-static void* mb_malloc(size_t s);
+  // static void* mb_malloc(size_t s);
 static void* mb_realloc(void** p, size_t s);
 static void mb_free(void* p);
 
