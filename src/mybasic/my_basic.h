@@ -28,6 +28,11 @@
 #ifndef __MY_BASIC_H__
 #define __MY_BASIC_H__
 
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */

@@ -37,10 +37,10 @@
 #else /* _MSC_VER */
 #	include <unistd.h>
 #endif /* _MSC_VER */
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// #include <assert.h>
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <string.h>
 #include "my_basic.h"
 
 #include "platform_conf.h"
