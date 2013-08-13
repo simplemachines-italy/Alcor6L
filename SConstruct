@@ -488,6 +488,12 @@ if not GetOption( 'help' ):
   if comp['lang'] == 'lua':
     conf.env.Append(CPPDEFINES = {"LUA_COMPILER" : ( comp['luac'] != 0 and 1 or 0 ) } )
 
+  # my-basic has a function 'MEM' which indicates
+  # core memory status. To enable this, we include
+  # the following.
+  if comp['lang'] == 'mybasic':
+    conf.env.Append(CPPDEFINES = ['_MB_ENABLE_ALLOC_STAT'])
+
   # Additional libraries
   local_libs = ''
 
