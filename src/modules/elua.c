@@ -37,6 +37,71 @@
 // ****************************************************************************
 // eLua core module for my-basic.
 
+// v = pd_platform()
+int elua_version(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(ELUA_STR_VERSION);
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, ELUA_STR_VERSION, len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+// elua_save_history("fname")
+int elua_save_history(mb_interpreter_t* s, void **l) {
+  int fun_result = MB_FUNC_OK;
+  char *fname = 0;
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_pop_string(s, l, &fname));
+  mb_check(mb_attempt_close_bracket(s, l));
+#ifdef BUILD_LINENOISE
+  int res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
+  if (res == 0)
+    printf("History saved to %s.\n", fname);
+  else if (res == LINENOISE_HISTORY_NOT_ENABLED)
+    printf("linenoise not enabled for MY-BASIC.\n");
+  else if (res = LINENOISE_HISTORY_EMPTY)
+    printf("History empty, nothing to save.\n");
+  else
+    printf("Unable to save history to %s.\n", fname);
+  return fun_result;
+#else
+  printf("linenoise support not enabled.");
+  return fun_result;
+#endif
+}
+
+// elua_shall("str")
+int elua_shell(mb_interpreter_t* s, void **l) {
+  int res = MB_FUNC_OK;
+  char *cmdcpy, *pcmd = 0;
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_pop_string(s, l, &pcmd));
+  mb_check(mb_attempt_close_bracket(s, l));
+
+  // "+2" below comes from the string terminator (+1) and the '\n' 
+  // that will be added by the shell code (+1)
+  if ((cmdcpy = (char *)malloc(strlen(pcmd) + 2)) == NULL) {
+    printf("not enough memory for elua-shell");
+    return res;
+  }
+
+  strcpy(cmdcpy, pcmd);
+  shellh_execute_command(cmdcpy, 0);
+  free(cmdcpy);
+
+  return res;
+}
+
 #elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
@@ -100,7 +165,7 @@ any elua_shell(any x) {
 // ****************************************************************************
 // eLua core module for PicoC.
 
-//PicoC: elua_version();
+// PicoC: elua_version();
 static void elua_version(pstate *p, val *r, val **param, int n)
 {
   r->Val->Identifier = ELUA_STR_VERSION;
