@@ -368,8 +368,10 @@ const SHELL_COMMAND* shellh_execute_command( char* cmd, int interactive_mode )
     {
       // Special case: the "exit" command has a NULL handler
       // Special case: "lua" is not allowed in non-interactive mode
-      // The same goes for picoLisp and PicoC.
-#if defined ALCOR_LANG_PICOLISP
+      // The same goes for the other languages in Alcor6L.
+#if defined ALCOR_LANG_MYBASIC
+      if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "mybasic" ) ) )
+#elif defined ALCOR_LANG_PICOLISP
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "picolisp" ) ) )
 #elif defined ALCOR_LANG_PICOC
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "picoc" ) ) )
