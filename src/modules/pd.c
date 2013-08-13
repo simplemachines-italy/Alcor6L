@@ -13,6 +13,51 @@
 
 #include "my_basic.h"
 
+// v = pd_platform()
+int pd_platform(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(MACRO_NAME(ALCOR_PLATFORM));
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, MACRO_NAME(ALCOR_PLATFORM), len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+// V = pd_cpu()
+int pd_cpu(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(MACRO_NAME(ALCOR_CPU));
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, MACRO_NAME(ALCOR_CPU), len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+// v = pd_board()
+int pd_board(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(MACRO_NAME(ALCOR_BOARD));
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, MACRO_NAME(ALCOR_BOARD), len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
 #elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
