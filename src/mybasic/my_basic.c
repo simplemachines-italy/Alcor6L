@@ -45,6 +45,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "my_basic.h"
+#include "platform_conf.h"
+#include "mybasic_mod.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -808,6 +810,20 @@ static const _func_t _core_libs[] = {
 #endif /* _MB_ENABLE_ALLOC_STAT */
 };
 
+// Alcor6L platform libraries.
+#define MB_LIB_PROTO(fname)\
+  int fname(mb_interpreter_t* s, void **l);
+
+// platform module.
+MB_LIB_PROTO(pd_cpu);
+MB_LIB_PROTO(pd_platform);
+MB_LIB_PROTO(pd_board);
+
+// eLua module.
+MB_LIB_PROTO(elua_version);
+MB_LIB_PROTO(elua_save_history);
+MB_LIB_PROTO(elua_shell);
+
 static const _func_t _std_libs[] = {
 	{ "ABS", _std_abs },
 	{ "SGN", _std_sgn },
@@ -837,6 +853,15 @@ static const _func_t _std_libs[] = {
 
 	{ "PRINT", _std_print },
 	{ "INPUT", _std_input },
+// For Alcor6L.
+#if defined MYBASIC_PLATFORM_LIBS_ROM
+# undef _ROM
+# define _ROM(module) MYBASIC_MOD_##module
+	MYBASIC_PLATFORM_LIBS_ROM
+#if defined MYBASIC_TARGET_SPECIFIC_LIBS
+	MYBASIC_TARGET_SPECIFIC_LIBS
+#endif
+#endif
 };
 
 /* ========================================================} */

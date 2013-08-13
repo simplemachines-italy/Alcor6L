@@ -112,6 +112,10 @@
 // **************************************************************************** 
 // Language configurations: my-basic
 
+#define MYBASIC_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(ELUA)
+
 #elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
