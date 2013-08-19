@@ -160,7 +160,7 @@ static void write_rtc_regs(u8 *regs)
 // ****************************************************************************
 // RTC module for my-basic.
 
-#elif defined ALCOR_LANG_MYBASIC
+#elif defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // RTC module for picoLisp.
