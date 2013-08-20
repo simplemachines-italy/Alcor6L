@@ -53,6 +53,10 @@
   PICOLISP_LIB_DEFINE(cpu_r8, cpu-r8),\
   PICOLISP_LIB_DEFINE(cpu_clock, cpu-clock),
 
+#define PICOLISP_MOD_TIMER\
+  PICOLISP_LIB_DEFINE(tmr_delay, tmr-delay),\
+  PICOLISP_LIB_DEFINE(tmr_read, tmr-read),
+
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)

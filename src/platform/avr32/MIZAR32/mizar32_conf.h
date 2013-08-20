@@ -127,7 +127,8 @@
   _ROM(TERM)\
   _ROM(MIZAR32_LCD)\
   _ROM(ELUA)\
-  _ROM(CPU)
+  _ROM(CPU)\
+  _ROM(TIMER)
 
 #elif defined ALCOR_LANG_PICOC
 

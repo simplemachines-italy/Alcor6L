@@ -201,6 +201,10 @@ any can_setup(any x);
 any can_send(any x);
 any can_recv(any x);
 
+// timer module.
+any tmr_delay(any ex);
+any tmr_read(any ex);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/

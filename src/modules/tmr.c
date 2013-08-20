@@ -46,24 +46,54 @@
 // ****************************************************************************
 // Timer module for picoLisp.
 
-// (tmr-delay id period) -> period
+// (tmr-delay period) -> Nil
+// (tmr-delay id period) -> Nil
 any tmr_delay(any ex) {
   timer_data_type period;
-  unsigned id;
+  unsigned id = PLATFORM_TIMER_SYS_ID, count = 0;
+  any x, y, foo = ex;
+
+  // How many parameters do we have?
+  while (isCell(foo = cdr(foo)))
+    ++count;
+
+  x = cdr(ex), y = EVAL(car(x));
+  if (count == 1) {
+    // We only have 1 parameter. Assume
+    // 'sys-timer and get the time period.
+    NeedNum(ex, y);
+    period = (timer_data_type)unBox(y);
+  } else {
+    // Minimum 2 args required here. Ignore
+    // the others.
+    if (isSymb(y)) {
+      if (!equal(y, mkStr("sys-timer")))
+	err(ex, y, "invalid timer identifier");
+    } else {
+      NeedNum(ex, y);
+      id = unBox(y);
+    }
+    MOD_CHECK_TIMER(ex, id);
+    x = cdr(x), y = EVAL(car(x));
+    NeedNum(ex, y);
+    period = unBox(y);
+  }
+  platform_timer_delay(id, period);
+  return Nil;
+}
+
+// (tmr-read) -> num
+any tmr_read(any ex) {
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  timer_data_type res;
   any x, y;
 
   x = cdr(ex), y = EVAL(car(x));
-  if (isSymb(y)) {
-    if (equal(y, mkStr("sys-timer")))
-      id = PLATFORM_TIMER_SYS_ID;
-  } else {
-    NeedNum(ex, y);
-    id = unBox(y);
-  }
-  id = param[0]->Val->UnsignedInteger;
-  MOD_CHECK_TIMER(id);
-  get_timer_data(&period, param, 1);
-  platform_timer_delay(id, period);
+  NeedNum(ex, y);
+  id = unBox(y);
+  MOD_CHECK_TIMER(ex, id);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_READ, 0);
+  return box(res);
 }
 
 #elif defined ALCOR_LANG_PICOC
