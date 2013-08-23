@@ -1,5 +1,8 @@
+
 /* 23jan11abu
  * (c) Software Lab. Alexander Burger
+ * Modified for Alcor6L <simplemachines-italy>
+ * July, 2013.
  */
 
 #include "pico.h"
@@ -297,6 +300,8 @@ static any initSym(any v, char *s) {
    return x;
 }
 
+#include "common.h"
+
 void initSymbols(void) {
    int i;
 
@@ -307,6 +312,9 @@ void initSymbols(void) {
    intern(Nil, Intern);
    Meth  = initSym(boxSubr(doMeth), "meth");
    Quote = initSym(boxSubr(doQuote), "quote");
+#ifdef PICOLISP_MOD_TIMER
+   sys_timer = initSym(box(PLATFORM_TIMER_SYS_ID), "*sys-timer*");
+#endif
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 
    At    = initSym(Nil, "@");

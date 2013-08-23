@@ -160,6 +160,7 @@ extern any Intern[2], Transient[2], Reloc;
 extern any ApplyArgs, ApplyBody;
 extern any Nil, Meth, Quote, T, At, At2, At3, This;
 extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
+any sys_timer;
 
 // Alcor6L platform modules.
 any pd_platform(any x);
@@ -616,6 +617,10 @@ static inline int length(any x) {
       ++n;
    return n;
 }
+
+/* list length minus 1 is the number
+   of parameters to a function */
+#define plen(foo) (length(foo) - 1)
 
 /* Membership */
 static inline any member(any x, any y) {
