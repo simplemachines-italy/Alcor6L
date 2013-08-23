@@ -46,33 +46,23 @@
 // ****************************************************************************
 // Timer module for picoLisp.
 
-// (tmr-delay period) -> Nil
-// (tmr-delay id period) -> Nil
+// (tmr-delay ['num] 'num) -> Nil
 any tmr_delay(any ex) {
   timer_data_type period;
-  unsigned id = PLATFORM_TIMER_SYS_ID, count = 0;
-  any x, y, foo = ex;
-
-  // How many parameters do we have?
-  while (isCell(foo = cdr(foo)))
-    ++count;
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  any x, y;
 
   x = cdr(ex), y = EVAL(car(x));
-  if (count == 1) {
+  if (plen(ex) == 1) {
     // We only have 1 parameter. Assume
-    // 'sys-timer and get the time period.
+    // *sys-timer* and get the time period.
     NeedNum(ex, y);
     period = (timer_data_type)unBox(y);
   } else {
-    // Minimum 2 args required here. Ignore
-    // the others.
-    if (isSymb(y)) {
-      if (!equal(y, mkStr("sys-timer")))
-	err(ex, y, "invalid timer identifier");
-    } else {
-      NeedNum(ex, y);
-      id = unBox(y);
-    }
+    // Minimum 2 args required here - the
+    // id and the period. Ignore the others.
+    NeedNum(ex, y);
+    id = unBox(y);
     MOD_CHECK_TIMER(ex, id);
     x = cdr(x), y = EVAL(car(x));
     NeedNum(ex, y);
@@ -82,16 +72,19 @@ any tmr_delay(any ex) {
   return Nil;
 }
 
-// (tmr-read) -> num
+// (tmr-read ['num]) -> num
 any tmr_read(any ex) {
   unsigned id = PLATFORM_TIMER_SYS_ID;
   timer_data_type res;
   any x, y;
 
   x = cdr(ex), y = EVAL(car(x));
-  NeedNum(ex, y);
-  id = unBox(y);
-  MOD_CHECK_TIMER(ex, id);
+  if (plen(ex) > 0) {
+    NeedNum(ex, y);
+    id = unBox(y);
+    MOD_CHECK_TIMER(ex, id);      
+  }
+
   res = platform_timer_op(id, PLATFORM_TIMER_OP_READ, 0);
   return box(res);
 }
