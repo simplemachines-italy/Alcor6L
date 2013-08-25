@@ -89,6 +89,23 @@ any tmr_read(any ex) {
   return box(res);
 }
 
+// (tmr-start ['num]) -> num
+any tmr_start(any ex) {
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  timer_data_type res;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  if (plen(ex) > 0) {
+    NeedNum(ex, y);
+    id = unBox(y);
+    MOD_CHECK_TIMER(ex, id);
+  }
+
+  res = platform_timer_sys_id(id, PLATFORM_TIMER_OP_START, 0);
+  return box(res);
+}
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
