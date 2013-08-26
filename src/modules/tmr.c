@@ -166,6 +166,18 @@ static void tmr_read(pstate *p, val *r, val **param, int n)
   set_timer_data(r, res);
 }
 
+// PicoC: timervalue = tmr_start(id);
+static void tmr_start(pstate *p, val *r, val **param, int n)
+{
+  unsigned id;
+  timer_data_type res;
+
+  id = param[0]->Val->UnsignedInteger;
+  MOD_CHECK_TIMER(id);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_START, 0);
+  set_timer_data(r, res);
+}
+
 // PicoC: time_us = tmr_gettimediff(id, start, end); 
 static void tmr_gettimediff(pstate *p, val *r, val **param, int n)
 {
@@ -296,6 +308,7 @@ const PICOC_RO_TYPE tmr_variables[] = {
 const PICOC_REG_TYPE tmr_library[] = {
   {FUNC(tmr_delay), PROTO("void tmr_delay(unsigned int, unsigned long);")},
   {FUNC(tmr_read), PROTO("unsigned long tmr_read(unsigned int);")},
+  {FUNC(tmr_start), PROTO("unsigned long tmr_start(unsigned int);")},
   {FUNC(tmr_gettimediff), PROTO("unsigned long tmr_gettimediff(unsigned int, unsigned long, unsigned long);")},
   {FUNC(tmr_getdiffnow), PROTO("unsigned long tmr_getdiffnow(unsigned int, unsigned long);")},
   {FUNC(tmr_getmindelay), PROTO("unsigned long tmr_getmindelay(unsigned int);")},
