@@ -147,6 +147,40 @@ any tmr_getdiffnow(any ex) {
   return box(res);
 }
 
+// (tmr-getmindelay ['num]) -> num
+any tmr_getmindelay(any ex) {
+  timer_data_type res;
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  if (plen(ex) > 0) {
+    NeedNum(ex, y);
+    id = unBox(y);
+    MOD_CHECK_TIMER(ex, id);
+  }
+
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_GET_MIN_DELAY, 0);
+  return box(res);
+}
+
+// (tmr-getmaxdelay ['num]) -> num
+any tmr_getmaxdelay(any ex) {
+  timer_data_type res;
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  if (plen(ex) > 0) {
+    NeedNum(ex, y);
+    id = unBox(y);
+    MOD_CHECK_TIMER(ex, id);
+  }
+
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_GET_MAX_DELAY, 0);
+  return box(res);
+}
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
