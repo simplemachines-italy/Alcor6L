@@ -216,6 +216,13 @@ any tmr_getclock(any ex) {
   return box(res);
 }
 
+#ifdef HAS_TMR_MATCH_INT_PICOLISP
+// TODO: For now, picoLisp on Alcor6L doesn't
+// support interrupts.
+// any tmr_set_match_int(any ex)
+// {}
+#endif // HAS_TMR_MATCH_INT_PICOLISP
+
 // Look for all VIRTx timer identifiers.
 #if VTMR_NUM_TIMERS > 0
 // (tmr-decode 'sym) -> num
