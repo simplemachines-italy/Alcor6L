@@ -206,6 +206,13 @@ any can_recv(any x);
 // timer module.
 any tmr_delay(any ex);
 any tmr_read(any ex);
+any tmr_start(any ex);
+any tmr_gettimediff(any ex);
+any tmr_getdiffnow(any ex);
+any tmr_getmindelay(any ex);
+any tmr_getmaxdelay(any ex);
+any tmr_setclock(any ex);
+any tmr_getclock(any ex);
 
 #include "platform_picolisp.h"
 
