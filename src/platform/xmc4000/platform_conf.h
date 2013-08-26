@@ -23,6 +23,7 @@
 #define BUILD_ROMFS
 #define BUILD_XMODEM
 #define BUILD_LINENOISE
+#define BUILD_EDITOR_IV
 
 // *****************************************************************************
 // UART/Timer IDs configuration data (used in main.c)
