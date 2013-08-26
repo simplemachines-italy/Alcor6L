@@ -55,7 +55,14 @@
 
 #define PICOLISP_MOD_TIMER\
   PICOLISP_LIB_DEFINE(tmr_delay, tmr-delay),\
-  PICOLISP_LIB_DEFINE(tmr_read, tmr-read),
+  PICOLISP_LIB_DEFINE(tmr_read, tmr-read),\
+  PICOLISP_LIB_DEFINE(tmr_start, tmr-start),\
+  PICOLISP_LIB_DEFINE(tmr_gettimediff, tmr-gettimediff),\
+  PICOLISP_LIB_DEFINE(tmr_getdiffnow, tmr-getdiffnow),\
+  PICOLISP_LIB_DEFINE(tmr_getmindelay, tmr-getmindelay),\
+  PICOLISP_LIB_DEFINE(tmr_getmaxdelay, tmr-getmaxdelay),\
+  PICOLISP_LIB_DEFINE(tmr_setclock, tmr-setclock),\
+  PICOLISP_LIB_DEFINE(tmr_getclock, tmr-getclock),
 
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
