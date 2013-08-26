@@ -1,5 +1,6 @@
 /* 07jun12abu
  * (c) Software Lab. Alexander Burger
+ * Modified for Alcor6L, <simplemachines-italy>, 2013.
  */
 
 #ifndef __MPLISP_H__
