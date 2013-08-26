@@ -129,6 +129,24 @@ any tmr_gettimediff(any ex) {
   return box(res);
 }
 
+// (tmr-getdiffnow 'num 'num) -> num
+any tmr_getdiffnow(any ex) {
+  timer_data_type start, res;
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  id = unBox(y); // get id.
+  MOD_CHECK_TIMER(ex, id);
+
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
+  start = unBox(y); // get start.
+  res = platform_timer_get_diff_crt(id, start);
+  return box(res);
+}
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
