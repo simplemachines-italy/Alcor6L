@@ -102,7 +102,30 @@ any tmr_start(any ex) {
     MOD_CHECK_TIMER(ex, id);
   }
 
-  res = platform_timer_sys_id(id, PLATFORM_TIMER_OP_START, 0);
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_START, 0);
+  return box(res);
+}
+
+// (tmr-gettimediff 'num 'num 'num) -> num
+any tmr_gettimediff(any ex) {
+  timer_data_type start, end, res;
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  id = unBox(y); // get id.
+  MOD_CHECK_TIMER(ex, id);
+
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
+  start = unBox(y); // get start.
+
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
+  end = unBox(y); // get end.
+
+  res = platform_timer_get_diff_us(id, start, end);
   return box(res);
 }
 
