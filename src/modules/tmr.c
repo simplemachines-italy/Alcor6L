@@ -216,6 +216,34 @@ any tmr_getclock(any ex) {
   return box(res);
 }
 
+// Look for all VIRTx timer identifiers.
+#if VTMR_NUM_TIMERS > 0
+// (tmr-decode 'sym) -> num
+any tmr_decode(any ex) {
+  char* pend;
+  long res;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char key[bufSize(y)];
+  bufString(y, key);
+  if (strlen(key) > MAX_VTIMER_NAME_LEN ||
+      strlen(key) < MIN_VTIMER_NAME_LEN)
+    return box(0);
+  if (strncmp(key, "VIRT", 4))
+    return box(0);
+  res = strtol(key + 4, &pend, 10);
+  if (*pend != '\0')
+    return box(0);
+  if (res >= VTMR_NUM_TIMERS)
+    return box(0);
+
+  return box(res + VTMR_FIRST_ID);
+}
+
+#endif // #if VTMR_NUM_TIMERS > 0
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
