@@ -78,7 +78,7 @@ int elua_save_history(mb_interpreter_t* s, void **l) {
 #endif
 }
 
-// elua_shall("str")
+// elua_shell("str")
 int elua_shell(mb_interpreter_t* s, void **l) {
   int res = MB_FUNC_OK;
   char *cmdcpy, *pcmd = 0;
