@@ -74,37 +74,18 @@
 *******************************************************************************/
            
 void DAVE_MUX_Init(void)
-{              	         
-
+{
        /*        SCU Macro definitions     */                              
-//********* MODULE USIC CONFIGURATIONS *************************	         						
-   /*USIC 0 Channel 0 Mux Related SFR/Bitfields Configurations*/ 						         
- WR_REG(USIC0_CH0->DX0CR, USIC_CH_DX0CR_DSEL_Msk, USIC_CH_DX0CR_DSEL_Pos,1); 
-  			  					 				 				 		       				              				  					    					 					   				  					 				 				       				  										 									 					 					  									      					              					  						    					      
-                 
-   // Data Pointer & Buffer Size for Transmitter Buffer Control  
- WR_REG(USIC0_CH0->TBCTR, USIC_CH_TBCTR_DPTRSIZE_Msk, USIC_CH_TBCTR_DPTRSIZE_Pos,0x01000002);		/*    DPTR = 2,  SIZE = 1 */ 
-         
-  // Data Pointer & Buffer Size for Receiver Buffer Control  
- WR_REG(USIC0_CH0->RBCTR, USIC_CH_RBCTR_DPTRSIZE_Msk, USIC_CH_RBCTR_DPTRSIZE_Pos,0x01000000);		/*    DPTR = 0,  SIZE = 1 */ 
- 						
-   /*USIC 0 Channel 1 Mux Related SFR/Bitfields Configurations*/ 									  					 				 				 		       				              				  					    					 					   				  					 				 				       				  										 									 					 					  									      					              					  						    					      
-         						
-   /*USIC 1 Channel 0 Mux Related SFR/Bitfields Configurations*/ 									  					 				 				 		       				              				  					    					 					   				  					 				 				       				  										 									 					 					  									      					              					  						    					      
-       						
-   /*USIC 1 Channel 1 Mux Related SFR/Bitfields Configurations*/ 									  					 				 				 		       				              				  					    					 					   				  					 				 				       				  										 									 					 					  									      					              					  						    					      
-         						
-   /*USIC 2 Channel 0 Mux Related SFR/Bitfields Configurations*/ 									  					 				 				 		       				              				  					    					 					   				  					 				 				       				  										 									 					 					  									      					              					  						    					      
-       						
-   /*USIC 2 Channel 1 Mux Related SFR/Bitfields Configurations*/ 									  					 				 				 		       				              				  					    					 					   				  					 				 				       				  										 									 					 					  									      					              					  						    					      
-         	        					        	         
-                                                          	         
-                                          
+//********* MODULE USIC CONFIGURATIONS *************************	
+   /*USIC 0 Channel 0 Mux Related SFR/Bitfields Configurations*/
+  WR_REG(USIC0_CH0->DX0CR, USIC_CH_DX0CR_DSEL_Msk, USIC_CH_DX0CR_DSEL_Pos,1);
+   // Data Pointer & Buffer Size for Transmitter Buffer Control
+  WR_REG(USIC0_CH0->TBCTR, USIC_CH_TBCTR_DPTRSIZE_Msk, USIC_CH_TBCTR_DPTRSIZE_Pos,0x01000002);
+  // Data Pointer & Buffer Size for Receiver Buffer Control
+  WR_REG(USIC0_CH0->RBCTR, USIC_CH_RBCTR_DPTRSIZE_Msk, USIC_CH_RBCTR_DPTRSIZE_Pos,0x01000000);
 
-/*        PORT Macro definitions for IOCR_OE, IOCR_PCR & HWSEL_HW     */               
-           
-  WR_REG(PORT1->IOCR4, PORT_IOCR_PC1_PCR_Msk, PORT_IOCR_PC1_PCR_Pos, PORT_IOCR_PCR2);            /*    P1.5 : PORT1_IOCR4_PC5_PCR */
-
-  WR_REG(PORT1->IOCR4, PORT_IOCR_PC1_OE_Msk, PORT_IOCR_PC1_OE_Pos, PORT_IOCR_OE1);                /*    P1.5 : PORT1_IOCR4_PC5_OE */					       
+  // uart pins for xmc4500. (rx = 1.4, tx = 1.5)
+  WR_REG(PORT1->IOCR4, PORT_IOCR_PC1_PCR_Msk, PORT_IOCR_PC1_PCR_Pos, PORT_IOCR_PCR2);
+  WR_REG(PORT1->IOCR4, PORT_IOCR_PC1_OE_Msk, PORT_IOCR_PC1_OE_Pos, PORT_IOCR_OE1);
 }
 
