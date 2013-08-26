@@ -181,6 +181,41 @@ any tmr_getmaxdelay(any ex) {
   return box(res);
 }
 
+// (tmr-setclock 'num 'num) -> num
+any tmr_setclock(any ex) {
+  u32 clock;
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  id = unBox(y); // get id.
+  MOD_CHECK_TIMER(ex, id);
+
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
+  clock = unBox(y); // get clock.
+
+  clock = platform_timer_op(id, PLATFORM_TIMER_OP_SET_CLOCK, clock);
+  return box(clock);
+}
+
+// (tmr-getclock ['num]) -> num
+any tmr_getclock(any ex) {
+  timer_data_type res;
+  unsigned id = PLATFORM_TIMER_SYS_ID;
+  any x, y;
+
+  x = cdr(ex), y = EVAL(car(x));
+  if (plen(ex) > 0) {
+    NeedNum(ex, y);
+    id = unBox(y);
+    MOD_CHECK_TIMER(ex, id);
+  }
+  res = platform_timer_op(id, PLATFORM_TIMER_OP_GET_CLOCK, 0);
+  return box(res);
+}
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
