@@ -80,11 +80,13 @@
   _ROM(PICOC_PLAT_LIB_ELUA, NULL, &elua_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_UART, NULL, &uart_library[0], NULL)\
   _ROM(PICOC_PLAT_LIB_TMR, NULL, &tmr_library[0], NULL)\
-  ADCLINE
+  ADCLINE\
+  _ROM(PICOC_PLAT_LIB_PIO, NULL, &pio_library[0], NULL)
+
   // _ROM(PICOC_PLAT_LIB_I2C, NULL, &i2c_library[0], NULL)
   // _ROM(PICOC_PLAT_LIB_PWM, NULL, &pwm_library[0], NULL)
   // _ROM(PICOC_PLAT_LIB_SPI, NULL, &spi_library[0], NULL)
-  // _ROM(PICOC_PLAT_LIB_PIO, NULL, &pio_library[0], NULL)
+
 
 #ifndef NO_FP
 # define MATHLINE_VAR _ROM(PICOC_CORE_VAR_MATH, &math_variables[0])
