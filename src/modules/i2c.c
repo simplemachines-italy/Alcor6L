@@ -33,7 +33,7 @@
 // I2C module for picoLisp.
 
 // (i2c-setup 'num 'num) -> num
-any i2c_setup(any ex) {
+any plisp_i2c_setup(any ex) {
   any x, y;
   unsigned id;
   s32 speed;
@@ -53,7 +53,7 @@ any i2c_setup(any ex) {
 }
 
 // (i2c-start 'num) -> Nil
-any i2c_start(any ex) {
+any plisp_i2c_start(any ex) {
   unsigned id;
   any x, y;
 
@@ -67,7 +67,7 @@ any i2c_start(any ex) {
 }
 
 // (i2c-stop 'num) -> Nil
-any i2c_stop(any ex) {
+any plisp_i2c_stop(any ex) {
   unsigned id;
   any x, y;
 
@@ -81,7 +81,7 @@ any i2c_stop(any ex) {
 }
 
 // (i2c-address 'num 'num 'num) -> num
-any i2c_address(any ex) {
+any plisp_i2c_address(any ex) {
   unsigned id;
   int add, dir, ret;
   any x, y;
@@ -162,7 +162,7 @@ static void i2ch_prin(unsigned id, any x) {
 }
 
 // (i2c-write 'num 'any ..) -> any
-any i2c_write(any ex) {
+any plisp_i2c_write(any ex) {
   unsigned id;
   any x, y = Nil;
 
