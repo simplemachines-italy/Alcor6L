@@ -214,6 +214,13 @@ any tmr_getmaxdelay(any ex);
 any tmr_setclock(any ex);
 any tmr_getclock(any ex);
 
+// i2c module.
+any plisp_i2c_setup(any ex);
+any plisp_i2c_start(any ex);
+any plisp_i2c_stop(any ex);
+any plisp_i2c_address(any ex);
+any plisp_i2c_write(any ex);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/

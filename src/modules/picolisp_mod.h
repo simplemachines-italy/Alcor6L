@@ -64,6 +64,13 @@
   PICOLISP_LIB_DEFINE(tmr_setclock, tmr-setclock),\
   PICOLISP_LIB_DEFINE(tmr_getclock, tmr-getclock),
 
+#define PICOLISP_MOD_I2C\
+  PICOLISP_LIB_DEFINE(plisp_i2c_setup, i2c-setup),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_start, i2c-start),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_stop, i2c-stop),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_address, i2c-address),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_write, i2c-write),
+
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)

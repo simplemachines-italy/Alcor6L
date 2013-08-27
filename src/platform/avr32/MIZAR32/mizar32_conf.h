@@ -128,7 +128,8 @@
   _ROM(MIZAR32_LCD)\
   _ROM(ELUA)\
   _ROM(CPU)\
-  _ROM(TIMER)
+  _ROM(TIMER)\
+  _ROM(I2C)
 
 #elif defined ALCOR_LANG_PICOC
 
