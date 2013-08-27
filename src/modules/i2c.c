@@ -32,7 +32,7 @@
 // ****************************************************************************
 // I2C module for picoLisp.
 
-// (i2c-setup id speed) -> num
+// (i2c-setup 'num 'num) -> num
 any i2c_setup(any ex) {
   any x, y;
   unsigned id;
@@ -40,55 +40,67 @@ any i2c_setup(any ex) {
 
   x = cdr(ex);
   NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
   MOD_CHECK_ID(ex, i2c, id);
 
   x = cdr(x);
   NeedNum(x, y = EVAL(car(x)));
+  speed = unBox(y);
   if (speed <= 0)
-    err(NULL, y, "frequency must be > 0");
+    err(ex, y, "frequency must be > 0");
 
   return box(platform_i2c_setup(id, (u32)speed));
 }
 
-// (i2c-start id) -> Nil
+// (i2c-start 'num) -> Nil
 any i2c_start(any ex) {
   unsigned id;
   any x, y;
 
-  lisp_getnum(ex, id);
   x = cdr(ex);
   NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
   MOD_CHECK_ID(ex, i2c, id);
   platform_i2c_send_start(id);
 
   return Nil;
 }
 
-// (i2c-stop id) -> Nil
+// (i2c-stop 'num) -> Nil
 any i2c_stop(any ex) {
   unsigned id;
   any x, y;
 
-  lisp_getnum(ex, id);
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
   MOD_CHECK_ID(ex, i2c, id);
   platform_i2c_send_stop(id);
 
   return Nil;
 }
 
-// (i2c-address id addr dir) -> num
+// (i2c-address 'num 'num 'num) -> num
 any i2c_address(any ex) {
   unsigned id;
   int add, dir;
   any x, y;
 
-  lisp_getnum(ex, id); // id.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.  
   MOD_CHECK_ID(ex, i2c, id);
-  lisp_getnum(x, add); // address.
-  lisp_getnum(x, dir); // direction.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  add = unBox(y); // get address.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y); // get direction.
   
   if (add < 0 || add > 127)
-    err(NULL, ex, "slave address must be from 0 to 127");
+    err(NULL, NULL, "slave address must be from 0 to 127");
 
   return box(platform_i2c_send_address(id,
 				       (u16)add,
