@@ -83,7 +83,7 @@ any i2c_stop(any ex) {
 // (i2c-address 'num 'num 'num) -> num
 any i2c_address(any ex) {
   unsigned id;
-  int add, dir;
+  int add, dir, ret;
   any x, y;
 
   x = cdr(ex);
@@ -102,9 +102,78 @@ any i2c_address(any ex) {
   if (add < 0 || add > 127)
     err(NULL, NULL, "slave address must be from 0 to 127");
 
-  return box(platform_i2c_send_address(id,
-				       (u16)add,
-				       dir));
+  ret = platform_i2c_send_address(id, (u16)add, dir);
+  return box(ret);
+
+}
+
+// Helpers for picoLisp i2c 'write' function.
+
+static void outString_i2c(unsigned id, char *s) {
+  while (*s)
+    platform_i2c_send_byte(id, *s++);
+}
+
+static void outNum_i2c(unsigned id, long n) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_i2c(id, buf);
+}
+
+static void i2ch_prin(unsigned id, any x) {
+  if (!isNil(x)) {
+    if (isNum(x))
+      outNum_i2c(id, unBox(x));
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      u8 byte;
+ 
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+        if (c != '^') {
+          byte = c;
+          platform_i2c_send_byte(id, byte);
+        }
+        else if (!(c = getByte(&i, &w, &x))) {
+          byte = '^';
+	  platform_i2c_send_byte(id, byte);
+	}
+        else if (c == '?') {
+          byte = 127;
+	  platform_i2c_send_byte(id, byte);
+        }
+        else {
+          c &= 0x1F;
+          byte = (u8)c;
+	  platform_i2c_send_byte(id, byte);
+        }
+      }
+    }
+    else {
+      while (i2ch_prin(id, car(x)), !isNil(x = cdr(x))) {
+        if (!isCell(x)) {
+	  i2ch_prin(id, x);
+          break;
+	}
+      }
+    }
+  }
+}
+
+// (i2c-write 'num 'any ..) -> any
+any i2c_write(any ex) {
+  unsigned id;
+  any x, y = Nil;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, i2c, id);
+
+  while (isCell(x = cdr(x)))
+    i2ch_prin(id, y = EVAL(car(x)));
+  return y;
 }
 
 #elif defined ALCOR_LANG_PICOC
