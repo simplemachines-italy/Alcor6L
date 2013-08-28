@@ -176,6 +176,34 @@ any plisp_i2c_write(any ex) {
   return y;
 }
 
+// (i2c-read 'num 'num) -> sym
+any plisp_i2c_read(any ex) {
+  unsigned id;
+  u32 size, i, count = 0;
+  int data;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, i2c, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  size = unBox(y); // get size.
+  char *b = malloc(size + 1);
+
+  if (size == 0)
+    return Nil;
+  for (i = 0; i < size; i++) {
+    if ((data = platform_i2c_recv_byte(id, i < size - 1)) == -1)
+      break;
+    else
+      b[count++] = (char)data;
+  }
+  return mkStr(b);
+}
+
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************

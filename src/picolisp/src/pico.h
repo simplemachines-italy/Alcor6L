@@ -226,6 +226,7 @@ any plisp_i2c_start(any ex);
 any plisp_i2c_stop(any ex);
 any plisp_i2c_address(any ex);
 any plisp_i2c_write(any ex);
+any plisp_i2c_read(any ex);
 
 #include "platform_picolisp.h"
 

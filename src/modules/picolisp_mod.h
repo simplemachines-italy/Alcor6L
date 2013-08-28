@@ -69,7 +69,8 @@
   PICOLISP_LIB_DEFINE(plisp_i2c_start, i2c-start),\
   PICOLISP_LIB_DEFINE(plisp_i2c_stop, i2c-stop),\
   PICOLISP_LIB_DEFINE(plisp_i2c_address, i2c-address),\
-  PICOLISP_LIB_DEFINE(plisp_i2c_write, i2c-write),
+  PICOLISP_LIB_DEFINE(plisp_i2c_write, i2c-write),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_read, i2c-read),
 
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
