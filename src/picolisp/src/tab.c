@@ -326,6 +326,12 @@ void initSymbols(void) {
    plisp_i2c_recv = initSym(box(PLATFORM_I2C_DIRECTION_RECEIVER), "*i2c-receiver*");
 #endif
 
+   // can symbols.
+#ifdef PICOLISP_MOD_CAN
+   can_id_ext = initSym(box(ELUA_CAN_ID_EXT), "*can-id-ext*");
+   can_id_std = initSym(box(ELUA_CAN_ID_STD), "*can-id-std*");
+#endif
+
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 
    At    = initSym(Nil, "@");
