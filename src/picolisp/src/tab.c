@@ -312,9 +312,20 @@ void initSymbols(void) {
    intern(Nil, Intern);
    Meth  = initSym(boxSubr(doMeth), "meth");
    Quote = initSym(boxSubr(doQuote), "quote");
+
+   // system timer symbols.
 #ifdef PICOLISP_MOD_TIMER
    sys_timer = initSym(box(PLATFORM_TIMER_SYS_ID), "*tmr-sys-timer*");
 #endif
+   
+   // i2c symbols.
+#ifdef PICOLISP_MOD_I2C
+   plisp_i2c_fast = initSym(box(PLATFORM_I2C_SPEED_FAST), "*i2c-fast*");
+   plisp_i2c_slow = initSym(box(PLATFORM_I2C_SPEED_SLOW), "*i2c-slow*");
+   plisp_i2c_trans = initSym(box(PLATFORM_I2C_DIRECTION_TRANSMITTER), "*i2c-transmitter*");
+   plisp_i2c_recv = initSym(box(PLATFORM_I2C_DIRECTION_RECEIVER), "*i2c-receiver*");
+#endif
+
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 
    At    = initSym(Nil, "@");

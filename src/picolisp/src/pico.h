@@ -161,7 +161,13 @@ extern any Intern[2], Transient[2], Reloc;
 extern any ApplyArgs, ApplyBody;
 extern any Nil, Meth, Quote, T, At, At2, At3, This;
 extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
+
+// globals for picoLisp platform modules.
+
+// system timer.
 any sys_timer;
+// i2c symbols.
+any plisp_i2c_fast, plisp_i2c_slow, plisp_i2c_trans, plisp_i2c_recv;
 
 // Alcor6L platform modules.
 any pd_platform(any x);
