@@ -55,7 +55,8 @@ any tmr_delay(any ex) {
   x = cdr(ex), y = EVAL(car(x));
   if (plen(ex) == 1) {
     // We only have 1 parameter. Assume
-    // *sys-timer* and get the time period.
+    // *tmr-sys-timer* and get the time
+    // period.
     NeedNum(ex, y);
     period = (timer_data_type)unBox(y);
   } else {
