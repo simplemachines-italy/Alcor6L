@@ -313,7 +313,7 @@ void initSymbols(void) {
    Meth  = initSym(boxSubr(doMeth), "meth");
    Quote = initSym(boxSubr(doQuote), "quote");
 #ifdef PICOLISP_MOD_TIMER
-   sys_timer = initSym(box(PLATFORM_TIMER_SYS_ID), "*sys-timer*");
+   sys_timer = initSym(box(PLATFORM_TIMER_SYS_ID), "*tmr-sys-timer*");
 #endif
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 
