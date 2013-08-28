@@ -43,38 +43,24 @@ any can_send(any ex) {
   int id, canid, idtype;
   any x, y;
 
-  static const char const *args[] = {
-    "id-ext",
-    "id-std",
-    NULL
-  };
-
-  // get id.
   x = cdr(ex);
   NeedNum(ex, y = EVAL(car(x)));
-  id = unBox(y);
+  id = unBox(y); // id.
   MOD_CHECK_ID(ex, can, id);
 
-  // get can id.
   x = cdr(x);
   NeedNum(ex, y = EVAL(car(x)));
-  canid = unBox(y);
+  canid = unBox(y); // can id.
 
-  // get id type (picoLisp symbol).
-  x = cdr(x), y = EVAL(car(x));
-  if (equal(mkStr(args[0]), y))
-    idtype = ELUA_CAN_ID_EXT;
-  else if (equal(mkStr(args[1]), y))
-    idtype = ELUA_CAN_ID_STD;
-  else
-    err(NULL, x, "invalid CAN idtype");
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  idtype = unBox(y); // id type.
 
-  // get can data.
   x = cdr(x);
   len = bufSize(y = EVAL(car(x)));
   char data[len];
   NeedSym(ex, y);
-  bufString(y, data);
+  bufString(y, data); // can data.
   
   if (len > PLATFORM_CAN_MAXLEN)
     err(NULL, x, "message exceeds max length");
