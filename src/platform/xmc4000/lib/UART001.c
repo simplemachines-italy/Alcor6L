@@ -333,7 +333,7 @@ void UART001_lConfigureBaudRate\
 	uint32_t temp = 0U;
 	float div_factor;
 	uint8_t loop_cnt;
-	bool swapped;
+	xmc_bool swapped;
 	dividend_in = (uint32_t)((uint32_t)(UART001_CLOCK * 1000000)/ \
                     	(UART001_MAX_VALUE * UART001_DCTQ_VALUE)); 
 	/* swap if divisor_in/dividend_in > max_divisor/max_dividend */

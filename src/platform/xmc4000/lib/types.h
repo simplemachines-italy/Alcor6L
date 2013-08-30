@@ -67,7 +67,7 @@ typedef enum SetResetType{
 }SetResetType;
 
 #ifndef __STDBOOL_H__
-typedef unsigned char bool;
+typedef unsigned char xmc_bool;
 #endif
 
 #ifndef EOF

@@ -299,11 +299,11 @@ typedef enum UART001_FlagStatusType
   /** Rx FIFO Size value */
   uint8_t RxFifoSize;
   /** Enable Receiver Noise Interrupt */
-  bool RecvNoiseEn;
+  xmc_bool RecvNoiseEn;
   /** Enable Format Error Interrupt */
-  bool FormatErrEn;
+  xmc_bool FormatErrEn;
   /** Enable Frame Finished Interrupt */
-  bool FrameFinEn;
+  xmc_bool FrameFinEn;
   /** Calculated step value */
   uint16_t BGR_STEP;
   /** Calculated pdiv value */
