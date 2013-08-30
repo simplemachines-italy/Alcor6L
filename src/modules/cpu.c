@@ -70,7 +70,7 @@ any cpu_w32(any ex) {
   any x, y;
 
   get_addr_data(addr, data);
-  *(U32 *)addr = data;
+  *(u32 *)addr = data;
   return box(data);
 }
 
