@@ -45,6 +45,14 @@
 // *****************************************************************************
 // Language configurations: picoLisp.
 
+// platform library functions
+#define PICOLISP_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(TERM)\
+  _ROM(ELUA)\
+  _ROM(CPU)\
+  _ROM(TIMER)
+
 #elif defined ALCOR_LANG_PICOC
 
 // *****************************************************************************
