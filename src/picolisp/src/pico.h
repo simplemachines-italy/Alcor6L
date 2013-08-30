@@ -1,3 +1,4 @@
+
 /* 07jun12abu
  * (c) Software Lab. Alexander Burger
  * Modified for Alcor6L, <simplemachines-italy>, 2013.
@@ -17,7 +18,15 @@
 
 #define PICOLISP_WORD ((int)sizeof(long))
 #define BITS (8*PICOLISP_WORD)
-#define CELLS (1024*1024/sizeof(cell))
+
+#if defined ALCOR_BOARD_MIZAR32
+# define PC_MUL 1024
+#elif defined ALCOR_BOARD_HEXAGON
+# define PC_MUL 64
+#else
+# error "Unknown board/CPU. PC_MUL not defined."
+#endif
+#define CELLS (PC_MUL*1024/sizeof(cell))
 
 typedef unsigned long word;
 typedef unsigned char byte;
