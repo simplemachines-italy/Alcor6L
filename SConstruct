@@ -549,7 +549,7 @@ if not GetOption( 'help' ):
   # Language specific files.
   if comp['lang'] == 'mybasic':
     source_files += Split( mybasic_full_files )
-  if comp['lang'] == 'picolisp':
+  elif comp['lang'] == 'picolisp':
     source_files += Split( picolisp_full_files )
   elif comp['lang'] == 'picoc':
     source_files += Split( picoc_full_files )
