@@ -11,7 +11,9 @@
 #include "shell.h"
 
 // Language specific includes.
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -42,7 +44,10 @@
 // in the order you want eLua to search for them
 char *boot_order[] = {
 #if defined BUILD_MMCFS
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+  "/mmc/autorun.scm",
+  "/mmc/autorun.tscm",
+#elif defined ALCOR_LANG_MYBASIC
   "/mmc/autorun.bas",
   "/mmc/autorun.bc",
 #elif defined ALCOR_LANG_PICOLISP
@@ -57,7 +62,10 @@ char *boot_order[] = {
 #endif
 #endif
 #if defined BUILD_ROMFS
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+  "/rom/autorun.scm",
+  "/rom/autorun.tscm",
+#elif defined ALCOR_LANG_MYBASIC
   "/rom/autorun.bas",
   "/rom/autorun.bc",
 #elif defined ALCOR_LANG_PICOLISP
@@ -143,7 +151,10 @@ int main( void )
     if( ( fp = fopen( boot_order[ i ], "r" ) ) != NULL )
     {
       fclose( fp );
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+      char* tinyscheme_argv[] = { "tinyscheme", boot_order[i], NULL };
+      tinyscheme_main( 2, tinyscheme_argv );
+#elif defined ALCOR_LANG_MYBASIC
       char* mybasic_argv[] = { "mybasic", boot_order[i], NULL };
       mybasic_main( 2, mybasic_argv );
 #elif defined ALCOR_LANG_PICOLISP
@@ -167,7 +178,10 @@ int main( void )
   // Run the shell
   if( shell_init() == 0 )
   {
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+    char* tinyscheme_argv[] = { "tinyscheme", NULL };
+    tinyscheme_main( 1, tinyscheme_argv );
+#elif defined ALCOR_LANG_MYBASIC
     char* mybasic_argv[] = { "mybasic", NULL };
     mybasic_main( 1, mybasic_argv );
 #elif defined ALCOR_LANG_PICOLISP

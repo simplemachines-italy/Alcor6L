@@ -3,7 +3,9 @@
 
 #include "elua_int.h"
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -32,7 +34,15 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// Interrupt handlers for tiny-scheme.
+
+// TODO:
+// Interrupt handler mechanism for tiny-scheme.
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Interrupt handlers for my-basic
