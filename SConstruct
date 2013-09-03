@@ -196,7 +196,7 @@ vars.AddVariables(
   MatchEnumVariable('lang',
                     'Build Alcor6L with support for the specified language',
                     'lua',
-                    allowed_values=[ 'lua', 'picoc', 'picolisp', 'mybasic' ] ),
+                    allowed_values=[ 'lua', 'picoc', 'picolisp', 'mybasic', 'tinyscheme' ] ),
   BoolVariable(     'optram',
                     'enables Tiny RAM enhancements',
                     True ),
@@ -208,10 +208,16 @@ vars.AddVariables(
 vars.Update(comp)
 
 # Target config variables.
-if comp['lang'] == 'mybasic':
+if comp['lang'] == 'tinyscheme':
   vars.AddVariables(
     MatchEnumVariable('target',
-                      'build "regular float mybasic',
+                      'build "regular" float tinyscheme',
+                      'fp',
+                      allowed_values = [ 'fp' ] ) )
+elif comp['lang'] == 'mybasic':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float mybasic',
                       'fp',
                       allowed_values = [ 'fp' ] ) )
 elif comp['lang'] == 'picolisp':
@@ -235,7 +241,7 @@ elif comp['lang'] == 'lua':
 
 # Boot config variables.
 # For picoc, the only boot option for now is 'standard'
-if comp['lang'] == 'picoc' or comp['lang'] == 'picolisp' or comp['lang'] == 'mybasic':
+if comp['lang'] == 'picoc' or comp['lang'] == 'picolisp' or comp['lang'] == 'mybasic' or comp['lang'] == 'tinyscheme':
   vars.AddVariables(
     MatchEnumVariable('boot',
                       'boot mode, standard will boot to shell',
@@ -389,7 +395,9 @@ if not GetOption( 'help' ):
   output = 'Alcor6L_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
 
   # Language specific defines.
-  if comp['lang'] == 'mybasic':
+  if comp['lang'] == 'tinyscheme':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_TINYSCHEME'])
+  elif comp['lang'] == 'mybasic':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_MYBASIC']) 
   elif comp['lang'] == 'picolisp':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOLISP'])
@@ -444,8 +452,15 @@ if not GetOption( 'help' ):
 
   mybasic_full_files = " " + " ".join( [ "src/mybasic/%s" % name for name in mybasic_files.split() ] )
 
+  # TinyScheme source files and include path.
+  tinyscheme_files = """scheme.c"""
+
+  tinyscheme_full_files = " " + " ".join( [ "src/tinyscheme/%s" % name for name in tinyscheme_files.split() ] )
+
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
-  if comp['lang'] == 'mybasic':
+  if comp['lang'] == 'tinyscheme':
+    comp.Append(CPPPATH = ['src/tinyscheme'])
+  elif comp['lang'] == 'mybasic':
     comp.Append(CPPPATH = ['src/mybasic'])
   elif comp['lang'] == 'picolisp':
     comp.Append(CPPPATH = ['src/picolisp/src'])
@@ -474,7 +489,9 @@ if not GetOption( 'help' ):
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
 
   # Tiny RAM optimizations.
-  if comp['lang'] == 'mybasic':
+  if comp['lang'] == 'tinyscheme':
+    conf.env.Append(CPPDEFINES = {"TINYSCHEME_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  elif comp['lang'] == 'mybasic':
     conf.env.Append(CPPDEFINES = {"MYBASIC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
   elif comp['lang'] == 'picolisp':
     conf.env.Append(CPPDEFINES = {"PICOLISP_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
@@ -502,7 +519,7 @@ if not GetOption( 'help' ):
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c src/shell/shell_luac.c src/shell/shell_picolisp.c src/shell/shell_mybasic.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c src/shell/shell_luac.c src/shell/shell_picolisp.c src/shell/shell_mybasic.c src/shell/shell_tinyscheme.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c
@@ -547,7 +564,9 @@ if not GetOption( 'help' ):
   source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
 
   # Language specific files.
-  if comp['lang'] == 'mybasic':
+  if comp['lang'] == 'tinyscheme':
+    source_files += Split( tinyscheme_full_files )
+  elif comp['lang'] == 'mybasic':
     source_files += Split( mybasic_full_files )
   elif comp['lang'] == 'picolisp':
     source_files += Split( picolisp_full_files )
