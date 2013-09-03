@@ -1,7 +1,9 @@
 // Module for interfacing with network functions (elua_net.h)
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -27,7 +29,18 @@
 
 #include "platform_conf.h"
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// Net module for tiny-scheme.
+
+#ifdef BUILD_UIP
+
+#else
+
+#endif
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Net module for my-basic.

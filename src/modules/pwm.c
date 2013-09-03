@@ -3,7 +3,14 @@
 
 #include "platform.h"
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// Pulse width modulation module for tiny-scheme.
+
+// TODO:
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // **************************************************************************** 
 // Pulse width modulation module for my-basic.

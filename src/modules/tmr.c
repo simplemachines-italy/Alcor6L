@@ -1,7 +1,9 @@
 // Module for interfacing with timers
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -36,7 +38,12 @@
 #define HAS_TMR_MATCH_INT_PICOC
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// Timer module for tiny-scheme.
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Timer module for my-basic.

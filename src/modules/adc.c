@@ -1,7 +1,9 @@
 // Module for interfacing with ADC
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -25,7 +27,14 @@
 
 #ifdef BUILD_ADC
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************                                                
+// ADC (Analog to digital converter) module for tiny-basic.
+
+// TODO:
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for my-basic.
@@ -37,7 +46,132 @@
 // ****************************************************************************
 // ADC (Analog to digital converter) module for picoLisp.
 
-// TODO:
+// (adc-maxval 'num) -> num
+any adc_maxval(any ex) {
+  unsigned id;
+  u32 res;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  res = platform_adc_get_maxval(id);
+  return box(res);
+}
+
+// (adc-setclock 'num 'num 'num) -> num
+any adc_setclock(any ex) {
+  s32 sfreq; // signed version for negative checking.
+  u32 freq;
+  unsigned id, timer_id = 0;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get adc id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  sfreq = unBox(y); // get frequency.
+  if (sfreq < 0)
+    err(ex, y, "frequency must be 0 or positive");
+
+  freq = (u32) sfreq;
+  if (freq > 0) {
+    x = cdr(x);
+    NeedNum(ex, y = EVAL(car(x)));
+    timer_id = unBox(y); // get timer id.
+    MOD_CHECK_ID(ex, timer, timer_id);
+    MOD_CHECK_RES_ID(ex, adc, id, timer, timer_id);
+  }
+
+  platform_adc_set_timer(id, timer_id);
+  freq = platform_adc_set_clock(id, freq);
+  return box(freq);
+}
+
+// (adc-isdone) -> T | Nil
+any adc_isdone(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  return platform_adc_is_done(id) == 0 ?
+    T : Nil;
+}
+
+// (adc-setblocking 'num 'num) -> Nil
+any adc_setblocking(any ex) {
+  unsigned id, mode;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  mode = unBox(y); // get mode.
+
+  platform_adc_set_blocking(id, mode);
+  return Nil;
+}
+
+// (adc-setsmoothing 'num 'num) -> num
+any adc_setsmoothing(any ex) {
+  unsigned id, length, res;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  length = unBox(y); // get length.
+  if (!(length & (length - 1))) {
+    res = platform_adc_set_smoothing(id, length);
+    if (res == PLATFORM_ERR)
+      err(ex, NULL, "Buffer allocation failed.");
+    else
+      return box(res);
+  } else {
+    err(ex, y, "Length must be power of 2");
+  }
+}
+
+// (adc-sample 'num 'num) -> 
+any adc_sample(any ex) {
+  unsigned id, count, nchans = 1;
+  any x, y;
+  if (!isNil(x)) {
+    if (isNum(x)) {
+      x = cdr(ex);
+      NeedNum(ex, y = EVAL(car(x)));
+      id = unBox(y); // get id.
+      MOD_CHECK_ID(ex, adc, id);
+
+      x = cdr(x);
+      NeedNum(ex, y = EVAL(car(x)));
+      count = unBox(y); // get count.
+      res = adc_setup_channel(id, intlog2(count));
+      if (res != PLATFORM_OK)
+	err(ex, NULL, "sampling setup failed");
+      platform_adc_start_sequence();
+    } else if (isCell(
+      
+    }
+  }
+}
 
 #elif defined ALCOR_LANG_PICOC
 

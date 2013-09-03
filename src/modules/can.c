@@ -3,7 +3,14 @@
 
 #include "platform.h"
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// CAN for tiny-basic.
+
+#include "scheme.h"
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // CAN for my-basic.

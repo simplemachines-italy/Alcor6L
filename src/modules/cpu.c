@@ -1,7 +1,9 @@
 // Module for interfacing with CPU
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -40,7 +42,12 @@ static const cpu_const_t cpu_constants[] =
 };
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// CPU module for tiny-scheme.
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // CPU module for my-basic.

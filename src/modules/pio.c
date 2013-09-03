@@ -1,7 +1,9 @@
 // Module for interfacing with PIO
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -47,7 +49,14 @@ static void pioh_clear_masks(void)
     pio_masks[i] = 0;
 }
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// **************************************************************************** 
+// PIO module for tiny-scheme.
+
+// TODO:
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // PIO module for my-basic.
