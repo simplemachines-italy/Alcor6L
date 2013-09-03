@@ -4,7 +4,9 @@
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "picolisp_mod.h"

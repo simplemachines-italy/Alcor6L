@@ -107,9 +107,16 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
 
-// **************************************************************************** 
+// *****************************************************************************
+// Language configurations: tiny-scheme.
+
+// TODO:
+
+#elif defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
 // Language configurations: my-basic
 
 #define MYBASIC_PLATFORM_LIBS_ROM\
