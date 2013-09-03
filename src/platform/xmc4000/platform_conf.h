@@ -4,7 +4,9 @@
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#ifdef ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+#include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "picolisp_mod.h"
@@ -35,7 +37,12 @@
 
 #define PLATFORM_HAS_SYSTIMER
 
-#ifdef ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// *****************************************************************************
+// Language configurations: tiny-scheme.
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // *****************************************************************************
 // Language configurations: my-basic.
