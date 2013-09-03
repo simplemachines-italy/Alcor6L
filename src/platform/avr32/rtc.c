@@ -1,7 +1,9 @@
 // eLua module for Mizar2 Real Time Clock hardware
 // Modified to include support for Alcor6L.
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"
@@ -155,7 +157,12 @@ static void write_rtc_regs(u8 *regs)
   i2c_send(rtc_slave_address, regs - 1, NFIELDS+1, true);
 }
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// RTC module for tiny-scheme.
+
+#elif defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // RTC module for my-basic.
