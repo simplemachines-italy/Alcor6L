@@ -26,7 +26,9 @@ typedef struct
 } SHELL_HELP_DATA;
 
 // Language specific includes.
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+  SHELL_HELP( tinyscheme );
+#elif defined ALCOR_LANG_MYBASIC
   SHELL_HELP( mybasic );
 #elif defined ALCOR_LANG_PICOLISP
   SHELL_HELP( picolisp );
@@ -65,7 +67,9 @@ static const char shell_help_summary_exit[] = "exit the shell";
 static const SHELL_HELP_DATA shell_help_data[] = 
 {
   SHELL_INFO( help ),
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+  SHELL_INFO( tinyscheme ),
+#elif defined ALCOR_LANG_MYBASIC
   SHELL_INFO( mybasic ),
 #elif defined ALCOR_LANG_PICOLISP
   SHELL_INFO( picolisp ),

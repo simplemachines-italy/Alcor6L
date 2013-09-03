@@ -12,7 +12,9 @@
 #include "platform_conf.h"
 #include "xmodem.h"
 
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#elif defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
 #elif defined ALCOR_LANG_PICOLISP
 # include "pico.h"

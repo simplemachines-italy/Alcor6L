@@ -35,7 +35,9 @@
 char* shell_prog;
 
 // Language specific shell functions.
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+  SHELL_FUNC( shell_tinyscheme );
+#elif defined ALCOR_LANG_MYBASIC
   SHELL_FUNC( shell_mybasic );
 #elif defined ALCOR_LANG_PICOLISP
   SHELL_FUNC( shell_picolisp );
@@ -211,7 +213,9 @@ void shellh_show_help( const char *cmd, const char *helptext )
 // Insert shell commands here
 static const SHELL_COMMAND shell_commands[] =
 {
-#if defined ALCOR_LANG_MYBASIC
+#if defined ALCOR_LANG_TINYSCHEME
+  { "tinyscheme", shell_tinyscheme },
+#elif defined ALCOR_LANG_MYBASIC
   { "mybasic", shell_mybasic },
 #elif defined ALCOR_LANG_PICOLISP
   { "picolisp", shell_picolisp },
