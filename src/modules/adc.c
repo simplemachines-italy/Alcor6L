@@ -149,30 +149,6 @@ any adc_setsmoothing(any ex) {
   }
 }
 
-// (adc-sample 'num 'num) -> 
-any adc_sample(any ex) {
-  unsigned id, count, nchans = 1;
-  any x, y;
-  if (!isNil(x)) {
-    if (isNum(x)) {
-      x = cdr(ex);
-      NeedNum(ex, y = EVAL(car(x)));
-      id = unBox(y); // get id.
-      MOD_CHECK_ID(ex, adc, id);
-
-      x = cdr(x);
-      NeedNum(ex, y = EVAL(car(x)));
-      count = unBox(y); // get count.
-      res = adc_setup_channel(id, intlog2(count));
-      if (res != PLATFORM_OK)
-	err(ex, NULL, "sampling setup failed");
-      platform_adc_start_sequence();
-    } else if (isCell(
-      
-    }
-  }
-}
-
 #elif defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
