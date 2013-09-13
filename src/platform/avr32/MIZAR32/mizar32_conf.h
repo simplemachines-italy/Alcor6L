@@ -31,6 +31,7 @@
   // Build options for 256KB and 512KB flash
 # define RAM_SIZE 0x10000
 # define BUILD_SHELL
+//# define BUILD_ADVANCED_SHELL
 # define BUILD_XMODEM
 # define BUILD_ADC
 # define BUILD_LCD
@@ -41,9 +42,13 @@
 // Interrupt handler support
 #if defined ALCOR_LANG_PICOLISP
 # define BUILD_PICOLISP_INT_HANDLERS
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # define BUILD_PICOC_INT_HANDLERS
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # define BUILD_LUA_INT_HANDLERS
 #endif
 
@@ -51,9 +56,10 @@
 # define BUILD_EDITOR_IV
 #endif
 
+// uip support.
 #ifdef BUILD_UIP
-#define BUILD_DHCPC
-#define BUILD_DNS
+# define BUILD_DHCPC
+# define BUILD_DNS
 //#define BUILD_CON_TCP
 #endif
 
@@ -114,7 +120,9 @@
 
 // TODO:
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Language configurations: my-basic
@@ -123,7 +131,9 @@
   _ROM(PD)\
   _ROM(ELUA)
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // Language configurations: picoLisp.
@@ -138,7 +148,9 @@
   _ROM(TIMER)\
   _ROM(I2C)
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Language configurations: PicoC.
@@ -214,7 +226,9 @@
 // PicoC stack configuration.
 #define PICOC_STACK_SIZE      (32*1024)
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Language configurations: Lua.
@@ -279,7 +293,7 @@
 
 #endif
 
-#endif // #if defined ALCOR_LANG_PICOLISP
+#endif // #if defined ALCOR_LANG_LUA
 
 // *****************************************************************************
 // Configuration data

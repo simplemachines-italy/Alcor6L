@@ -1,17 +1,27 @@
 // eLua module for Mizar2 Real Time Clock hardware
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+// 
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -162,17 +172,23 @@ static void write_rtc_regs(u8 *regs)
 // ****************************************************************************
 // RTC module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // RTC module for my-basic.
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // RTC module for picoLisp.
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // RTC module for PicoC.
@@ -321,7 +337,9 @@ extern void rtc_library_init(void)
 	   &rtc_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // RTC module for Lua.
@@ -454,4 +472,4 @@ const LUA_REG_TYPE rtc_map[] =
   { LNILKEY, LNILVAL }
 };
 
-#endif // ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_LUA

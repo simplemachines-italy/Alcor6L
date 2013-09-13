@@ -1,23 +1,34 @@
 // eLua module for Mizar32 LCD character display
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+//
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include "platform.h"
 #include "platform_conf.h"
 #include "lcd.h"       
@@ -138,12 +149,16 @@ static int set_cursor( u8 command_byte )
 // **************************************************************************** 
 // LCD display module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // LCD display module for my-basic.
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // LCD display module for picoLisp.
@@ -374,7 +389,9 @@ any lcd_display(any x) {
 // TODO:
 // any lcd_definechar(any ex) {}
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // LCD display module for PicoC.
@@ -639,7 +656,9 @@ extern void lcd_disp_library_init(void)
 	   &lcd_disp_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // LCD display module for Lua.
@@ -899,4 +918,4 @@ const LUA_REG_TYPE lcd_map[] =
   { LNILKEY, LNILVAL }
 };
 
-#endif // #ifdef ALCOR_LANG_PICOLISP.
+#endif // #ifdef ALCOR_LANG_LUA
