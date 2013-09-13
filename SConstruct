@@ -398,7 +398,7 @@ if not GetOption( 'help' ):
   if comp['lang'] == 'tinyscheme':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_TINYSCHEME'])
   elif comp['lang'] == 'mybasic':
-    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_MYBASIC']) 
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_MYBASIC'])
   elif comp['lang'] == 'picolisp':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOLISP'])
   elif comp['lang'] == 'picoc':
@@ -432,29 +432,24 @@ if not GetOption( 'help' ):
     lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c
     ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c
     luac.c print.c"""
-
   lua_full_files = " " + " ".join( [ "src/lua/%s" % name for name in lua_files.split() ] )
 
   # PicoC source files and include path
   picoc_files = """picoc.c table.c lex.c parse.c expression.c heap.c type.c variable.c platform.c clibrary.c include.c
     cstdlib/stdio.c cstdlib/math.c cstdlib/string.c cstdlib/stdlib.c cstdlib/errno.c cstdlib/ctype.c
     cstdlib/stdbool.c platform/platform_unix.c platform/library_unix.c rotable.c"""
-
   picoc_full_files = " " + " ".join( [ "src/picoc/%s" % name for name in picoc_files.split() ] )
 
-  # picolisp source files and include path.
+  # picoLisp source files and include path.
   picolisp_files = """apply.c flow.c gc.c io.c main.c math.c subr.c sym.c tab.c"""
-  
   picolisp_full_files = " " + " ".join( [ "src/picolisp/src/%s" % name for name in picolisp_files.split() ] )
 
   # my-basic source files and include path.
   mybasic_files = """my_basic.c main.c"""
-
   mybasic_full_files = " " + " ".join( [ "src/mybasic/%s" % name for name in mybasic_files.split() ] )
 
   # TinyScheme source files and include path.
   tinyscheme_files = """scheme.c"""
-
   tinyscheme_full_files = " " + " ".join( [ "src/tinyscheme/%s" % name for name in tinyscheme_files.split() ] )
 
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
