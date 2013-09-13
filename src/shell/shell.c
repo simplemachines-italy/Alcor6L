@@ -35,15 +35,29 @@
 char* shell_prog;
 
 // Language specific shell functions.
+//
+
+#if defined ALCOR_LANG_HASKELL
+  SHELL_FUNC( shell_hugs98 );
+#endif
+
 #if defined ALCOR_LANG_TINYSCHEME
   SHELL_FUNC( shell_tinyscheme );
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
   SHELL_FUNC( shell_mybasic );
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
   SHELL_FUNC( shell_picolisp );
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
   SHELL_FUNC( shell_picoc );
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   SHELL_FUNC( shell_lua );
   SHELL_FUNC( shell_luac );
 #endif
@@ -213,18 +227,33 @@ void shellh_show_help( const char *cmd, const char *helptext )
 // Insert shell commands here
 static const SHELL_COMMAND shell_commands[] =
 {
+// Language specific commands.
+//
+#if defined ALCOR_LANG_HASKELL
+  { "hugs", shell_hugs98 },
+#endif
+
 #if defined ALCOR_LANG_TINYSCHEME
   { "tinyscheme", shell_tinyscheme },
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
   { "mybasic", shell_mybasic },
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
   { "picolisp", shell_picolisp },
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
   { "picoc", shell_picoc },
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   { "lua", shell_lua },
   { "luac", shell_luac },
 #endif
+
   { "help", shell_help },
   { "recv", shell_recv },
   { "ver", shell_ver },
@@ -375,11 +404,17 @@ const SHELL_COMMAND* shellh_execute_command( char* cmd, int interactive_mode )
       // The same goes for the other languages in Alcor6L.
 #if defined ALCOR_LANG_MYBASIC
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "mybasic" ) ) )
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "picolisp" ) ) )
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "picoc" ) ) )
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "lua" ) ) )
 #endif
         pcmd->handler_func( argc, argv );
