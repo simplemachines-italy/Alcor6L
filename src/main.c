@@ -13,18 +13,27 @@
 // Language specific includes.
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lauxlib.h"
 # include "lualib.h"
 #endif
 
+// Generic includes.
 #include "term.h"
 #include "platform_conf.h"
 #include "elua_rfs.h"
@@ -47,34 +56,55 @@ char *boot_order[] = {
 #if defined ALCOR_LANG_TINYSCHEME
   "/mmc/autorun.scm",
   "/mmc/autorun.tscm",
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
   "/mmc/autorun.bas",
   "/mmc/autorun.bc",
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
   "/mmc/autorun.l",
   "/mmc/autorun.lc",
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
   "/mmc/autorun.c",
   "/mmc/autorun.pc",
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   "/mmc/autorun.lua",
   "/mmc/autorun.lc",
 #endif
 #endif
 #if defined BUILD_ROMFS
+#if defined ALCOR_LANG_HASKELL
+  "/rom/autorun.hs",
+  "/rom/autorun.hc",
+#endif
+
 #if defined ALCOR_LANG_TINYSCHEME
   "/rom/autorun.scm",
   "/rom/autorun.tscm",
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
   "/rom/autorun.bas",
   "/rom/autorun.bc",
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
   "/rom/autorun.l",
   "/rom/autorun.lc",
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
   "/rom/autorun.c",
   "/rom/autorun.pc",
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   "/rom/autorun.lua",
   "/rom/autorun.lc",
 #endif
@@ -151,19 +181,29 @@ int main( void )
     if( ( fp = fopen( boot_order[ i ], "r" ) ) != NULL )
     {
       fclose( fp );
+// The entry point for languages.
+//
 #if defined ALCOR_LANG_TINYSCHEME
       char* tinyscheme_argv[] = { "tinyscheme", boot_order[i], NULL };
       tinyscheme_main( 2, tinyscheme_argv );
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
       char* mybasic_argv[] = { "mybasic", boot_order[i], NULL };
       mybasic_main( 2, mybasic_argv );
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
       char* picolisp_argv[] = { "picolisp", boot_order[i], NULL };
       picolisp_main( 2, picolisp_argv );
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
       char* picoc_argv[] = { "picoc", boot_order[i], NULL };
       picoc_main( 2, picoc_argv );
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
       char* lua_argv[] = { "lua", boot_order[i], NULL };
       lua_main( 2, lua_argv );
 #endif
@@ -181,16 +221,24 @@ int main( void )
 #if defined ALCOR_LANG_TINYSCHEME
     char* tinyscheme_argv[] = { "tinyscheme", NULL };
     tinyscheme_main( 1, tinyscheme_argv );
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
     char* mybasic_argv[] = { "mybasic", NULL };
     mybasic_main( 1, mybasic_argv );
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
     char* picolisp_argv[] = { "picolisp", NULL };
     picolisp_main( 1, picolisp_argv );
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
     char* picoc_argv[] = { "picoc", NULL };
     picoc_main( 1, picoc_argv );
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
     // Start Lua directly
     char* lua_argv[] = { "lua", NULL };
     lua_main( 1, lua_argv );

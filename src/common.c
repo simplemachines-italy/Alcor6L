@@ -19,13 +19,21 @@
 
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lapi.h"
 # include "lauxlib.h"

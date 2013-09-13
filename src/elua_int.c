@@ -5,14 +5,22 @@
 
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "ldebug.h"
 #endif
@@ -42,7 +50,9 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 // TODO:
 // Interrupt handler mechanism for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Interrupt handlers for my-basic
@@ -50,7 +60,9 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 // TODO:
 // Interrupt handler mechanism for my-basic.
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // Interrupt handlers for picoLisp.
@@ -58,7 +70,9 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 // TODO:
 // Interrupt handler mechanism for picoLisp.
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Interrupt handlers for PicoC.
@@ -66,7 +80,9 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 // TODO:
 // Interrupt handler mechanism for PicoC.
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Interrupt handlers for Lua.
@@ -214,7 +230,7 @@ int elua_int_add( elua_int_id inttype, elua_int_resnum resnum )
 
 #endif // #if defined(BUILD_LUA_INT_HANDLERS)
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // C handlers
