@@ -1,18 +1,28 @@
 // Interface with core services
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+//
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -39,7 +49,9 @@
 // ****************************************************************************
 // eLua core module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // eLua core module for my-basic.
@@ -109,7 +121,9 @@ int elua_shell(mb_interpreter_t* s, void **l) {
   return res;
 }
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // eLua core module for picoLisp.
@@ -167,7 +181,9 @@ any elua_shell(any x) {
     return mkStr(t->cmd);
 }
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // eLua core module for PicoC.
@@ -231,7 +247,9 @@ extern void elua_library_init(void)
   REGISTER("elua.h", NULL, &elua_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // eLua core module for Lua.
@@ -326,4 +344,4 @@ LUALIB_API int luaopen_elua( lua_State *L )
 #endif
 }
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

@@ -1,18 +1,28 @@
 // Module for interfacing with ADC
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+//
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -34,14 +44,18 @@
 
 // TODO:
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for my-basic.
 
 // TODO:
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for picoLisp.
@@ -149,7 +163,9 @@ any adc_setsmoothing(any ex) {
   }
 }
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for PicoC.
@@ -369,7 +385,9 @@ extern void adc_library_init(void)
   REGISTER("adc.h", NULL, &adc_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for Lua.
@@ -616,4 +634,4 @@ LUALIB_API int luaopen_adc( lua_State *L )
 
 #endif
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

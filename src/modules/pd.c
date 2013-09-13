@@ -11,7 +11,9 @@
 // ****************************************************************************
 // Platform module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Platform module for my-basic.
@@ -63,7 +65,9 @@ int pd_board(mb_interpreter_t* s, void **l) {
   return result;
 }
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // Platform module for picoLisp.
@@ -85,7 +89,9 @@ any pd_board(any x) {
    return mkStr(MACRO_NAME(ALCOR_BOARD));
 }
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Platform module for PicoC.
@@ -129,7 +135,9 @@ extern void pd_library_init(void)
   REGISTER("pd.h", NULL, &pd_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Platform module for eLua.
@@ -177,4 +185,4 @@ LUALIB_API int luaopen_pd( lua_State* L )
   LREGISTER( L, AUXLIB_PD, pd_map );
 }
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

@@ -1,18 +1,27 @@
 // Module for interfacing with CPU
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -20,6 +29,7 @@
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include <string.h> 
 #include "platform.h"
 
@@ -47,12 +57,16 @@ static const cpu_const_t cpu_constants[] =
 // ****************************************************************************
 // CPU module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // CPU module for my-basic.
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // CPU module for picoLisp.
@@ -135,7 +149,9 @@ any cpu_clock(any ex) {
   return box(platform_cpu_get_frequency());
 }
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // CPU module for PicoC.
@@ -251,7 +267,9 @@ extern void cpu_library_init(void)
   REGISTER("cpu.h", NULL, &cpu_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // **************************************************************************** 
 // CPU module for Lua.
@@ -523,4 +541,4 @@ LUALIB_API int luaopen_cpu( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

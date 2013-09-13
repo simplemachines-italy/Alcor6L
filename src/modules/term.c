@@ -1,18 +1,28 @@
 // Module for interfacing with terminal functions
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+//
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -20,6 +30,7 @@
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include "platform.h"
 #include "term.h"
 #include <string.h>
@@ -35,12 +46,16 @@ static const char* term_key_names[] = {TERM_KEYCODES};
 // ****************************************************************************
 // Terminal module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC && defined BUILD_TERM
+#endif
+
+#if defined ALCOR_LANG_MYBASIC && defined BUILD_TERM
 
 // ****************************************************************************
 // Terminal module for my-basic.
 
-#elif defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
+#endif
+
+#if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
 
 // ****************************************************************************
 // Terminal module for picoLisp.
@@ -263,7 +278,9 @@ any plisp_term_decode(any ex) {
   return Nil;
 }
 
-#elif defined ALCOR_LANG_PICOC && defined BUILD_TERM
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC && defined BUILD_TERM
 
 // ****************************************************************************
 // Terminal module for PicoC.
@@ -460,7 +477,9 @@ extern void term_library_init(void)
 	   &term_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Terminal module for Lua.
@@ -670,4 +689,4 @@ LUALIB_API int luaopen_term( lua_State* L )
 #endif // #ifdef BUILD_TERM  
 }
 
-#endif // #if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
+#endif // #if defined ALCOR_LANG_LUA && defined BUILD_TERM

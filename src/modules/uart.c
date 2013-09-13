@@ -1,18 +1,28 @@
 // Module for interfacing with UART
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+//
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -20,6 +30,7 @@
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include "platform.h"
 #include "common.h"
 #include "sermux.h"
@@ -44,17 +55,23 @@ enum
 // ****************************************************************************
 // UART module for tiny-scheme.
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // UART module for my-basic.
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // UART module for picoLisp.
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // UART module for PicoC.
@@ -394,7 +411,9 @@ extern void uart_library_init(void)
 	   &uart_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // UART module for Lua.
@@ -672,4 +691,4 @@ LUALIB_API int luaopen_uart( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

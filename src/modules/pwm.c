@@ -10,21 +10,27 @@
 
 // TODO:
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // **************************************************************************** 
 // Pulse width modulation module for my-basic.
 
 // TODO:
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // Pulse width modulation module for picoLisp.
 
 // TODO:
 
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Pulse width modulation module for PicoC.
@@ -120,7 +126,9 @@ extern void pwm_library_init(void)
   REGISTER("pwm.h", NULL, &pwm_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // **************************************************************************** 
 // Pulse width modulation module for Lua.
@@ -221,4 +229,4 @@ LUALIB_API int luaopen_pwm( lua_State *L )
   LREGISTER( L, AUXLIB_PWM, pwm_map );
 }
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

@@ -1,18 +1,28 @@
 // Module for interfacing with network functions (elua_net.h)
 // Modified to include support for Alcor6L.
 
+// Language specific includes.
+//
 #if defined ALCOR_LANG_TINYSCHEME
 # include "scheme.h"
-#elif defined ALCOR_LANG_MYBASIC
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
 # include "my_basic.h"
-#elif defined ALCOR_LANG_PICOLISP
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
-#elif defined ALCOR_LANG_PICOC
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -20,6 +30,7 @@
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include "platform.h"
 #include "elua_net.h"
 #include "common.h"
@@ -40,7 +51,9 @@
 
 #endif
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // Net module for my-basic.
@@ -51,7 +64,9 @@
 
 #endif
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // Net module for picoLisp.
@@ -62,7 +77,9 @@
 
 #endif
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Net module for PicoC.
@@ -73,7 +90,9 @@
 
 #endif
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Net module for Lua.
@@ -301,4 +320,4 @@ LUALIB_API int luaopen_net( lua_State *L )
 
 #endif // #ifdef BUILD_UIP
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA

@@ -10,14 +10,18 @@
 
 #include "scheme.h"
 
-#elif defined ALCOR_LANG_MYBASIC
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
 // CAN for my-basic.
 
 #include "my_basic.h"
 
-#elif defined ALCOR_LANG_PICOLISP
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
 
 #include "pico.h"
 
@@ -104,7 +108,9 @@ any can_recv(any ex) {
   }
 }
 
-#elif defined ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // CAN for PicoC.
@@ -204,7 +210,9 @@ extern void can_library_init(void)
   REGISTER("can.h", &can_lib_setup_func, &can_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // CAN for PicoC.
@@ -303,4 +311,4 @@ LUALIB_API int luaopen_can( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOLISP
+#endif // #ifdef ALCOR_LANG_LUA
