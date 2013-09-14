@@ -237,6 +237,13 @@ any plisp_i2c_address(any ex);
 any plisp_i2c_write(any ex);
 any plisp_i2c_read(any ex);
 
+// pwm module.
+any plisp_pwm_setup(any ex);
+any plisp_pwm_start(any ex);
+any plisp_pwm_stop(any ex);
+any plisp_pwm_setclock(any ex);
+any plisp_pwm_getclock(any ex);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/
