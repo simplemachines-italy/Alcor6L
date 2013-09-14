@@ -39,7 +39,7 @@
 #include "picoc_mod.h"
 #include "rotable.h"
 
-// picoc: realfrequency = pwm_setup(id, frequency, duty);
+// PicoC: realfrequency = pwm_setup(id, frequency, duty);
 static void pwm_setup(pstate *p, val *r, val **param, int n)
 {
   u32 freq;
@@ -60,7 +60,7 @@ static void pwm_setup(pstate *p, val *r, val **param, int n)
   r->Val->UnsignedLongInteger = freq;
 }
 
-// picoc: pwm_start(id);
+// PicoC: pwm_start(id);
 static void pwm_start(pstate *p, val *r, val **param, int n)
 {
   unsigned id;
@@ -70,7 +70,7 @@ static void pwm_start(pstate *p, val *r, val **param, int n)
   platform_pwm_start(id);
 }
 
-// picoc: pwm_stop(id);
+// PicoC: pwm_stop(id);
 static void pwm_stop(pstate *p, val *r, val **param, int n)
 {
   unsigned id;
@@ -80,7 +80,7 @@ static void pwm_stop(pstate *p, val *r, val **param, int n)
   platform_pwm_stop(id);
 }
 
-// picoc: realclock = pwm_setclock(id, clock);
+// PicoC: realclock = pwm_setclock(id, clock);
 static void pwm_setclock(pstate *p, val *r, val **param, int n)
 {
   unsigned id;
@@ -95,7 +95,7 @@ static void pwm_setclock(pstate *p, val *r, val **param, int n)
   r->Val->UnsignedLongInteger = clk;
 }
 
-// picoc: clock = pwm_getclock(id);
+// PicoC: clock = pwm_getclock(id);
 static void pwm_getclock(pstate *p, val *r, val **param, int n)
 {
   unsigned id;
