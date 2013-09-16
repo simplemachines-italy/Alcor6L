@@ -175,8 +175,12 @@ extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
 
 // system timer.
 any sys_timer;
+
 // i2c symbols.
 any plisp_i2c_fast, plisp_i2c_slow, plisp_i2c_trans, plisp_i2c_recv;
+
+// spi symbols.
+any plisp_spi_master, plisp_spi_slave;
 
 // Alcor6L platform modules.
 any pd_platform(any x);
@@ -243,6 +247,12 @@ any plisp_pwm_start(any ex);
 any plisp_pwm_stop(any ex);
 any plisp_pwm_setclock(any ex);
 any plisp_pwm_getclock(any ex);
+
+// spi module.
+any plisp_spi_sson(any ex);
+any plisp_spi_ssoff(any ex);
+any plisp_spi_setup(any ex);
+any plisp_spi_write(any ex);
 
 #include "platform_picolisp.h"
 

@@ -332,6 +332,12 @@ void initSymbols(void) {
    can_id_std = initSym(box(ELUA_CAN_ID_STD), "*can-id-std*");
 #endif
 
+   // spi symbols.
+#ifdef PICOLISP_MOD_SPI
+   plisp_spi_master = initSym(box(PLATFORM_SPI_MASTER), "*spi-master*");
+   plisp_spi_slave = initSym(box(PLATFORM_SPI_SLAVE), "*spi-slave*");
+#endif   
+
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 
    At    = initSym(Nil, "@");

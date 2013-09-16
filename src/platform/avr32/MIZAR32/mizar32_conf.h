@@ -147,7 +147,8 @@
   _ROM(CPU)\
   _ROM(TIMER)\
   _ROM(I2C)\
-  _ROM(PWM)
+  _ROM(PWM)\
+  _ROM(SPI)
 
 #endif // ALCOR_LANG_PICOLISP
 

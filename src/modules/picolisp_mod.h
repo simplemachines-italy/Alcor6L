@@ -79,6 +79,12 @@
   PICOLISP_LIB_DEFINE(plisp_pwm_setclock, pwm-setclock),\
   PICOLISP_LIB_DEFINE(plisp_pwm_getclock, pwm-getclock),
 
+#define PICOLISP_MOD_SPI\
+  PICOLISP_LIB_DEFINE(plisp_spi_sson, spi-sson),\
+  PICOLISP_LIB_DEFINE(plisp_spi_ssoff, spi-ssoff),\
+  PICOLISP_LIB_DEFINE(plisp_spi_setup, spi-setup),\
+  PICOLISP_LIB_DEFINE(plisp_spi_write, spi-write),
+
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)
