@@ -37,10 +37,6 @@ char* shell_prog;
 // Language specific shell functions.
 //
 
-#if defined ALCOR_LANG_HASKELL
-  SHELL_FUNC( shell_hugs98 );
-#endif
-
 #if defined ALCOR_LANG_TINYSCHEME
   SHELL_FUNC( shell_tinyscheme );
 #endif
@@ -229,10 +225,6 @@ static const SHELL_COMMAND shell_commands[] =
 {
 // Language specific commands.
 //
-#if defined ALCOR_LANG_HASKELL
-  { "hugs", shell_hugs98 },
-#endif
-
 #if defined ALCOR_LANG_TINYSCHEME
   { "tinyscheme", shell_tinyscheme },
 #endif

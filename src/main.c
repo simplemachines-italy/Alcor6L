@@ -79,11 +79,6 @@ char *boot_order[] = {
 #endif
 #endif
 #if defined BUILD_ROMFS
-#if defined ALCOR_LANG_HASKELL
-  "/rom/autorun.hs",
-  "/rom/autorun.hc",
-#endif
-
 #if defined ALCOR_LANG_TINYSCHEME
   "/rom/autorun.scm",
   "/rom/autorun.tscm",
