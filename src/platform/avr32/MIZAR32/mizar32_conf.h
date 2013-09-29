@@ -226,7 +226,7 @@
   _ROM(PICOC_PLAT_VAR_RTC, &rtc_variables[0])
 
 // PicoC stack configuration.
-#define PICOC_STACK_SIZE      (32*1024)
+#define PICOC_STACK_SIZE      (1024*1024)
 
 #endif
 
