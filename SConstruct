@@ -1,4 +1,4 @@
-import os, sys, shutil, string
+import os, sys, shutil, string, time
 import platform as syspl
 import glob, re, subprocess
 
@@ -392,7 +392,13 @@ if not GetOption( 'help' ):
     print "*********************************"
     print
 
+  # fetch date.
+  t = time.localtime()
+  tstr = time.strftime("%Y%m%d", t)
+
   output = 'Alcor6L_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
+  # include build date in output.
+  output += '_' + tstr
 
   # Language specific defines.
   if comp['lang'] == 'tinyscheme':
