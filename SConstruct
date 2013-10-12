@@ -195,8 +195,8 @@ vars.AddVariables(
                     allowed_values=toolchain_list.keys() + [ 'auto' ] ),
   MatchEnumVariable('lang',
                     'Build Alcor6L with support for the specified language',
-                    'lua',
-                    allowed_values=[ 'lua', 'picoc', 'picolisp', 'mybasic', 'tinyscheme' ] ),
+                    'elua',
+                    allowed_values=[ 'elua', 'picoc', 'picolisp', 'mybasic', 'tinyscheme' ] ),
   BoolVariable(     'optram',
                     'enables Tiny RAM enhancements',
                     True ),
@@ -231,13 +231,13 @@ elif comp['lang'] == 'picoc':
     MatchEnumVariable('target',
                       'build "regular" float picoc or integer-only',
                       'fp',
-                      allowed_values = [ 'fp', 'nofp' ] ) )
-elif comp['lang'] == 'lua':
+                      allowed_values = [ 'fp', 'long' ] ) )
+elif comp['lang'] == 'elua':
   vars.AddVariables(
     MatchEnumVariable('target',
-                      'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
-                      'lua',
-                      allowed_values = [ 'lua', 'lualong', 'lualonglong' ] ) )
+                      'build "regular" float Lua, 32 bit integer-only "long" or 64-bit integer-only "longlong"',
+                      'fp',
+                      allowed_values = [ 'fp', 'long', 'longlong' ] ) )
 
 # Boot config variables.
 # For picoc, the only boot option for now is 'standard'
@@ -247,7 +247,7 @@ if comp['lang'] == 'picoc' or comp['lang'] == 'picolisp' or comp['lang'] == 'myb
                       'boot mode, standard will boot to shell',
                       'standard',
                       allowed_values = [ 'standard' ] ) )
-elif comp['lang'] == 'lua':
+elif comp['lang'] == 'elua':
   vars.AddVariables(
     MatchEnumVariable('boot',
                       'boot mode, standard will boot to shell, luarpc boots to an rpc server',
@@ -255,7 +255,7 @@ elif comp['lang'] == 'lua':
                       allowed_values=[ 'standard' , 'luarpc' ] ) )
 
 # option for compilers running on the MCU
-if comp['lang'] == 'lua':
+if comp['lang'] == 'elua':
   vars.AddVariables(
     BoolVariable('luac',
                  'Builds Lua compiler. It can then be used from the shell.',
@@ -346,7 +346,7 @@ if not GetOption( 'help' ):
   # Build the compilation command now
   compcmd = ''
   if comp['romfs'] == 'compile':
-    if comp['target'] == 'lualonglong':
+    if comp['target'] == 'longlong':
       print "Cross-compilation is not yet supported in 64-bit mode"
       Exit( -1 )
     if syspl.system() == 'Windows':
@@ -426,7 +426,7 @@ if not GetOption( 'help' ):
   elif comp['allocator'] == 'simple':
      conf.env.Append(CPPDEFINES = ['USE_SIMPLE_ALLOCATOR'])
 
-  if comp['boot'] == 'luarpc' and comp['lang'] == 'lua':
+  if comp['boot'] == 'luarpc' and comp['lang'] == 'elua':
     conf.env.Append(CPPDEFINES = ['ELUA_BOOT_RPC'])
 
   # Special macro definitions for the SYM target
@@ -477,16 +477,18 @@ if not GetOption( 'help' ):
     if comp['target'] == 'no_fp':
       conf.env.Append(CPPDEFINES = ['NO_FP'])
 
-  if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
-    conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
-  if comp['target'] == 'lualonglong':
-    conf.env.Append(CPPDEFINES = ['LUA_INTEGRAL_LONGLONG'])
-  if comp['target'] != 'lualong' and comp['target'] != 'lualonglong':
-    conf.env.Append(CPPDEFINES = ['LUA_PACK_VALUE'])
-  if platform_list[platform]['big_endian']:
-    conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_BIG'])
-  else:
-    conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_LITTLE'])
+  if comp['lang'] == 'elua':
+    if comp['target'] == 'long' or comp['target'] == 'longlong':
+      conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
+    if comp['target'] == 'longlong':
+      conf.env.Append(CPPDEFINES = ['LUA_INTEGRAL_LONGLONG'])
+    if comp['target'] != 'long' and comp['target'] != 'longlong':
+      conf.env.Append(CPPDEFINES = ['LUA_PACK_VALUE'])
+    if platform_list[platform]['big_endian']:
+      conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_BIG'])
+    else:
+      conf.env.Append(CPPDEFINES = ['ELUA_ENDIAN_LITTLE'])
+
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
 
   # Tiny RAM optimizations.
@@ -505,7 +507,7 @@ if not GetOption( 'help' ):
     conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
 
   # For (bytecode) compilers running on the MCU.
-  if comp['lang'] == 'lua':
+  if comp['lang'] == 'elua':
     conf.env.Append(CPPDEFINES = {"LUA_COMPILER" : ( comp['luac'] != 0 and 1 or 0 ) } )
 
   # my-basic has a function 'MEM' which indicates
