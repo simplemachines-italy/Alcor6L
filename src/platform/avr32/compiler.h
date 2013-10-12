@@ -88,7 +88,7 @@
 typedef unsigned char           Bool; //!< Boolean.
 #ifndef __cplusplus
 #if !defined(__bool_true_false_are_defined)
-typedef unsigned char           bool; //!< Boolean.
+typedef unsigned char           avr32_bool; //!< Boolean.
 #endif
 #endif
 typedef signed char             S8 ;  //!< 8-bit signed integer.

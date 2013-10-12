@@ -50,7 +50,7 @@ comp.Append(CPPDEFINES = ['CORTEX_M3'])
 comp.Append(CCFLAGS = ['-ffunction-sections','-fdata-sections','-fno-strict-aliasing','-Wall'])
 comp.Append(LINKFLAGS = ['-nostartfiles','-nostdlib','-T',ldscript,'-Wl,--gc-sections','-Wl,--allow-multiple-definition'])
 comp.Append(ASFLAGS = ['-x','assembler-with-cpp','-c','-Wall','$_CPPDEFFLAGS'])
-comp.Append(LIBS = ['c','gcc','m'])
+comp.Append(LIBS = ['c','m','gcc'])
 
 TARGET_FLAGS = ['-mcpu=cortex-m3','-mthumb']
 

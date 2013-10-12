@@ -2,6 +2,7 @@
 #include "interpreter.h"
 #include "picoc_mod.h"
 #include "platform_conf.h"
+#include "rotable.h"
 
 /* the value passed to exit() */
 int PicocExitValue = 0;
@@ -21,33 +22,34 @@ void PicocInitialise(int StackSize)
 #endif
     /* global init for libraries */
     LibraryInit();
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_OFF
     LibraryAdd(&GlobalTable, "c library", &CLibrary[0]);
     CLibraryInit();
 #endif
     PlatformLibraryInit();
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
-    /**
-     * FIXME: should be handled automatically for
-     * both optram=1 and 0. Besides, this might be
-     * an issue for MCU peripherals not common
-     * for all platforms.
-     */
-    //pd_library_init();
-    //pwm_library_init();
-    //tmr_library_init();
-    //adc_library_init();
-    //pio_library_init();
-    //can_library_init();
-    //term_library_init();
-    //picoc_platform_library_init();
-    //spi_library_init();
-    //uart_library_init();
+#if PICOC_TINYRAM_OFF
+#if !defined (ALCOR_SIMULATOR) && !defined (ALCOR_PLATFORM_I386)
+    // Please note: The few modules (like CAN) aren't
+    // available on every target platform. (For example:
+    // Mizar32). They are defined in platform_picoc.h
+    // All such platform-specific modules will then be
+    // included here with PLATFORM_SPECIFIC_INIT_CALLS;
+    PICOC_LIB_INIT_CALL(cpu);
+    PICOC_LIB_INIT_CALL(pwm);
+    PICOC_LIB_INIT_CALL(tmr);
 #ifdef BUILD_ADC
-    //disp_library_init();
-#endif /* #ifdef BUILD_ADC */
+    PICOC_LIB_INIT_CALL(adc);
 #endif
-		
+    PICOC_LIB_INIT_CALL(pio);
+    PICOC_LIB_INIT_CALL(term);
+    PICOC_LIB_INIT_CALL(spi);
+    PICOC_LIB_INIT_CALL(uart);
+    PICOC_LIB_INIT_CALL(pd);
+    PICOC_LIB_INIT_CALL(elua);
+    PLATFORM_SPECIFIC_INIT_CALLS;
+#endif
+#endif // #if PICOC_TINYRAM_OFF 
+
 #if defined (PICOC_PLATFORM_LIBS_REG)
     /* nothing here yet */
 #endif
@@ -170,6 +172,10 @@ void ProgramFail(struct ParseState *Parser, const char *Message, ...)
     va_end(Args);
     PlatformPrintf("\n");
     PlatformExit(1);
+}
+
+void pmod_error(char *msg) {
+  ProgramFail(NULL, msg);
 }
 
 /* like ProgramFail() but gives descriptive error messages for assignment */

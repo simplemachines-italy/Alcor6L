@@ -1,11 +1,97 @@
 // Module for interfacing with platform data
+// Modified to include support for Alcor6L.
 
 #include "platform.h"
 
 #define MACRO_NAME( x ) MACRO_AGAIN( x )
 #define MACRO_AGAIN( x ) #x
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// Platform module for tiny-scheme.
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// Platform module for my-basic.
+
+#include "my_basic.h"
+
+// v = pd_platform()
+int pd_platform(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(MACRO_NAME(ALCOR_PLATFORM));
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, MACRO_NAME(ALCOR_PLATFORM), len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+// V = pd_cpu()
+int pd_cpu(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(MACRO_NAME(ALCOR_CPU));
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, MACRO_NAME(ALCOR_CPU), len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+// v = pd_board()
+int pd_board(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(MACRO_NAME(ALCOR_BOARD));
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, MACRO_NAME(ALCOR_BOARD), len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Platform module for picoLisp.
+
+#include "pico.h"
+
+// (pd-platform) -> sym
+any pd_platform(any x) {
+   return mkStr(MACRO_NAME(ALCOR_PLATFORM));
+}
+
+// (pd-cpu) -> sym
+any pd_cpu(any x) {
+   return mkStr(MACRO_NAME(ALCOR_CPU));
+}
+
+// (pd-board) -> sym
+any pd_board(any x) {
+   return mkStr(MACRO_NAME(ALCOR_BOARD));
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Platform module for PicoC.
@@ -49,7 +135,9 @@ extern void pd_library_init(void)
   REGISTER("pd.h", NULL, &pd_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Platform module for eLua.
@@ -97,4 +185,4 @@ LUALIB_API int luaopen_pd( lua_State* L )
   LREGISTER( L, AUXLIB_PD, pd_map );
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA

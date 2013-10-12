@@ -1,4 +1,4 @@
-import os, sys, shutil, string
+import os, sys, shutil, string, time
 import platform as syspl
 import glob, re, subprocess
 
@@ -102,7 +102,8 @@ platform_list = {
   'stm32' : { 'cpus' : [ 'STM32F103ZE', 'STM32F103RE' ], 'toolchains' : [ 'arm-gcc', 'codesourcery', 'devkitarm', 'arm-eabi-gcc' ], 'big_endian': False },
   'avr32' : { 'cpus' : [ 'AT32UC3A0512', 'AT32UC3A0256', 'AT32UC3A0128', 'AT32UC3B0256' ], 'toolchains' : [ 'avr32-gcc', 'avr32-unknown-none-gcc' ], 'big_endian': True },
   'lpc24xx' : { 'cpus' : [ 'LPC2468' ], 'toolchains' : [ 'arm-gcc', 'codesourcery', 'devkitarm', 'arm-eabi-gcc' ], 'big_endian': False },
-  'lpc17xx' : { 'cpus' : [ 'LPC1768' ], 'toolchains' : [ 'arm-gcc', 'codesourcery', 'devkitarm', 'arm-eabi-gcc' ], 'big_endian': False }
+  'lpc17xx' : { 'cpus' : [ 'LPC1768' ], 'toolchains' : [ 'arm-gcc', 'codesourcery', 'devkitarm', 'arm-eabi-gcc' ], 'big_endian': False },
+  'xmc4000' : { 'cpus' : [ 'XMC4500F144K1024' ], 'toolchains' : [ 'arm-gcc', 'codesourcery', 'devkitarm', 'arm-eabi-gcc' ], 'big_endian' : False }
 }
 
 # List of board/CPU combinations
@@ -127,7 +128,8 @@ board_list = { 'SAM7-EX256' : [ 'AT91SAM7X256', 'AT91SAM7X512' ],
                'MBED' : ['LPC1768'],
                'MIZAR32' : [ 'AT32UC3A0256', 'AT32UC3A0512', 'AT32UC3A0128' ],
                'NETDUINO' : [ 'AT91SAM7X512' ],
-               'EK-LM3S9D92' : [ 'LM3S9D92' ]
+               'EK-LM3S9D92' : [ 'LM3S9D92' ],
+               'HEXAGON': [ 'XMC4500F144K1024' ]
             }
 
 cpu_list = sum([board_list[i] for i in board_list],[])
@@ -194,7 +196,7 @@ vars.AddVariables(
   MatchEnumVariable('lang',
                     'Build Alcor6L with support for the specified language',
                     'lua',
-                    allowed_values=[ 'lua', 'picoc' ] ),
+                    allowed_values=[ 'lua', 'picoc', 'picolisp', 'mybasic', 'tinyscheme' ] ),
   BoolVariable(     'optram',
                     'enables Tiny RAM enhancements',
                     True ),
@@ -206,13 +208,31 @@ vars.AddVariables(
 vars.Update(comp)
 
 # Target config variables.
-if comp['lang'] == 'picoc':
+if comp['lang'] == 'tinyscheme':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float tinyscheme',
+                      'fp',
+                      allowed_values = [ 'fp' ] ) )
+elif comp['lang'] == 'mybasic':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float mybasic',
+                      'fp',
+                      allowed_values = [ 'fp' ] ) )
+elif comp['lang'] == 'picolisp':
+  vars.AddVariables(
+    MatchEnumVariable('target',
+                      'build "regular" float miniPicoLisp',
+                      'fp',
+                      allowed_values = [ 'fp' ] ) )
+elif comp['lang'] == 'picoc':
   vars.AddVariables(
     MatchEnumVariable('target',
                       'build "regular" float picoc or integer-only',
                       'fp',
                       allowed_values = [ 'fp', 'nofp' ] ) )
-else:
+elif comp['lang'] == 'lua':
   vars.AddVariables(
     MatchEnumVariable('target',
                       'build "regular" float lua, 32 bit integer-only "lualong" or 64-bit integer-only "lualonglong"',
@@ -221,18 +241,25 @@ else:
 
 # Boot config variables.
 # For picoc, the only boot option for now is 'standard'
-if comp['lang'] == 'picoc':
+if comp['lang'] == 'picoc' or comp['lang'] == 'picolisp' or comp['lang'] == 'mybasic' or comp['lang'] == 'tinyscheme':
   vars.AddVariables(
     MatchEnumVariable('boot',
                       'boot mode, standard will boot to shell',
                       'standard',
                       allowed_values = [ 'standard' ] ) )
-else:
+elif comp['lang'] == 'lua':
   vars.AddVariables(
     MatchEnumVariable('boot',
                       'boot mode, standard will boot to shell, luarpc boots to an rpc server',
                       'standard',
                       allowed_values=[ 'standard' , 'luarpc' ] ) )
+
+# option for compilers running on the MCU
+if comp['lang'] == 'lua':
+  vars.AddVariables(
+    BoolVariable('luac',
+                 'Builds Lua compiler. It can then be used from the shell.',
+                 False))
 
 vars.Update(comp)
 
@@ -244,7 +271,7 @@ if not GetOption( 'help' ):
   #           cpu = <cpuname>
   #           board = <board> cpu=<cpuname>
   if comp['board'] == 'auto' and comp['cpu'] == 'auto':
-    print "Must specifiy board, cpu, or both"
+    print "Must specify board, cpu, or both"
     Exit( -1 )
   elif comp['board'] != 'auto' and comp['cpu'] != 'auto':
     # Check if the board, cpu pair is correct
@@ -352,7 +379,7 @@ if not GetOption( 'help' ):
     print
     print "*********************************"
     print "Compiling Alcor6L ..."
-    print "Language        ", comp['lang']
+    print "Language:       ", comp['lang']
     print "CPU:            ", comp['cpu']
     print "Board:          ", comp['board']
     print "Platform:       ", platform
@@ -365,10 +392,22 @@ if not GetOption( 'help' ):
     print "*********************************"
     print
 
-  output = 'alcor_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
+  # fetch date.
+  t = time.localtime()
+  tstr = time.strftime("%Y%m%d", t)
+
+  output = 'Alcor6L_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
+  # include build date in output.
+  output += '_' + tstr
 
   # Language specific defines.
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'tinyscheme':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_TINYSCHEME'])
+  elif comp['lang'] == 'mybasic':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_MYBASIC'])
+  elif comp['lang'] == 'picolisp':
+    conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOLISP'])
+  elif comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_PICOC'])
   else:
     conf.env.Append(CPPDEFINES = ['ALCOR_LANG_LUA'])
@@ -397,24 +436,47 @@ if not GetOption( 'help' ):
   # Lua source files and include path
   lua_files = """lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c lobject.c lopcodes.c
     lparser.c lstate.c lstring.c ltable.c ltm.c lundump.c lvm.c lzio.c lauxlib.c lbaselib.c
-    ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c"""
-
+    ldblib.c liolib.c lmathlib.c loslib.c ltablib.c lstrlib.c loadlib.c linit.c lua.c lrotable.c legc.c
+    luac.c print.c"""
   lua_full_files = " " + " ".join( [ "src/lua/%s" % name for name in lua_files.split() ] )
 
   # PicoC source files and include path
   picoc_files = """picoc.c table.c lex.c parse.c expression.c heap.c type.c variable.c platform.c clibrary.c include.c
     cstdlib/stdio.c cstdlib/math.c cstdlib/string.c cstdlib/stdlib.c cstdlib/errno.c cstdlib/ctype.c
     cstdlib/stdbool.c platform/platform_unix.c platform/library_unix.c rotable.c"""
-
   picoc_full_files = " " + " ".join( [ "src/picoc/%s" % name for name in picoc_files.split() ] )
 
+  # picoLisp source files and include path.
+  picolisp_files = """apply.c flow.c gc.c io.c main.c math.c subr.c sym.c tab.c"""
+  picolisp_full_files = " " + " ".join( [ "src/picolisp/src/%s" % name for name in picolisp_files.split() ] )
+
+  # my-basic source files and include path.
+  mybasic_files = """my_basic.c main.c"""
+  mybasic_full_files = " " + " ".join( [ "src/mybasic/%s" % name for name in mybasic_files.split() ] )
+
+  # TinyScheme source files and include path.
+  tinyscheme_files = """scheme.c"""
+  tinyscheme_full_files = " " + " ".join( [ "src/tinyscheme/%s" % name for name in tinyscheme_files.split() ] )
+
   comp.Append(CPPPATH = ['inc', 'inc/newlib',  'inc/remotefs', 'src/platform'])
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'tinyscheme':
+    comp.Append(CPPPATH = ['src/tinyscheme'])
+  elif comp['lang'] == 'mybasic':
+    comp.Append(CPPPATH = ['src/mybasic'])
+  elif comp['lang'] == 'picolisp':
+    comp.Append(CPPPATH = ['src/picolisp/src'])
+  elif comp['lang'] == 'picoc':
     comp.Append(CPPPATH = ['src/picoc'])
   else:
     comp.Append(CPPPATH = ['src/lua'])
 
-  comp.Append(CPPPATH = [ 'src/iv' ])
+  comp.Append(CPPPATH = ['src/iv'])
+  
+  # 'target' options.
+  if comp['lang'] == 'picoc':
+    if comp['target'] == 'no_fp':
+      conf.env.Append(CPPDEFINES = ['NO_FP'])
+
   if comp['target'] == 'lualong' or comp['target'] == 'lualonglong':
     conf.env.Append(CPPDEFINES = ['LUA_NUMBER_INTEGRAL'])
   if comp['target'] == 'lualonglong':
@@ -428,7 +490,13 @@ if not GetOption( 'help' ):
   conf.env.Append(CPPPATH = ['src/modules', 'src/platform/%s' % platform])
 
   # Tiny RAM optimizations.
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'tinyscheme':
+    conf.env.Append(CPPDEFINES = {"TINYSCHEME_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  elif comp['lang'] == 'mybasic':
+    conf.env.Append(CPPDEFINES = {"MYBASIC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  elif comp['lang'] == 'picolisp':
+    conf.env.Append(CPPDEFINES = {"PICOLISP_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
+  elif comp['lang'] == 'picoc':
     conf.env.Append(CPPDEFINES = {"PICOC_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
     if comp['optram'] == 0:
       conf.env.Append(CPPDEFINES = ['BUILTIN_MINI_STDLIB'])
@@ -436,13 +504,23 @@ if not GetOption( 'help' ):
   else:
     conf.env.Append(CPPDEFINES = {"LUA_OPTIMIZE_MEMORY" : ( comp['optram'] != 0 and 2 or 0 ) } )
 
+  # For (bytecode) compilers running on the MCU.
+  if comp['lang'] == 'lua':
+    conf.env.Append(CPPDEFINES = {"LUA_COMPILER" : ( comp['luac'] != 0 and 1 or 0 ) } )
+
+  # my-basic has a function 'MEM' which indicates
+  # core memory status. To enable this, we include
+  # the following.
+  if comp['lang'] == 'mybasic':
+    conf.env.Append(CPPDEFINES = ['_MB_ENABLE_ALLOC_STAT'])
+
   # Additional libraries
   local_libs = ''
 
   # Shell files
   shell_files = """ src/shell/shell.c src/shell/shell_adv_cp_mv.c src/shell/shell_adv_rm.c src/shell/shell_cat.c src/shell/shell_help.c
                     src/shell/shell_ls.c src/shell/shell_lua.c src/shell/shell_mkdir.c src/shell/shell_recv.c src/shell/shell_ver.c
-                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c """
+                    src/shell/shell_wofmt.c src/shell/shell_picoc.c src/shell/shell_iv.c src/shell/shell_luac.c src/shell/shell_picolisp.c src/shell/shell_mybasic.c src/shell/shell_tinyscheme.c """
 
   # Application files
   app_files = """ src/main.c src/romfs.c src/semifs.c src/xmodem.c src/term.c src/common.c src/common_tmr.c src/buf.c src/elua_adc.c src/dlmalloc.c
@@ -457,7 +535,7 @@ if not GetOption( 'help' ):
   comp.Append(CPPPATH = ['src/uip'])
 
   # FatFs files
-  app_files = app_files + "src/elua_mmc.c src/mmcfs.c src/fatfs/ff.c src/fatfs/ccsbcs.c "
+  app_files = app_files + "src/elua_mmc.c src/elua_mmc_sim.c src/common_fs.c src/mmcfs.c src/fatfs/ff.c src/fatfs/ccsbcs.c "
   comp.Append(CPPPATH = ['src/fatfs'])
 
   # Alcor6L module files
@@ -487,7 +565,13 @@ if not GetOption( 'help' ):
   source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
 
   # Language specific files.
-  if comp['lang'] == 'picoc':
+  if comp['lang'] == 'tinyscheme':
+    source_files += Split( tinyscheme_full_files )
+  elif comp['lang'] == 'mybasic':
+    source_files += Split( mybasic_full_files )
+  elif comp['lang'] == 'picolisp':
+    source_files += Split( picolisp_full_files )
+  elif comp['lang'] == 'picoc':
     source_files += Split( picoc_full_files )
   else:
     source_files += Split( lua_full_files )

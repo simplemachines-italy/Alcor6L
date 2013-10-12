@@ -1,4 +1,5 @@
 // eLua platform configuration
+// Modified to include support for Alcor6L.
 
 // Simplemachines.it Mizar32 board has 128Kbytes of flash with 8kb of bootloader
 // To fit in 120K, build using:
@@ -30,6 +31,7 @@
   // Build options for 256KB and 512KB flash
 # define RAM_SIZE 0x10000
 # define BUILD_SHELL
+//# define BUILD_ADVANCED_SHELL
 # define BUILD_XMODEM
 # define BUILD_ADC
 # define BUILD_LCD
@@ -38,9 +40,15 @@
 // # define BUILD_UIP
 
 // Interrupt handler support
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_PICOLISP
+# define BUILD_PICOLISP_INT_HANDLERS
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # define BUILD_PICOC_INT_HANDLERS
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # define BUILD_LUA_INT_HANDLERS
 #endif
 
@@ -48,9 +56,10 @@
 # define BUILD_EDITOR_IV
 #endif
 
+// uip support.
 #ifdef BUILD_UIP
-#define BUILD_DHCPC
-#define BUILD_DNS
+# define BUILD_DHCPC
+# define BUILD_DNS
 //#define BUILD_CON_TCP
 #endif
 
@@ -104,17 +113,124 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// *****************************************************************************
+// Language configurations: tiny-scheme.
+
+// TODO:
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// Language configurations: my-basic
+
+#define MYBASIC_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(ELUA)
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Language configurations: picoLisp.
+
+// platform library functions
+#define PICOLISP_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(TERM)\
+  _ROM(MIZAR32_LCD)\
+  _ROM(ELUA)\
+  _ROM(CPU)\
+  _ROM(TIMER)\
+  _ROM(I2C)\
+  _ROM(PWM)\
+  _ROM(SPI)
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // Language configurations: PicoC.
 
-// stack and heap config
-// values are set after experimentation. Needs validation.
-#define HEAP_SIZE             (48*1024)
-#define PICOC_STACK_SIZE      (42*1024)
-
+#ifndef NO_FP
+# define MATHLINE _ROM(PICOC_CORE_LIB_MATH, &MathSetupFunc, &MathFunctions[0], NULL)
 #else
+# define MATHLINE
+#endif
+
+/* core library functions */
+#define PICOC_CORE_LIBS_ROM\
+  MATHLINE\
+  _ROM(PICOC_CORE_LIB_STDIO, &StdioSetupFunc, &StdioFunctions[0], StdioDefs)\
+  _ROM(PICOC_CORE_LIB_CTYPE, NULL, &StdCtypeFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STDBOOL, &StdboolSetupFunc, NULL, StdboolDefs)\
+  _ROM(PICOC_CORE_LIB_STDLIB, &StdlibSetupFunc, &StdlibFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STRING, &StringSetupFunc, &StringFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_ERRNO, &StdErrnoSetupFunc, NULL, NULL)
+
+#ifdef BUILD_ADC
+# define ADCLINE _ROM(PICOC_PLAT_LIB_ADC, NULL, &adc_library[0], NULL)
+#else
+# define ADCLINE
+#endif
+
+/* platform library functions */
+#define PICOC_PLATFORM_LIBS_ROM\
+  _ROM(PICOC_PLAT_LIB_PD, NULL, &pd_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TERM, NULL, &term_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_CPU, NULL, &cpu_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_ELUA, NULL, &elua_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_UART, NULL, &uart_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_PWM, NULL, &pwm_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TMR, NULL, &tmr_library[0], NULL)\
+  ADCLINE\
+  _ROM(PICOC_PLAT_LIB_I2C, NULL, &i2c_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_SPI, NULL, &spi_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_PIO, NULL, &pio_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_RTC, NULL, &rtc_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_LCD, NULL, &lcd_disp_library[0], NULL)
+
+#ifndef NO_FP
+# define MATHLINE_VAR _ROM(PICOC_CORE_VAR_MATH, &math_variables[0])
+#else
+# define MATHLINE_VAR
+#endif
+
+/* core system variables */
+#define PICOC_CORE_VARS_ROM\
+  _ROM(PICOC_CORE_VAR_ERRNO, &errno_variables[0])\
+  MATHLINE_VAR\
+  _ROM(PICOC_CORE_VAR_STDBOOL, &stdbool_variables[0])\
+  _ROM(PICOC_CORE_VAR_STDIO, &stdio_variables[0])
+
+#ifdef BUILD_TERM
+# define TERMLINE_VAR _ROM(PICOC_PLAT_VAR_TERM, &term_variables[0])
+#else
+# define TERMLINE_VAR
+#endif
+
+/* platform variables */
+#define PICOC_PLATFORM_VARS_ROM\
+  TERMLINE_VAR\
+  _ROM(PICOC_PLAT_VAR_UART, &uart_variables[0])\
+  _ROM(PICOC_PLAT_VAR_I2C, &i2c_variables[0])\
+  _ROM(PICOC_PLAT_VAR_SPI, &spi_variables[0])\
+  _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])\
+  _ROM(PICOC_PLAT_VAR_PIO, &pio_variables[0])\
+  _ROM(PICOC_PLAT_VAR_LCD, &lcd_variables[0])\
+  _ROM(PICOC_PLAT_VAR_RTC, &rtc_variables[0])
+
+// PicoC stack configuration.
+#define PICOC_STACK_SIZE      (1024*1024)
+
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Language configurations: Lua.
@@ -179,7 +295,7 @@
 
 #endif
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #if defined ALCOR_LANG_LUA
 
 // *****************************************************************************
 // Configuration data

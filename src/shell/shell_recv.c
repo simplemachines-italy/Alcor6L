@@ -12,10 +12,26 @@
 #include "platform_conf.h"
 #include "xmodem.h"
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"

@@ -1,9 +1,15 @@
 // eLua platform configuration
+// Modified to include support for Alcor6L.
 
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#include "auxmods.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc_mod.h"
+#else
+# include "auxmods.h"
+#endif
+
 #include "type.h"
 #include "stacks.h"
 #include "buf.h"
@@ -25,8 +31,67 @@
 
 #define PLATFORM_HAS_SYSTIMER
 
-// *****************************************************************************
 // Auxiliary libraries that will be compiled for this platform
+
+#ifdef ALCOR_LANG_PICOC
+
+// *****************************************************************************
+// Language configurations: PicoC.
+
+#ifndef NO_FP
+# define MATHLINE _ROM(PICOC_CORE_LIB_MATH, &MathSetupFunc, &MathFunctions[0], NULL)
+#else
+# define MATHLINE
+#endif
+
+/* core library functions */
+#define PICOC_CORE_LIBS_ROM\
+  MATHLINE\
+  _ROM(PICOC_CORE_LIB_STDIO, &StdioSetupFunc, &StdioFunctions[0], StdioDefs)\
+  _ROM(PICOC_CORE_LIB_CTYPE, NULL, &StdCtypeFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STDBOOL, &StdboolSetupFunc, NULL, StdboolDefs)\
+  _ROM(PICOC_CORE_LIB_STDLIB, &StdlibSetupFunc, &StdlibFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_STRING, &StringSetupFunc, &StringFunctions[0], NULL)\
+  _ROM(PICOC_CORE_LIB_ERRNO, &StdErrnoSetupFunc, NULL, NULL)
+
+/* platform library functions */
+#define PICOC_PLATFORM_LIBS_ROM\
+  _ROM(PICOC_PLAT_LIB_PD, NULL, &pd_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TERM, NULL, &term_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_ELUA, NULL, &elua_library[0], NULL)\
+  _ROM(PICOC_PLAT_LIB_TMR, NULL, &tmr_library[0], NULL)
+
+#ifndef NO_FP
+# define MATHLINE_VAR _ROM(PICOC_CORE_VAR_MATH, &math_variables[0])
+#else
+# define MATHLINE_VAR
+#endif
+
+/* core system variables */
+#define PICOC_CORE_VARS_ROM\
+  _ROM(PICOC_CORE_VAR_ERRNO, &errno_variables[0])\
+  MATHLINE_VAR\
+  _ROM(PICOC_CORE_VAR_STDBOOL, &stdbool_variables[0])\
+  _ROM(PICOC_CORE_VAR_STDIO, &stdio_variables[0])
+
+#ifdef BUILD_TERM
+# define TERMLINE_VAR _ROM(PICOC_PLAT_VAR_TERM, &term_variables[0])
+#else
+# define TERMLINE_VAR
+#endif
+
+/* platform variables */
+#define PICOC_PLATFORM_VARS_ROM\
+  TERMLINE_VAR\
+  _ROM(PICOC_PLAT_VAR_TMR, &tmr_variables[0])
+
+// PicoC stack configuration.
+#define PICOC_STACK_SIZE      (16*1024)
+
+#else
+
+// *****************************************************************************
+// Language configurations: Lua.
 
 #define LUA_PLATFORM_LIBS_ROM\
   _ROM( AUXLIB_PD, luaopen_pd, pd_map )\
@@ -34,6 +99,8 @@
   _ROM( AUXLIB_TERM, luaopen_term, term_map )\
   _ROM( AUXLIB_ELUA, luaopen_elua, elua_map )\
   _ROM( AUXLIB_TMR, luaopen_tmr, tmr_map )\
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // Bogus defines for common.c
 #define CON_UART_ID           0

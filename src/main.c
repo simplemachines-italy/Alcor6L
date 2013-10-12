@@ -11,14 +11,29 @@
 #include "shell.h"
 
 // Language specific includes.
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lauxlib.h"
 # include "lualib.h"
 #endif
 
+// Generic includes.
 #include "term.h"
 #include "platform_conf.h"
 #include "elua_rfs.h"
@@ -37,20 +52,54 @@
 // Define here your autorun/boot files,
 // in the order you want eLua to search for them
 char *boot_order[] = {
-#if defined (BUILD_MMCFS)
-#ifdef ALCOR_LANG_PICOC
+#if defined BUILD_MMCFS
+#if defined ALCOR_LANG_TINYSCHEME
+  "/mmc/autorun.scm",
+  "/mmc/autorun.tscm",
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+  "/mmc/autorun.bas",
+  "/mmc/autorun.bc",
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+  "/mmc/autorun.l",
+  "/mmc/autorun.lc",
+#endif
+
+#if defined ALCOR_LANG_PICOC
   "/mmc/autorun.c",
   "/mmc/autorun.pc",
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   "/mmc/autorun.lua",
   "/mmc/autorun.lc",
 #endif
 #endif
-#if defined(BUILD_ROMFS)
-#ifdef ALCOR_LANG_PICOC
+#if defined BUILD_ROMFS
+#if defined ALCOR_LANG_TINYSCHEME
+  "/rom/autorun.scm",
+  "/rom/autorun.tscm",
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+  "/rom/autorun.bas",
+  "/rom/autorun.bc",
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+  "/rom/autorun.l",
+  "/rom/autorun.lc",
+#endif
+
+#if defined ALCOR_LANG_PICOC
   "/rom/autorun.c",
   "/rom/autorun.pc",
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   "/rom/autorun.lua",
   "/rom/autorun.lc",
 #endif
@@ -127,10 +176,29 @@ int main( void )
     if( ( fp = fopen( boot_order[ i ], "r" ) ) != NULL )
     {
       fclose( fp );
-#ifdef ALCOR_LANG_PICOC
+// The entry point for languages.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+      char* tinyscheme_argv[] = { "tinyscheme", boot_order[i], NULL };
+      tinyscheme_main( 2, tinyscheme_argv );
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+      char* mybasic_argv[] = { "mybasic", boot_order[i], NULL };
+      mybasic_main( 2, mybasic_argv );
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+      char* picolisp_argv[] = { "picolisp", boot_order[i], NULL };
+      picolisp_main( 2, picolisp_argv );
+#endif
+
+#if defined ALCOR_LANG_PICOC
       char* picoc_argv[] = { "picoc", boot_order[i], NULL };
       picoc_main( 2, picoc_argv );
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
       char* lua_argv[] = { "lua", boot_order[i], NULL };
       lua_main( 2, lua_argv );
 #endif
@@ -145,10 +213,27 @@ int main( void )
   // Run the shell
   if( shell_init() == 0 )
   {
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+    char* tinyscheme_argv[] = { "tinyscheme", NULL };
+    tinyscheme_main( 1, tinyscheme_argv );
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+    char* mybasic_argv[] = { "mybasic", NULL };
+    mybasic_main( 1, mybasic_argv );
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+    char* picolisp_argv[] = { "picolisp", NULL };
+    picolisp_main( 1, picolisp_argv );
+#endif
+
+#if defined ALCOR_LANG_PICOC
     char* picoc_argv[] = { "picoc", NULL };
     picoc_main( 1, picoc_argv );
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
     // Start Lua directly
     char* lua_argv[] = { "lua", NULL };
     lua_main( 1, lua_argv );

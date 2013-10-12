@@ -17,9 +17,23 @@
 #include "elua_int.h"
 #include "sermux.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lapi.h"
 # include "lauxlib.h"
@@ -265,6 +279,18 @@ int platform_pio_has_pin( unsigned port, unsigned pin )
 #endif
 }
 
+int platform_pio_get_num_pins( unsigned port )
+{
+#if defined( PIO_PINS_PER_PORT )
+  return PIO_PINS_PER_PORT;
+#elif defined( PIO_PIN_ARRAY )
+  const u8 pio_port_pins[] = PIO_PIN_ARRAY;
+  return pio_port_pins[ port ];
+#else
+  #error "You must define either PIO_PINS_PER_PORT of PIO_PIN_ARRAY in platform_conf.h"
+#endif
+}
+
 // ****************************************************************************
 // CAN functions
 
@@ -448,7 +474,7 @@ void cmn_int_handler( elua_int_id id, elua_int_resnum resnum )
 // ****************************************************************************
 // Internal flash support functions (currently used only by WOFS)
 
-#if defined( BUILD_WOFS ) && !defined( ELUA_CPU_LINUX )
+#if defined( BUILD_WOFS ) && !defined( ALCOR_CPU_LINUX )
 
 // This symbol must be exported by the linker command file and must reflect the
 // TOTAL size of flash used by the eLua image (not only the code and constants,
@@ -614,6 +640,28 @@ const char* cmn_str64( u64 x )
   return nr + l + 1;
 }
 
+#ifdef ALCOR_LANG_PICOC
+
+// Helper to get timeout and timer_id values.
+void cmn_get_timeout_data(timer_data_type *timeout,
+			  unsigned *timer_id,
+			  val **param,
+			  int timeout_index,
+			  int timer_id_index)
+{
+  *timeout = param[timeout_index]->Val->UnsignedLongInteger;
+  if (*timeout < 0 || *timeout > PLATFORM_TIMER_INF_TIMEOUT)
+    pmod_error("invalid timeout value");
+  *timer_id = param[timer_id_index]->Val->UnsignedInteger;
+  if (*timer_id == PLATFORM_TIMER_SYS_ID &&
+      !platform_timer_sys_available())
+    pmod_error("the system timer is not implemented on this platform");
+}
+
+#endif // #ifdef ALCOR_LANG_PICOC
+
+#ifdef ALCOR_LANG_LUA
+
 // Read a timeout spec from the user and return it
 // The timeout spec has the format [timer_id, timeout]. Both arguments are optional: 
 // If none is specified -> defaults to infinite timeout
@@ -621,8 +669,6 @@ const char* cmn_str64( u64 x )
 // If timeout is PLATFORM_TIMER_INF_TIMEOUT -> also infinite timeout (independent of timer_id)
 // If both are specified -> wait the specified timeout on the specified timer_id
 // If timer_id is 'nil' the system timer will be used
-
-#ifdef ALCOR_LANG_LUA
 
 void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_type *ptimeout )
 {
@@ -641,4 +687,4 @@ void cmn_get_timeout_data( lua_State *L, int pidx, unsigned *pid, timer_data_typ
     luaL_error( L, "the system timer is not implemented on this platform" );
 }
 
-#endif
+#endif // #ifdef ALCOR_LANG_LUA

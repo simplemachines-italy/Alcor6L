@@ -1,0 +1,103 @@
+
+/**
+ * PicoLisp's platform agnostic modules.
+ * 
+ * All of them are declared here; Platform specific
+ * modules are defined in platform/xxx/picolisp_platform.h
+ */
+#ifndef __PICOLISP_MOD_H__
+#define __PICOLISP_MOD_H__
+
+#include "pico.h"
+
+// Helper macros.
+
+#define PICOLISP_LIB_DEFINE(fun, mod)\
+  {fun, #mod}
+
+// Platform module.
+#define PICOLISP_MOD_PD\
+  PICOLISP_LIB_DEFINE(pd_platform, pd-platform),\
+  PICOLISP_LIB_DEFINE(pd_cpu, pd-cpu),\
+  PICOLISP_LIB_DEFINE(pd_board, pd-board),
+
+// Terminal module.
+#define PICOLISP_MOD_TERM\
+  PICOLISP_LIB_DEFINE(plisp_term_clrscr, term-clrscr),\
+  PICOLISP_LIB_DEFINE(plisp_term_clreol, term-clreol),\
+  PICOLISP_LIB_DEFINE(plisp_term_moveto, term-moveto),\
+  PICOLISP_LIB_DEFINE(plisp_term_moveup, term-moveup),\
+  PICOLISP_LIB_DEFINE(plisp_term_movedown, term-movedown),\
+  PICOLISP_LIB_DEFINE(plisp_term_moveleft, term-moveleft),\
+  PICOLISP_LIB_DEFINE(plisp_term_moveright, term-moveright),\
+  PICOLISP_LIB_DEFINE(plisp_term_getlines, term-getlines),\
+  PICOLISP_LIB_DEFINE(plisp_term_getcols, term-getcols),\
+  PICOLISP_LIB_DEFINE(plisp_term_prinl, term-prinl),\
+  PICOLISP_LIB_DEFINE(plisp_term_getcx, term-getcx),\
+  PICOLISP_LIB_DEFINE(plisp_term_getcy, term-getcy),\
+  PICOLISP_LIB_DEFINE(plisp_term_getchar, term-getchar),\
+  PICOLISP_LIB_DEFINE(plisp_term_decode, term-decode),
+
+// eLua module.
+#define PICOLISP_MOD_ELUA\
+  PICOLISP_LIB_DEFINE(elua_version, elua-version),\
+  PICOLISP_LIB_DEFINE(elua_save_history, elua-save-history),\
+  PICOLISP_LIB_DEFINE(elua_shell, elua-shell),
+
+#define PICOLISP_MOD_CPU\
+  PICOLISP_LIB_DEFINE(cpu_w32, cpu-w32),\
+  PICOLISP_LIB_DEFINE(cpu_r32, cpu-r32),\
+  PICOLISP_LIB_DEFINE(cpu_w16, cpu-w16),\
+  PICOLISP_LIB_DEFINE(cpu_r16, cpu-r16),\
+  PICOLISP_LIB_DEFINE(cpu_w8, cpu-w8),\
+  PICOLISP_LIB_DEFINE(cpu_r8, cpu-r8),\
+  PICOLISP_LIB_DEFINE(cpu_clock, cpu-clock),
+
+#define PICOLISP_MOD_TIMER\
+  PICOLISP_LIB_DEFINE(tmr_delay, tmr-delay),\
+  PICOLISP_LIB_DEFINE(tmr_read, tmr-read),\
+  PICOLISP_LIB_DEFINE(tmr_start, tmr-start),\
+  PICOLISP_LIB_DEFINE(tmr_gettimediff, tmr-gettimediff),\
+  PICOLISP_LIB_DEFINE(tmr_getdiffnow, tmr-getdiffnow),\
+  PICOLISP_LIB_DEFINE(tmr_getmindelay, tmr-getmindelay),\
+  PICOLISP_LIB_DEFINE(tmr_getmaxdelay, tmr-getmaxdelay),\
+  PICOLISP_LIB_DEFINE(tmr_setclock, tmr-setclock),\
+  PICOLISP_LIB_DEFINE(tmr_getclock, tmr-getclock),
+
+#define PICOLISP_MOD_I2C\
+  PICOLISP_LIB_DEFINE(plisp_i2c_setup, i2c-setup),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_start, i2c-start),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_stop, i2c-stop),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_address, i2c-address),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_write, i2c-write),\
+  PICOLISP_LIB_DEFINE(plisp_i2c_read, i2c-read),
+
+#define PICOLISP_MOD_PWM\
+  PICOLISP_LIB_DEFINE(plisp_pwm_setup, pwm-setup),\
+  PICOLISP_LIB_DEFINE(plisp_pwm_start, pwm-start),\
+  PICOLISP_LIB_DEFINE(plisp_pwm_stop, pwm-stop),\
+  PICOLISP_LIB_DEFINE(plisp_pwm_setclock, pwm-setclock),\
+  PICOLISP_LIB_DEFINE(plisp_pwm_getclock, pwm-getclock),
+
+#define PICOLISP_MOD_SPI\
+  PICOLISP_LIB_DEFINE(plisp_spi_sson, spi-sson),\
+  PICOLISP_LIB_DEFINE(plisp_spi_ssoff, spi-ssoff),\
+  PICOLISP_LIB_DEFINE(plisp_spi_setup, spi-setup),\
+  PICOLISP_LIB_DEFINE(plisp_spi_write, spi-write),
+
+#define MOD_CHECK_ID(pvar, mod, id)					\
+  if (!platform_ ## mod ## _exists(id))					\
+    err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)
+
+#define MOD_CHECK_RES_ID(pvar, mod, id, resmod, resid)			\
+  if (!platform_ ## mod ## _check_ ## resmod ## _id(id, resid))		\
+    err(pvar, NULL, #resmod" %d not valid with " #mod " %d",		\
+	(unsigned)resid, (unsigned)id)
+
+#define MOD_CHECK_TIMER(pvar, id)					\
+  if (id == PLATFORM_TIMER_SYS_ID && !platform_timer_sys_available())	\
+    err(pvar, NULL, "the system timer is not available on this platform"); \
+  if (!platform_timer_exists(id))					\
+    err(pvar, NULL, "timer %d does not exist", (unsigned)id)		\
+
+#endif

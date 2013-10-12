@@ -5,6 +5,7 @@
 #define ROTABLE_H
 
 #include "interpreter.h"
+#include "rodefs.h"
 
 /* key types for rotables */
 #define PICOC_RO_KEY_STR  0

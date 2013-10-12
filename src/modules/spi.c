@@ -1,12 +1,28 @@
 // Module for interfacing with Lua SPI code
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -16,21 +32,188 @@
 
 #include "platform.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// SPI module for tiny-scheme.
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// SPI module for my-basic.
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// SPI module for picoLisp.
+
+// (spi-sson 'num) -> Nil
+any plisp_spi_sson(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, spi, id);
+
+  platform_spi_select(id, PLATFORM_SPI_SELECT_ON);
+  return Nil;
+}
+
+// (spi-ssoff 'num) -> Nil
+any plisp_spi_ssoff(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, spi, id);
+
+  platform_spi_select(id, PLATFORM_SPI_SELECT_OFF);
+  return Nil;
+}
+
+// (spi-setup 'num 'num 'num 'num 'num 'num) -> num
+any plisp_spi_setup(any ex) {
+  unsigned id, cpol, cpha, is_master, databits;
+  u32 clock, res;
+  any x, y;
+  
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, spi, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  is_master = unBox(y); // get type.
+  if (!is_master)
+    err(ex, y, "invalid type - only *spi-master* is supported");
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  clock = unBox(y); // get clock.
+  
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  cpol = unBox(y); // clock polarity.
+  if ((cpol != 0) && (cpol != 1))
+    err(ex, y, "invalid clock polarity.");
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  cpha = unBox(y); // clock phase.
+  if ((cpha != 0) && (cpha != 1))
+    err(ex, y, "invalid clock phase.");
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  databits = unBox(y); // get databits.
+  
+  res = platform_spi_setup(id,
+			   is_master,
+			   clock,
+			   cpol,
+			   cpha,
+			   databits);
+  return box(res);
+}
+
+// Helpers for picoLisp spi print function.
+
+static void outString_spi(unsigned id, char *s) {
+  while (*s)
+    platform_spi_send_recv(id, *s++);
+}
+ 
+static void outNum_spi(unsigned id, long n) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_spi(id, buf);
+}
+
+static void plisp_spih_prin(unsigned id, any x) {
+  if (!isNil(x)) {
+    if (isNum(x))
+      outNum_spi(id, unBox(x));
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      u8 byte;
+
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+        if (c != '^') {
+          byte = c;
+          platform_spi_send_recv(id, byte);
+        }
+        else if (!(c = getByte(&i, &w, &x))) {
+	  byte = '^';
+          platform_spi_send_recv(id, byte);
+        }
+        else if (c == '?') {
+          byte = 127;
+          platform_spi_send_recv(id, byte);
+        }
+        else {
+          c &= 0x1F;
+          byte = (u8)c;
+          platform_spi_send_recv(id, byte);
+        }
+      }
+    }
+    else {
+      while (plisp_spih_prin(id, car(x)), !isNil(x = cdr(x))) {
+        if (!isCell(x)) {
+          plisp_spih_prin(id, x);
+          break;
+	}
+      }
+    }
+  }
+}
+
+// (spi-write 'num 'any) -> any
+any plisp_spi_write(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, spi, id);
+
+  x = cdr(x), y = EVAL(car(x));
+  plisp_spih_prin(id, y);
+  return y;
+}
+
+// TODO:
+// plisp_spi_readwrite(any) {}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // SPI module for PicoC.
 
 // Platform variables
-const int master = PLATFORM_SPI_MASTER;
-const int slave = PLATFORM_SPI_SLAVE;
+static const int master = PLATFORM_SPI_MASTER;
+static const int slave = PLATFORM_SPI_SLAVE;
 
 // Library setup function
 extern void spi_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_int("spi_WAIT", master);
-  picoc_def_int("spi_NOWAIT", slave);
+  picoc_def_integer("spi_MASTER", master);
+  picoc_def_integer("spi_SLAVE", slave);
 #endif
 }
 
@@ -64,8 +247,8 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
   MOD_CHECK_ID(spi, id);
   is_master = param[1]->Val->UnsignedInteger;
   if (!is_master)
-    return pmod_error("invalid type (only spi.MASTER is supported)");
-  clock = param[2]->Val->UnsignedInteger;
+    return pmod_error("invalid type (only spi_MASTER is supported)");
+  clock = param[2]->Val->UnsignedLongInteger;
   cpol = param[3]->Val->UnsignedInteger;
   if ((cpol != 0) && (cpol != 1))
     return pmod_error("invalid clock polarity.");
@@ -74,7 +257,7 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
     return pmod_error("invalid clock phase.");
   databits = param[5]->Val->UnsignedInteger;
   res = platform_spi_setup(id, is_master, clock, cpol, cpha, databits);
-  r->Val->UnsignedInteger = res;
+  r->Val->UnsignedLongInteger = res;
 }
 
 // TODO: The following two functions should be
@@ -84,13 +267,13 @@ static void spi_setup(pstate *p, val *r, val **param, int n)
 static void spi_write_num(pstate *p, val *r, val **param, int n)	      
 {
   unsigned id = param[0]->Val->UnsignedInteger;
-  spi_data_type val = param[1]->Val->UnsignedInteger;
+  spi_data_type val = param[1]->Val->UnsignedLongInteger;
 
   platform_spi_send_recv(id, val);
   r->Val->Integer = 1;
 }
 
-// PicoC: spi_write_string(id, string, len);
+// PicoC: len = spi_write_string(id, string, len);
 static void spi_write_string(pstate *p, val *r, val **param, int n)
 {
   unsigned int id = param[0]->Val->UnsignedInteger, i;
@@ -100,7 +283,7 @@ static void spi_write_string(pstate *p, val *r, val **param, int n)
   for (i = 0; i < len; i++)
     platform_spi_send_recv(id, str[i]);
 
-  r->Val->Integer = len;
+  r->Val->UnsignedInteger = len;
 }
 
 // TODO:
@@ -122,10 +305,10 @@ const PICOC_RO_TYPE spi_variables[] = {
 const PICOC_REG_TYPE spi_library[] = {
   {FUNC(spi_sson), PROTO("void spi_sson(unsigned int);")},
   {FUNC(spi_ssoff), PROTO("void spi_ssoff(unsigned int);")},
-  {FUNC(spi_setup), PROTO("unsigned int spi_setup(unsigned int, unsigned int,\
-                           unsigned int, unsigned int, unsigned int,\
+  {FUNC(spi_setup), PROTO("unsigned long spi_setup(unsigned int, unsigned int,\
+                           unsigned long, unsigned int, unsigned int,\
                            unsigned int);")},
-  {FUNC(spi_write_num), PROTO("int spi_write_num(unsigned int, unsigned int);")},
+  {FUNC(spi_write_num), PROTO("int spi_write_num(unsigned int, unsigned long);")},
   {FUNC(spi_write_string), PROTO("unsigned int spi_write_string(unsigned int,\
                                   char *, unsigned int);")},
   {NILFUNC, NILPROTO}
@@ -137,7 +320,9 @@ extern void spi_library_init(void)
   REGISTER("spi.h", &spi_lib_setup_func, &spi_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // SPI module for Lua.
@@ -272,4 +457,4 @@ LUALIB_API int luaopen_spi( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA

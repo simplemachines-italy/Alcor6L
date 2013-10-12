@@ -1,12 +1,28 @@
 // Module for interfacing with terminal functions
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -14,26 +30,271 @@
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include "platform.h"
 #include "term.h"
 #include <string.h>
 #include "platform_conf.h"
 
-#if defined (ALCOR_LANG_PICOC) && defined (BUILD_TERM)
+// Common for all languages.
+#undef _D
+#define _D(x) #x
+static const char* term_key_names[] = {TERM_KEYCODES};
+
+#if defined ALCOR_LANG_TINYSCHEME && defined BUILD_TERM
+
+// ****************************************************************************
+// Terminal module for tiny-scheme.
+
+#endif
+
+#if defined ALCOR_LANG_MYBASIC && defined BUILD_TERM
+
+// ****************************************************************************
+// Terminal module for my-basic.
+
+#endif
+
+#if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
+
+// ****************************************************************************
+// Terminal module for picoLisp.
+
+// (term-clrscr) -> Nil
+any plisp_term_clrscr(any x) {
+  term_clrscr();
+  return Nil;
+}
+
+// (term-clreol) -> Nil
+any plisp_term_clreol(any x) {
+  term_clreol();
+  return Nil;
+}
+
+// (term-moveto 'num 'num) -> Nil
+any plisp_term_moveto(any ex) { 
+  any x, y;
+  long n1, n2;
+  
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n1 = unBox(y);
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n2 = unBox(y);
+  term_gotoxy(n1, n2);
+  return Nil;
+}
+
+// (term-moveup 'num) -> Nil
+any plisp_term_moveup(any ex) {
+  any x, y;
+  long n;
+  
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n = unBox(y);
+  term_up(n);
+  return Nil;
+}
+
+// (term-movedown 'num) -> Nil
+any plisp_term_movedown(any ex) {
+  any x, y;
+  long n;
+  
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n = unBox(y);
+  term_down(n);
+  return Nil;
+}
+
+// (term-moveleft 'num) -> Nil
+any plisp_term_moveleft(any ex) {
+  any x, y;
+  long n;
+  
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n = unBox(y);
+  term_left(n);
+  return Nil;
+}
+
+// (term-moveright 'num) -> Nil
+any plisp_term_moveright(any ex) {
+  any x, y;
+  long n;
+  
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n = unBox(y);
+  term_right(n);
+  return Nil;
+}
+
+// (term-getlines) -> num
+any plisp_term_getlines(any x) {
+  x = box(term_get_lines());
+  return x;
+}
+
+// (term-getcols) -> num
+any plisp_term_getcols(any x) {
+  x = box(term_get_cols());
+  return x;
+}
+
+// Helpers for picoLisp terminal print
+// function.
+static void outString_term(char *s) {
+  while (*s)
+    term_putch((u8)*s++);
+}
+
+static void outNum_term(long n) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_term(buf);
+}
+
+static void ptermh_prin(any x) {
+  if (!isNil(x)) {
+    if (isNum(x))
+      outNum_term(unBox(x));
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      u8 byte;
+      
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+        if (c != '^') {
+          byte = c;
+	  term_putch(byte);
+	}
+        else if (!(c = getByte(&i, &w, &x))) {
+	  byte = '^';
+          term_putch(byte);
+        }
+        else if (c == '?') {
+          byte = 127;
+	  term_putch(byte);
+        }
+        else {
+          c &= 0x1F;
+          byte = (u8)c;
+	  term_putch(byte);
+	}
+      }
+    }
+    else {
+      while (ptermh_prin(car(x)), !isNil(x = cdr(x))) {
+	if (!isCell(x)) {
+	  ptermh_prin(x);
+          break;
+	}
+      }
+    }
+  }
+}
+
+// (term-prinl 'num 'num 'any ..) -> any
+any plisp_term_prinl(any ex) {
+  any x, y;
+  long n1, n2;
+  
+  // get coordinates.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n1 = unBox(y);
+  x = cdr(x), y = EVAL(car(x));
+  NeedNum(ex, y);
+  n2 = unBox(y);
+  term_gotoxy(n1, n2);
+
+  // and now, print.
+  x = cdr(x), y = EVAL(car(x));
+  ptermh_prin(y);
+  return y;
+}
+
+// (term-getcx) -> num
+any plisp_term_getcx(any x) {
+  x = box(term_get_cx());
+  return x;
+}
+
+// (term-getcy) -> num
+any plisp_term_getcy(any x) {
+  x = box(term_get_cy());
+  return x;
+}
+
+// (term-getchar) -> num
+// (term-getchar 'sym) -> num
+any plisp_term_getchar(any x) {
+  any y;
+  x = cdr(x), y = EVAL(car(x));
+
+  if (equal(mkStr("wait"), y) || isNil(y))
+    x = box(term_getch(TERM_INPUT_WAIT));
+  else if (equal(mkStr("nowait"), y))
+    x = box(term_getch(TERM_INPUT_DONT_WAIT));
+  else
+    err(NULL, x, "invalid parameter");
+  return x;
+}
+
+// (term-decode 'sym) -> num|Nil
+any plisp_term_decode(any ex) {
+  any x;
+  int n, i, c;
+  word w;
+  /* should hold the longest entry in TERM_KEYCODES */
+  char key[15];
+  for (i = 0; i < 15; i++) key[i] = 0;
+  unsigned total = sizeof(term_key_names)/sizeof(char*);
+  
+  x = EVAL(cadr(ex));
+  if (isSym(x)) {
+    if (isNil(x))
+      return Nil;
+    x = name(x);
+    for (n = 0, c = getByte1(&i, &w, &x); c; ++n, c = getByte(&i, &w, &x))
+      key[n] = c;
+    if (!key[0] || key[0] != 'K')
+      err(NULL, ex, "Key invalid. Parse error");
+    for (i = 0; i < total; i++)
+      if (!strcmp(key, term_key_names[i]))
+	break;
+    if (i == total)
+      return Zero;
+    else
+      return box(i + TERM_FIRST_KEY);
+  }
+  return Nil;
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC && defined BUILD_TERM
 
 // ****************************************************************************
 // Terminal module for PicoC.
 
 // Platform variables
-const int no_wait = TERM_INPUT_DONT_WAIT;
-const int wait = TERM_INPUT_WAIT;
+static const int no_wait = TERM_INPUT_DONT_WAIT;
+static const int wait = TERM_INPUT_WAIT;
 
 // Library setup function
 extern void term_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_int("term_WAIT", wait);
-  picoc_def_int("term_NOWAIT", no_wait);
+  picoc_def_integer("term_WAIT", wait);
+  picoc_def_integer("term_NOWAIT", no_wait);
 #endif
 }
 
@@ -41,14 +302,12 @@ extern void term_lib_setup_func(void)
 static void pterm_clrscr(pstate *p, val *r, val **param, int n)
 {
   term_clrscr();
-  r->Val->Integer = 0;
 }
 
 // picoc: term_clreol();
 static void pterm_clreol(pstate *p, val *r, val **param, int n)
 {
   term_clreol();
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveto(x y);
@@ -59,7 +318,6 @@ static void pterm_moveto(pstate *p, val *r, val **param, int n)
   y = param[1]->Val->UnsignedInteger;
 
   term_gotoxy(x, y);
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveup(lines);
@@ -69,7 +327,6 @@ static void pterm_moveup(pstate *p, val *r, val **param, int n)
 
   delta = param[0]->Val->UnsignedInteger;
   term_up(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: movedown(lines);
@@ -79,7 +336,6 @@ static void pterm_movedown(pstate *p, val *r, val **param, int n)
   delta = param[0]->Val->UnsignedInteger;
 
   term_down(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveleft(cols);
@@ -89,7 +345,6 @@ static void pterm_moveleft(pstate *p, val *r, val **param, int n)
   delta = param[0]->Val->UnsignedInteger;
 
   term_left(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: term_moveright(cols);
@@ -99,7 +354,6 @@ static void pterm_moveright(pstate *p, val *r, val **param, int n)
   delta = param[0]->Val->UnsignedInteger;
 
   term_right(delta);
-  r->Val->Integer = 0;
 }
 
 // picoc: lines = term_getlines();
@@ -126,7 +380,7 @@ static void pterm_puts(pstate *p, val *r, val **param, int n)
   for (i = 0; i < len; i++)
     term_putch(buf[i]);
 
-  r->Val->UnsignedInteger = len;
+  r->Val->UnsignedLongInteger = len;
 }
 
 // picoc: term_putch(ch);
@@ -148,10 +402,10 @@ static void pterm_getcy(pstate *p, val *r, val **param, int n)
   r->Val->UnsignedInteger = term_get_cy();
 }
 
-// picoc: key = term_getchar([mode]);
+// picoc: key = term_getchar(mode);
 static void pterm_getchar(pstate *p, val *r, val **param, int n)
 {
-  int temp = TERM_INPUT_WAIT, res;
+  int temp, res;
 
   temp = param[0]->Val->Integer;
   res = term_getch(temp);
@@ -162,10 +416,6 @@ static void pterm_getchar(pstate *p, val *r, val **param, int n)
   r->Val->Integer = res;
 }
 
-#undef _D
-#define _D(x) #x
-static const char* term_key_names[] = {TERM_KEYCODES};
-
 // Look for all KC_xxxx codes
 // picoc: term_decode(str);
 static void pterm_decode(pstate *p, val *r, val **param, int n)
@@ -174,16 +424,19 @@ static void pterm_decode(pstate *p, val *r, val **param, int n)
   unsigned i, total = sizeof(term_key_names) / sizeof(char*);
 
   if (!key || *key != 'K') {
-    r->Val->Integer = -1;
-    return pmod_error("Invalid key.");
+    r->Val->Integer = 0;
+    return;
   }
   for (i = 0; i < total; i++)
     if (!strcmp(key, term_key_names[i]))
       break;
-  if (i == total)
+  if (i == total) {
     r->Val->Integer = 0;
-  else
+    return;
+  } else {
     r->Val->Integer = i + TERM_FIRST_KEY;
+    return;
+  }
 }
 
 #define MIN_OPT_LEVEL 2
@@ -199,16 +452,16 @@ const PICOC_RO_TYPE term_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE term_library[] = {
-  {FUNC(pterm_clrscr), PROTO("int term_clrscr(void);")},
-  {FUNC(pterm_clreol), PROTO("int term_clreol(void);")},
-  {FUNC(pterm_moveto), PROTO("int term_moveto(unsigned int, unsigned int);")},
-  {FUNC(pterm_moveup), PROTO("int term_moveup(unsigned int);")},
-  {FUNC(pterm_movedown), PROTO("int term_movedown(unsigned int);")},
-  {FUNC(pterm_moveleft), PROTO("int term_moveleft(unsigned int);")},
-  {FUNC(pterm_moveright), PROTO("int term_moveright(unsigned int);")},
+  {FUNC(pterm_clrscr), PROTO("void term_clrscr(void);")},
+  {FUNC(pterm_clreol), PROTO("void term_clreol(void);")},
+  {FUNC(pterm_moveto), PROTO("void term_moveto(unsigned int, unsigned int);")},
+  {FUNC(pterm_moveup), PROTO("void term_moveup(unsigned int);")},
+  {FUNC(pterm_movedown), PROTO("void term_movedown(unsigned int);")},
+  {FUNC(pterm_moveleft), PROTO("void term_moveleft(unsigned int);")},
+  {FUNC(pterm_moveright), PROTO("void term_moveright(unsigned int);")},
   {FUNC(pterm_getlines), PROTO("unsigned int term_getlines(void);")},
   {FUNC(pterm_getcols), PROTO("unsigned int term_getcols(void);")},
-  {FUNC(pterm_puts), PROTO("unsigned int term_puts(unsigned int, unsigned int, char *);")},
+  {FUNC(pterm_puts), PROTO("unsigned long term_puts(unsigned int, unsigned int, char *);")},
   {FUNC(pterm_putch), PROTO("unsigned int term_putch(char);")},
   {FUNC(pterm_getcx), PROTO("unsigned int term_getcx(void);")},
   {FUNC(pterm_getcy), PROTO("unsigned int term_getcy(void);")},
@@ -220,10 +473,13 @@ const PICOC_REG_TYPE term_library[] = {
 // Init library.
 extern void term_library_init(void)
 {
-  REGISTER("term.h", &term_lib_setup_func, &term_library[0]);
+  REGISTER("term.h", &term_lib_setup_func,
+	   &term_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Terminal module for Lua.
@@ -359,11 +615,6 @@ static int luaterm_getchar( lua_State* L )
   return 1;
 }
 
-// Key codes by name
-#undef _D
-#define _D( x ) #x
-static const char* term_key_names[] = { TERM_KEYCODES };
-
 // __index metafunction for term
 // Look for all KC_xxxx codes
 static int term_mt_index( lua_State* L )
@@ -438,4 +689,4 @@ LUALIB_API int luaopen_term( lua_State* L )
 #endif // #ifdef BUILD_TERM  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #if defined ALCOR_LANG_LUA && defined BUILD_TERM

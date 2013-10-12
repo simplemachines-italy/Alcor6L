@@ -411,7 +411,7 @@ int VariableDefined(const char *Ident);
 void VariableGet(struct ParseState *Parser, const char *Ident, struct Value **LVal);
 void VariableDefinePlatformVar(struct ParseState *Parser, char *Ident, struct ValueType *Typ, union AnyValue *FromValue, int IsWritable);
 // For defining platform variables in Alcor modules.
-#define picoc_def_int(name, var)\
+#define picoc_def_integer(name, var)\
   VariableDefinePlatformVar(NULL, name, &IntType, (union AnyValue *)&var, FALSE)
 
 void VariableStackFrameAdd(struct ParseState *Parser, const char *FuncName, int NumParams);
@@ -442,6 +442,7 @@ void LibPrintf(struct ParseState *Parser, struct Value *ReturnValue, struct Valu
  * void PicocPlatformScanFile(const char *FileName);
  * extern int PicocExitValue; */
 void ProgramFail(struct ParseState *Parser, const char *Message, ...);
+void pmod_error(char *msg);
 void AssignFail(struct ParseState *Parser, const char *Format, struct ValueType *Type1, struct ValueType *Type2, int Num1, int Num2, const char *FuncName, int ParamNo);
 void LexFail(struct LexState *Lexer, const char *Message, ...);
 void PlatformCleanup();

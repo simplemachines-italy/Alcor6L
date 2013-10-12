@@ -1,13 +1,28 @@
 // Module for interfacing with PIO
-// Modified to include support for
-// PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -36,22 +51,474 @@ static pio_type pio_masks[ PLATFORM_IO_PORTS ];
 // Generic helper functions
 
 // Helper function: clear all masks
-static void pioh_clear_masks()
+static void pioh_clear_masks(void)
 {
   int i;
   
-  for( i = 0; i < PLATFORM_IO_PORTS; i ++ )
-    pio_masks[ i ] = 0;
+  for (i = 0; i < PLATFORM_IO_PORTS; i++)
+    pio_masks[i] = 0;
 }
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// **************************************************************************** 
+// PIO module for tiny-scheme.
+
+// TODO:
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// PIO module for my-basic.
+
+// TODO:
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// PIO module for picoLisp.
+
+// TODO:
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // PIO module for PicoC.
 
-// TODO:
+// forward declare.
+static int pio_value_parse(char *key);
 
-#else
+// Helper macro to check port/pin.
+#define PICOC_PIO_CHECK(x)\
+  if (!x)\
+    return pmod_error("Invalid port/pin");
+
+// Platform variables.
+static const int input = PIO_DIR_INPUT;
+static const int output = PIO_DIR_OUTPUT;
+static const int pull_up = PLATFORM_IO_PIN_PULLUP;
+static const int pull_down = PLATFORM_IO_PIN_PULLDOWN;
+static const int no_pull = PLATFORM_IO_PIN_NOPULL;
+
+extern void pio_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_integer("pio_OUTPUT", output);
+  picoc_def_integer("pio_INPUT", input);
+  picoc_def_integer("pio_PULLUP", pull_up);
+  picoc_def_integer("pio_PULLDOWN", pull_down);
+  picoc_def_integer("pio_NOPULL", no_pull);
+#endif
+}
+
+static int pioh_set_pin(int v, int op)
+{
+  pio_type pio_mask = 0;
+  int port, pin;
+  
+  pioh_clear_masks();
+  port = PLATFORM_IO_GET_PORT(v);
+  pin = PLATFORM_IO_GET_PIN(v);
+  
+  if (PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port) ||
+      !platform_pio_has_pin(port, pin))
+    pmod_error("invalid pin");
+
+  pio_mask |= 1 << pin;
+  if (pio_mask)
+    if (!platform_pio_op(port, pio_mask, op))
+      pmod_error("invalid PIO operation");
+  return 0;
+}
+
+static int pioh_set_port(int v, int op, pio_type mask)
+{
+  int port;
+  u32 port_mask = 0;
+
+  port = PLATFORM_IO_GET_PORT(v);
+  if (!PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port))
+    pmod_error("invalid port");
+  port_mask |= (1ULL << port);
+  if (port_mask & (1ULL << port))
+    if (!platform_pio_op(port, mask, op))
+      pmod_error("invalid PIO operation");
+  return 0;
+}
+
+static int pio_gen_setdir(int v, int optype, int op)
+{
+  if (op == PIO_DIR_INPUT)
+    op = optype == PIO_PIN_OP ? PLATFORM_IO_PIN_DIR_INPUT :
+      PLATFORM_IO_PORT_DIR_INPUT;
+  else if (op == PIO_DIR_OUTPUT)
+    op = optype == PIO_PIN_OP ? PLATFORM_IO_PIN_DIR_OUTPUT :
+      PLATFORM_IO_PORT_DIR_OUTPUT;
+  else
+    pmod_error("invalid direction");
+
+  if (optype == PIO_PIN_OP)
+    pioh_set_pin(v, op);
+  else
+    pioh_set_port(v, op, PLATFORM_IO_ALL_PINS);
+  return 0;
+}
+
+static int pio_gen_setpull(int v, int optype, int op)
+{
+  if ((op != PLATFORM_IO_PIN_PULLUP) &&
+      (op != PLATFORM_IO_PIN_PULLDOWN) &&
+      (op != PLATFORM_IO_PIN_NOPULL))
+    pmod_error("invalid pull type");
+
+  if (optype == PIO_PIN_OP)
+    pioh_set_pin(v, op);
+  else
+    pioh_set_port(v, op, PLATFORM_IO_ALL_PINS);
+
+  return 0;
+}
+
+static int pio_gen_setval(int v, int optype, pio_type val)
+{
+  if ((optype == PIO_PIN_OP) && (val != 1) && (val != 0))
+    pmod_error("invalid pin value");
+
+  if (optype == PIO_PIN_OP)
+    pioh_set_pin(v, val == 1 ? PLATFORM_IO_PIN_SET : PLATFORM_IO_PIN_CLEAR);
+  else
+    pioh_set_port(v, val == 1 ? PLATFORM_IO_PIN_SET : PLATFORM_IO_PIN_CLEAR, val);
+  return 0;
+}
+
+// ****************************************************************************
+// Pin operations
+
+// PicoC: pin_setdir(dir, "pin");
+static void pio_pin_setdir(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+
+  r->Val->Integer = pio_gen_setdir(ret, PIO_PIN_OP, dir);
+}
+
+// PicoC: pio_pin_setpull(pull, "pin");
+static void pio_pin_setpull(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+
+  r->Val->Integer = pio_gen_setpull(ret, PIO_PIN_OP, dir);
+}
+
+// PicoC: pio_pin_setval(val, "pin");
+static void pio_pin_setval(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+  pio_type val = (pio_type)param[0]->Val->UnsignedInteger;
+
+  r->Val->Integer = pio_gen_setval(ret, PIO_PIN_OP, val);
+}
+
+// PicoC: pio_pin_sethigh("pin");
+static void pio_pin_sethigh(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+
+  r->Val->Integer = pio_gen_setval(ret, PIO_PIN_OP, 1);
+}
+
+// PicoC: pio_pin_setlow("pin");
+static void pio_pin_setlow(pstate *p , val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+
+  r->Val->Integer = pio_gen_setval(ret, PIO_PIN_OP, 0);
+}
+
+// PicoC: pin_val = pio_pin_getval("pin");
+static void pio_pin_getval(pstate *p, val *r, val **param, int n)
+{
+  pio_type value;
+  int v, port, pin;
+  
+  v = pio_value_parse(param[0]->Val->Identifier);
+  PICOC_PIO_CHECK(v);
+  port = PLATFORM_IO_GET_PORT(v);
+  pin = PLATFORM_IO_GET_PIN(v);
+  
+  if (PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port) ||
+      !platform_pio_has_pin(port, pin)) {
+    return pmod_error("Invalid pin");
+  } else {
+    value = platform_pio_op(port, 1 << pin, PLATFORM_IO_PIN_GET);
+    r->Val->UnsignedInteger = value;
+  }
+}
+
+// ****************************************************************************
+// Port operations
+
+// PicoC: pio_port_setdir(dir, "port");
+static void pio_port_setdir(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+
+  r->Val->Integer = pio_gen_setdir(ret, PIO_PORT_OP, dir);
+}
+
+// PicoC: pio_port_setpull(pull, "port");
+static void pio_port_setpull(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+  
+  r->Val->Integer = pio_gen_setpull(ret, PIO_PORT_OP, dir);
+}
+
+// PicoC: pio_port_setval(val, "port");
+static void pio_port_setval(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+  pio_type val = (pio_type)param[0]->Val->UnsignedInteger;
+  
+  r->Val->Integer = pio_gen_setval(ret, PIO_PORT_OP, val);
+}
+
+// PicoC: pio_port_sethigh("port");
+static void pio_port_sethigh(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+
+  r->Val->Integer = pio_gen_setval(ret, PIO_PORT_OP, 1);
+}
+
+// PicoC: pio_port_setlow("port");
+static void pio_port_setlow(pstate *p , val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PICOC_PIO_CHECK(ret);
+
+  r->Val->Integer = pio_gen_setval(ret, PIO_PORT_OP, 0);
+}
+
+// PicoC: val = pio_port_getval("port");
+static void pio_port_getval(pstate *p, val *r, val **param, int n)
+{
+  pio_type value;
+  int v, port;
+
+  v = pio_value_parse(param[0]->Val->Identifier);
+  PICOC_PIO_CHECK(v);
+  port = PLATFORM_IO_GET_PORT(v);
+  
+  if (!PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port)) {
+    pmod_error("Invalid port");
+  } else {
+    value = platform_pio_op(port, PLATFORM_IO_ALL_PINS, PLATFORM_IO_PORT_GET_VALUE);
+    r->Val->UnsignedInteger = value;
+  }
+}
+
+// The 'decode' function returns a port/pin pair
+// from a platform code.
+// PicoC: pio_decode(code, &pin_code, &port_code);
+static void pio_decode(pstate *p, val *r, val **param, int n)
+{
+  int code = param[0]->Val->Integer;
+  int port = PLATFORM_IO_GET_PORT(code);
+  int pin = PLATFORM_IO_GET_PIN(code);
+  
+#ifdef ALCOR_PLATFORM_AVR32
+  /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
+   * random areas of hardware ports 2 and 3:
+   * PX00-PX04 = GPIO100-GPIO96     //Port 3 pins 04-00
+   * PX05-PX10 = GPIO95-GPIO90      //Port 2 pins 31-26
+   * PX11-PX14 = GPIO109-GPIO106    //Port 3 pins 13-10
+   * PX15-PX34 = GPIO89-GPIO70      //Port 2 pins 25-06
+   * PX35-PX39 = GPIO105-GPIO101    //Port 3 pins 09-05
+   *
+   * Here, we reverse the decode the hardware port/pins to the PX pin names.
+   * This is the inverse of the code above in pio_mt_index().
+   */
+  if ((port == 2 && pin >= 6) ||
+      (port == 3 && pin <= 13)) {
+    switch (port) {
+    case 2:
+      if (pin >= 26)
+	pin = (26 + 10) - pin;  // PX05-PX10
+      else
+	pin = (25 + 15) - pin;  // PX15-PX34
+      break;
+    case 3:
+      if (pin <= 4)
+	pin = 4 - pin;          // PX00-PX04
+      else if (pin <= 9)
+	pin = (35 + 9) - pin;   // PX35-PX39
+      else /* 10-13 */
+	pin = (13 + 11) - pin;  // PX11-PX14
+      break;
+    }
+    port = 'X' - 'A';   // 'A','B','C' are returned as 0,1,2 so 'X' is 23
+  }
+#endif
+
+  *((int *)param[1]->Val->Pointer) = port;
+  *((int *)param[2]->Val->Pointer) = pin;
+}
+
+// Helper function.
+// returns pin/port numeric identifiers.
+static int pio_value_parse(char *key)
+{
+  int port = 0xFFFF, pin = 0xFFFF, isport = 0, sz;
+ 
+  if (!key || *key != 'P')
+    return 0;
+  if (isupper(key[1])) { // PA, PB, ...
+    if (PIO_PREFIX != 'A')
+      return 0;
+    port = key[1] - 'A';
+    if (key[2] == '\0')
+      isport = 1;
+    else if (key[2] == '_') {
+      if (sscanf(key + 3, "%d%n", &pin, &sz) != 1 || sz != strlen(key) - 3)
+        return 0;
+
+#ifdef ALCOR_PLATFORM_AVR32
+      /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
+       * random areas of hardware ports 2 and 3:
+       * PX00-PX10 = GPIO100-GPIO90     //Port 3 pins 04-00; port 2 pins 31-26
+       * PX11-PX14 = GPIO109-GPIO106    //Port 3 pins 13-10
+       * PX15-PX34 = GPIO89-GPIO70      //Port 2 pins 25-06
+       * PX35-PX39 = GPIO105-GPIO101    //Port 3 pins 09-05
+       * Then port = trunc(GPIO/32) and pin = GPIO % 32
+       *
+       * This "Port X" exists in EVK1100 and MIZAR32 but not on EVK1101, which
+       * only has ports A and B. On EXK1101, the PC and PX syntax will still be
+       * accepted but will return nil thanks to the checks against NUM_PIO.
+       */
+
+      // Disallow "PC_06-PC_31" as aliases for PX pins
+      if (key[1] == 'C' && pin > 5)
+        return 0;
+
+      // Disallow "PD_nn" as aliases for PX pins
+      if (key[1] == 'D')
+        return 0;
+
+      // Map PX pins 00-39 to their ports/pins in the hardware register layout.
+      if (key[1] == 'X') {
+        unsigned gpio;
+
+        // You cannot perform port operations on port X because it
+        // doesn't exist in hardware.
+        if (pin == 0xFFFF)
+          return 0;
+
+        // Map PX pin numbers to GPIO pin numbers
+        if (pin < 0) return 0;
+        if (pin <= 10) gpio = 100 - pin;
+        else if (pin <= 14) gpio = 109 - (pin - 11);
+        else if (pin <= 34) gpio = 89 - (pin - 15);
+        else if (pin <= 39) gpio = 105 - (pin - 35);
+        else return 0;
+
+        port = gpio >> 5;
+        pin = gpio & 0x1F;
+      }
+#endif
+    }
+  } else { // P0, P1, ...
+    if (PIO_PREFIX != '0')
+      return 0;
+    if (!strchr(key, '_')) {  // parse port
+      if (sscanf(key + 1, "%d%n", &port, &sz) != 1  || sz != strlen(key) - 1)
+        return 0;
+      isport = 1;
+    } else {   // parse port_pin
+      if (sscanf(key + 1, "%d_%d%n", &port, &pin, &sz) != 2 || sz != strlen(key) - 1)
+        return 0;
+    }
+  }
+  sz = -1;
+  if (isport) {
+    if (platform_pio_has_port(port))
+      sz = PLATFORM_IO_ENCODE(port, 0, 1);
+  } else {
+    if (platform_pio_has_port(port) && platform_pio_has_pin(port, pin))
+      sz = PLATFORM_IO_ENCODE(port, pin, 0);
+  }
+  if (sz == -1)
+    return 0;
+  else
+    return sz;
+}
+
+#define MIN_OPT_LEVEL 2
+#include "rodefs.h"
+
+// Rotable for platform variables.
+#if PICOC_TINYRAM_ON
+const PICOC_RO_TYPE pio_variables[] = {
+  {STRKEY("pio_INPUT"), INT(input)},
+  {STRKEY("pio_OUTPUT"), INT(output)},
+  {STRKEY("pio_PULLUP"), INT(pull_up)},
+  {STRKEY("pio_PULLDOWN"), INT(pull_down)},
+  {STRKEY("pio_NOPULL"), INT(no_pull)},
+  {NILKEY, NILVAL}
+};
+#endif
+
+// A list of all library functions and their prototypes.
+const PICOC_REG_TYPE pio_library[] = {
+  // pin functions.
+  {FUNC(pio_pin_setdir), PROTO("int pio_pin_setdir(int, char *);")},
+  {FUNC(pio_pin_setpull), PROTO("int pio_pin_setpull(int, char *);")},
+  {FUNC(pio_pin_setval), PROTO("int pio_pin_setval(unsigned int, char *);")},
+  {FUNC(pio_pin_sethigh), PROTO("int pio_pin_sethigh(char *);")},
+  {FUNC(pio_pin_setlow), PROTO("int pio_pin_setlow(char *);")},
+  {FUNC(pio_pin_getval), PROTO("unsigned int pio_pin_getval(char *);")},
+
+  // port functions.
+  {FUNC(pio_port_setdir), PROTO("int pio_port_setdir(int, char *);")},
+  {FUNC(pio_port_setpull), PROTO("int pio_port_setpull(int, char *);")},
+  {FUNC(pio_port_setval), PROTO("int pio_port_setval(unsigned int, char *);")},
+  {FUNC(pio_port_sethigh), PROTO("int pio_port_sethigh(char *);")},
+  {FUNC(pio_port_setlow), PROTO("int pio_port_setlow(char *);")},
+  {FUNC(pio_port_getval), PROTO("unsigned int pio_port_getval(char *);")},
+
+  // decode function.
+  {FUNC(pio_decode), PROTO("int pio_decode(int, int *, int *);")},
+  {NILFUNC, NILPROTO}
+};
+
+/* init library */
+extern void pio_library_init(void)
+{
+  REGISTER("pio.h", &pio_lib_setup_func, &pio_library[0]);
+}
+
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // PIO module for Lua.
@@ -492,4 +959,4 @@ LUALIB_API int luaopen_pio( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // ALCOR_LANG_PICOC
+#endif // ALCOR_LANG_LUA

@@ -1,22 +1,40 @@
 // LM3S specific PIO support
+// Modified to include support for PicoC.
 
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
+#ifdef ALCOR_LANG_PICOC
+# include "picoc.h"
+# include "interpreter.h"
+# include "rotable.h"
+# include "picoc_mod.h"
+#else
+# include "lua.h"
+# include "lualib.h"
+# include "lauxlib.h"
+# include "lrotable.h"
+# include "auxmods.h"
+#endif
+
 #include "platform.h"
-#include "lrotable.h"
 #include "platform_conf.h"
 #include "inc/hw_gpio.h"
 #include "gpio.h"
-#include "auxmods.h"
+
 #include <string.h>
 
-#if LUA_OPTIMIZE_MEMORY == 0
-#error lm3s.pio can only be compiled with LTR on (optram=true)
+#ifdef ALCOR_LANG_PICOC
+# if PICOC_OPTIMIZE_MEMORY == 0
+#  error lm3s_pio can only be compiled with Tiny RAM on (optram=true)
+# endif
+#else
+# if LUA_OPTIMIZE_MEMORY == 0
+#  error lm3s.pio can only be compiled with LTR on (optram=true)
+# endif
 #endif
 
+
+
 // Alternate function setting is not available on all CPUs
-#if defined( ELUA_CPU_LM3S9B92 ) || defined( ELUA_CPU_LM3S9D92 )
+#if defined( ALCOR_CPU_LM3S9B92 ) || defined( ALCOR_CPU_LM3S9D92 )
 #define LM3S_HAS_ALTERNATE_PIO
 #endif
 
@@ -396,6 +414,18 @@ static const LM3S_PIN_DATA lm3s_pin_data[] =
   { NULL, 0 }
 };
 
+#ifdef ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// LM3S specific PIO support for PicoC.
+
+// TODO
+
+#else
+
+// ****************************************************************************
+// LM3S specific PIO support for Lua.
+
 static int lm3s_pio_mt_index( lua_State *L )
 {
   const char *key = luaL_checkstring( L, 2 );
@@ -425,8 +455,19 @@ static int lm3s_pio_set_function( lua_State *L )
 
 #endif // #ifdef LM3S_HAS_ALTERNATE_PIO
 
+#endif // #ifdef ALCOR_LANG_PICOC
+
 // ****************************************************************************
-// Other LM3S PIO specific functions
+// Other LM3S PIO specific functions for PicoC.
+
+#ifdef ALCOR_LANG_PICOC
+
+// TODO
+
+#else
+
+// ****************************************************************************
+// Other LM3S PIO specific functions for Lua.
 
 extern const u32 pio_base[];
 
@@ -517,3 +558,4 @@ const LUA_REG_TYPE lm3s_pio_map[] =
   { LNILKEY, LNILVAL }
 };
 
+#endif // #ifdef ALCOR_LANG_PICOC

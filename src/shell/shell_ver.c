@@ -18,7 +18,7 @@
 #endif
 
 const char shell_help_ver[] = "\n"
-  "This displays the git revision of the tree used to build eLua or an official version number if applicable.\n";
+  "This displays the git revision of the tree used to build Alcor6L or an official version number if applicable.\n";
 const char shell_help_summary_ver[] = "show version information";
 
 void shell_ver( int argc, char **argv )
@@ -28,7 +28,7 @@ void shell_ver( int argc, char **argv )
     SHELL_SHOW_HELP( ver );
     return;
   }
-  printf( "eLua version %s\n", ELUA_STR_VERSION );
-  printf( "For more information visit www.eluaproject.net and wiki.eluaproject.net\n" );
+  printf( "Alcor6L version %s\n", ELUA_STR_VERSION );
+  printf( "For more information visit www.simplemachines.it\n" );
 }
 

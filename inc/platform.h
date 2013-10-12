@@ -66,6 +66,7 @@ enum
 int platform_pio_has_port( unsigned port );
 const char* platform_pio_get_prefix( unsigned port );
 int platform_pio_has_pin( unsigned port, unsigned pin );
+int platform_pio_get_num_pins( unsigned port );
 pio_type platform_pio_op( unsigned port, pio_type pinmask, int op );
 
 // *****************************************************************************
@@ -73,6 +74,14 @@ pio_type platform_pio_op( unsigned port, pio_type pinmask, int op );
 
 // The ID of the system timer
 #define PLATFORM_TIMER_SYS_ID                 0x100
+
+#ifdef ALCOR_LANG_PICOC
+// Maximum values of the system timer
+#define PLATFORM_TIMER_SYS_MAX                ( ( 1LL << 31 ) - 2 )
+// Timer data type
+typedef u32 timer_data_type;
+
+#else
 
 #if defined( LUA_NUMBER_INTEGRAL ) && !defined( LUA_INTEGRAL_LONGLONG )
 // Maximum values of the system timer
@@ -85,6 +94,8 @@ typedef u32 timer_data_type;
 // Timer data type
 typedef u64 timer_data_type;
 #endif // #if defined( LUA_NUMBER_INTEGRAL ) && !defined( LUA_INTEGRAL_LONGLONG )
+
+#endif // #ifdef ALCOR_LANG_PICOC
 
 // This constant means 'infinite timeout'
 #define PLATFORM_TIMER_INF_TIMEOUT            ( PLATFORM_TIMER_SYS_MAX + 1 )
@@ -148,8 +159,8 @@ void platform_timer_sys_disable_int();
 // eLua CAN ID types
 enum
 {
-  ALCOR_CAN_ID_STD = 0,
-  ALCOR_CAN_ID_EXT
+  ELUA_CAN_ID_STD = 0,
+  ELUA_CAN_ID_EXT
 };
 
 int platform_can_exists( unsigned id );

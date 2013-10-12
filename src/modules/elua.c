@@ -1,12 +1,28 @@
 // Interface with core services
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -28,12 +44,151 @@
 #include "version.h"
 #endif
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// eLua core module for tiny-scheme.
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// eLua core module for my-basic.
+
+// v = pd_platform()
+int elua_version(mb_interpreter_t* s, void **l) {
+  int result = MB_FUNC_OK;
+  unsigned len = strlen(ELUA_STR_VERSION);
+  char *str = (char *)mb_malloc(len + 1);
+  memcpy(str, ELUA_STR_VERSION, len);
+  str[len] = '\0';
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_attempt_close_bracket(s, l));
+  mb_check(mb_push_string(s, l, str));
+  return result;
+}
+
+// elua_save_history("fname")
+int elua_save_history(mb_interpreter_t* s, void **l) {
+  int fun_result = MB_FUNC_OK;
+  char *fname = 0;
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_pop_string(s, l, &fname));
+  mb_check(mb_attempt_close_bracket(s, l));
+#ifdef BUILD_LINENOISE
+  int res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
+  if (res == 0)
+    printf("History saved to %s.\n", fname);
+  else if (res == LINENOISE_HISTORY_NOT_ENABLED)
+    printf("linenoise not enabled for MY-BASIC.\n");
+  else if (res = LINENOISE_HISTORY_EMPTY)
+    printf("History empty, nothing to save.\n");
+  else
+    printf("Unable to save history to %s.\n", fname);
+  return fun_result;
+#else
+  printf("linenoise support not enabled.");
+  return fun_result;
+#endif
+}
+
+// elua_shell("str")
+int elua_shell(mb_interpreter_t* s, void **l) {
+  int res = MB_FUNC_OK;
+  char *cmdcpy, *pcmd = 0;
+
+  mb_assert(s && l);
+  mb_check(mb_attempt_open_bracket(s, l));
+  mb_check(mb_pop_string(s, l, &pcmd));
+  mb_check(mb_attempt_close_bracket(s, l));
+
+  // "+2" below comes from the string terminator (+1) and the '\n' 
+  // that will be added by the shell code (+1)
+  if ((cmdcpy = (char *)malloc(strlen(pcmd) + 2)) == NULL) {
+    printf("not enough memory for elua-shell");
+    return res;
+  }
+
+  strcpy(cmdcpy, pcmd);
+  shellh_execute_command(cmdcpy, 0);
+  free(cmdcpy);
+
+  return res;
+}
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// eLua core module for picoLisp.
+
+any elua_version(any x) {
+  return mkStr(ELUA_STR_VERSION);
+}
+
+any elua_save_history(any x) {
+#ifdef BUILD_LINENOISE
+  int res; // holds result.
+  any y;   // cdr(x)
+  
+  y = cdr(x);
+  y = EVAL(car(y));
+  // holds file name.
+  char fname[bufSize(y)];
+  NeedSym(x, y);
+  bufString(y, fname);
+  res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
+  if (res == 0)
+    printf("History saved to %s.\n", fname);
+  else if (res == LINENOISE_HISTORY_NOT_ENABLED)
+    outString("linenoise not enabled for picoLisp.\n");
+  else if (res = LINENOISE_HISTORY_EMPTY)
+    outString("History empty, nothing to save.\n");
+  else
+    printf("Unable to save history to %s.\n", fname);
+  return y;
+#else
+  err(NULL, NULL, "linenoise support not enabled.");
+#endif
+}
+
+// (elua-shell 'sym) -> sym|Nil
+any elua_shell(any x) {
+  any y = cdr(x);
+  char *cmdcpy;
+  const SHELL_COMMAND *t;
+
+  y = EVAL(car(y));
+  char pcmd[bufSize(y)];
+  NeedSym(x, y);
+  bufString(y, pcmd);
+  // "+2" below comes from the string terminator (+1) and the '\n'
+  // that will be added by the shell code (+1)
+  if ((cmdcpy = (char *)malloc(strlen(pcmd) + 2)) == NULL)
+    err(NULL, NULL, "not enough memory for elua-shell");
+  strcpy(cmdcpy, pcmd);
+  t = shellh_execute_command(cmdcpy, 0);
+  free(cmdcpy);
+  if (!t)
+    return Nil;
+  else
+    return mkStr(t->cmd);
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // eLua core module for PicoC.
 
-//PicoC: elua_version();
+// PicoC: elua_version();
 static void elua_version(pstate *p, val *r, val **param, int n)
 {
   r->Val->Identifier = ELUA_STR_VERSION;
@@ -44,7 +199,8 @@ static void elua_save_history(pstate *p, val *r, val **param, int n)
 {
 #ifdef BUILD_LINENOISE
   const char *fname = param[0]->Val->Identifier;
-  
+  int res;
+ 
   res = linenoise_savehistory(LINENOISE_ID_LUA, fname);
   if (res == 0)
     printf("History saved to %s.\n", fname);
@@ -91,7 +247,9 @@ extern void elua_library_init(void)
   REGISTER("elua.h", NULL, &elua_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // eLua core module for Lua.
@@ -186,4 +344,4 @@ LUALIB_API int luaopen_elua( lua_State *L )
 #endif
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA

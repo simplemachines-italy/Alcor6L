@@ -1,12 +1,28 @@
 // Module for interfacing with the I2C interface
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -14,29 +30,223 @@
 # include "lrotable.h"
 #endif
 
+// Generic includes.
 #include "platform.h"
 #include <string.h>
 #include <ctype.h>
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// I2C module for tiny-scheme.
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// I2C module for my-basic.
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// I2C module for picoLisp.
+
+// (i2c-setup 'num 'num) -> num
+any plisp_i2c_setup(any ex) {
+  any x, y;
+  unsigned id;
+  s32 speed;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, i2c, id);
+
+  x = cdr(x);
+  NeedNum(x, y = EVAL(car(x)));
+  speed = unBox(y);
+  if (speed <= 0)
+    err(ex, y, "frequency must be > 0");
+
+  return box(platform_i2c_setup(id, (u32)speed));
+}
+
+// (i2c-start 'num) -> Nil
+any plisp_i2c_start(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, i2c, id);
+  platform_i2c_send_start(id);
+
+  return Nil;
+}
+
+// (i2c-stop 'num) -> Nil
+any plisp_i2c_stop(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, i2c, id);
+  platform_i2c_send_stop(id);
+
+  return Nil;
+}
+
+// (i2c-address 'num 'num 'num) -> num
+any plisp_i2c_address(any ex) {
+  unsigned id;
+  int add, dir, ret;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.  
+  MOD_CHECK_ID(ex, i2c, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  add = unBox(y); // get address.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y); // get direction.
+  
+  if (add < 0 || add > 127)
+    err(NULL, NULL, "slave address must be from 0 to 127");
+
+  ret = platform_i2c_send_address(id, (u16)add, dir);
+  return box(ret);
+
+}
+
+// Helpers for picoLisp i2c 'write' function.
+
+static void outString_i2c(unsigned id, char *s) {
+  while (*s)
+    platform_i2c_send_byte(id, *s++);
+}
+
+static void outNum_i2c(unsigned id, long n) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_i2c(id, buf);
+}
+
+static void i2ch_prin(unsigned id, any x) {
+  if (!isNil(x)) {
+    if (isNum(x))
+      outNum_i2c(id, unBox(x));
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      u8 byte;
+ 
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+        if (c != '^') {
+          byte = c;
+          platform_i2c_send_byte(id, byte);
+        }
+        else if (!(c = getByte(&i, &w, &x))) {
+          byte = '^';
+	  platform_i2c_send_byte(id, byte);
+	}
+        else if (c == '?') {
+          byte = 127;
+	  platform_i2c_send_byte(id, byte);
+        }
+        else {
+          c &= 0x1F;
+          byte = (u8)c;
+	  platform_i2c_send_byte(id, byte);
+        }
+      }
+    }
+    else {
+      while (i2ch_prin(id, car(x)), !isNil(x = cdr(x))) {
+        if (!isCell(x)) {
+	  i2ch_prin(id, x);
+          break;
+	}
+      }
+    }
+  }
+}
+
+// (i2c-write 'num 'any ..) -> any
+any plisp_i2c_write(any ex) {
+  unsigned id;
+  any x, y = Nil;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, i2c, id);
+
+  while (isCell(x = cdr(x)))
+    i2ch_prin(id, y = EVAL(car(x)));
+  return y;
+}
+
+// (i2c-read 'num 'num) -> sym
+any plisp_i2c_read(any ex) {
+  unsigned id;
+  u32 size, i, count = 0;
+  int data;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, i2c, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  size = unBox(y); // get size.
+  char *b = malloc(size + 1);
+
+  if (size == 0)
+    return Nil;
+  for (i = 0; i < size; i++) {
+    if ((data = platform_i2c_recv_byte(id, i < size - 1)) == -1)
+      break;
+    else
+      b[count++] = (char)data;
+  }
+  return mkStr(b);
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // I2C module for PicoC.
 
 // A few platform constants.
-const int fast = PLATFORM_I2C_SPEED_FAST;
-const int slow = PLATFORM_I2C_SPEED_SLOW;
-const int trans = PLATFORM_I2C_DIRECTION_TRANSMITTER;
-const int rec = PLATFORM_I2C_DIRECTION_RECEIVER;
+static const int fast = PLATFORM_I2C_SPEED_FAST;
+static const int slow = PLATFORM_I2C_SPEED_SLOW;
+static const int trans = PLATFORM_I2C_DIRECTION_TRANSMITTER;
+static const int rec = PLATFORM_I2C_DIRECTION_RECEIVER;
 
 // Library setup function
 extern void i2c_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_def_int("i2c_FAST", fast);
-  picoc_def_int("i2c_SLOW", slow);
-  picoc_def_int("i2c_TRANSMITTER", trans);
-  picoc_def_int("i2c_RECEIVER", rec);
+  picoc_def_integer("i2c_FAST", fast);
+  picoc_def_integer("i2c_SLOW", slow);
+  picoc_def_integer("i2c_TRANSMITTER", trans);
+  picoc_def_integer("i2c_RECEIVER", rec);
 #endif
 }
                                                             
@@ -44,13 +254,13 @@ extern void i2c_lib_setup_func(void)
 static void i2c_setup(pstate *p, val *r, val **param, int n)
 {
   unsigned id = param[0]->Val->UnsignedInteger;
-  s32 speed = (s32)param[1]->Val->UnsignedInteger;
+  s32 speed = (s32)param[1]->Val->LongInteger;
   
   MOD_CHECK_ID(i2c, id);
   if (speed <= 0)
     return pmod_error("frequency must be > 0");
 
-  r->Val->UnsignedInteger = platform_i2c_setup(id, (u32)speed);
+  r->Val->UnsignedLongInteger = platform_i2c_setup(id, (u32)speed);
 }
 
 // PicoC: i2c_start(id);
@@ -127,14 +337,14 @@ static void i2c_write_string(pstate *p, val *r, val **param, int n)
     wrote += 1;
   }
 
-  r->Val->UnsignedInteger = wrote;
+  r->Val->UnsignedLongInteger = wrote;
 }
 
 // PicoC: i2c_read(id, size);
 static void i2c_read(pstate *p, val *r, val **param, int n)
 {
   unsigned id = param[0]->Val->UnsignedInteger;
-  u32 size = param[1]->Val->UnsignedInteger, i;
+  u32 size = param[1]->Val->UnsignedLongInteger, i;
   char *b = HeapAllocMem(size + 1);
   unsigned int count = 0;
   int data;
@@ -168,13 +378,13 @@ const PICOC_RO_TYPE i2c_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE i2c_library[] = {
-  {FUNC(i2c_setup), PROTO("unsigned int i2c_setup(unsigned int, unsigned int);")},
+  {FUNC(i2c_setup), PROTO("unsigned long i2c_setup(unsigned int, long);")},
   {FUNC(i2c_start), PROTO("void i2c_start(unsigned int);")},
   {FUNC(i2c_stop), PROTO("void i2c_stop(unsigned int);")},
   {FUNC(i2c_address), PROTO("unsigned int i2c_address(unsigned int, int, int);")},
   {FUNC(i2c_write_integer), PROTO("unsigned int i2c_write_integer(unsigned int, int);")},
-  {FUNC(i2c_write_string), PROTO("unsigned int i2c_write_string(unsigned int, char *);")},
-  {FUNC(i2c_read), PROTO("char *i2c_read(unsigned int, unsigned int);")},
+  {FUNC(i2c_write_string), PROTO("unsigned long i2c_write_string(unsigned int, char *);")},
+  {FUNC(i2c_read), PROTO("char *i2c_read(unsigned int, unsigned long);")},
   {NILFUNC, NILPROTO}
 };
 
@@ -184,7 +394,9 @@ extern void i2c_library_init(void)
   REGISTER("i2c.h", &i2c_lib_setup_func, &i2c_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // I2C module for Lua.
@@ -353,4 +565,4 @@ LUALIB_API int luaopen_i2c( lua_State *L )
 #endif // #if LUA_OPTIMIZE_MEMORY > 0
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA

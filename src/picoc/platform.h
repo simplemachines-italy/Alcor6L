@@ -15,7 +15,7 @@
 # include <math.h>
 
 # define USE_MALLOC_STACK                   /* stack is allocated using malloc() */
-//# define USE_MALLOC_HEAP                    /* heap is allocated using malloc() */
+# define USE_MALLOC_HEAP                    /* heap is allocated using malloc() */
 
 #define LARGE_INT_POWER_OF_TEN 1000000000   /* the largest power of ten which fits in an int on this architecture */
 #if defined(__hppa__) || defined(__sparc__)

@@ -12,6 +12,8 @@
 #define luac_c
 #define LUA_CORE
 
+#ifdef LUA_COMPILER
+
 #include "lua.h"
 #include "lauxlib.h"
 
@@ -23,7 +25,21 @@
 #include "lstring.h"
 #include "lundump.h"
 
-#define PROGNAME	"luac"		/* default program name */
+#if LUA_COMPILER
+# include <setjmp.h>
+static jmp_buf ebuf;
+// for errors.
+# define FATAL_RET_VALUE  -1
+# define CANNOT_RET_VALUE -2
+# define USAGE_RET_VALUE  -3
+#endif // #if LUA_COMPILER
+
+#if LUA_COMPILER
+# define PROGNAME       "/mmc/luac"     /* default program name for luac running on the MCU */
+#else
+# define PROGNAME	"luac"		/* default program name */
+#endif
+
 #define	OUTPUT		PROGNAME ".out"	/* default output file */
 
 static int listing=0;			/* list bytecodes? */
@@ -37,13 +53,21 @@ static DumpTargetInfo target;
 static void fatal(const char* message)
 {
  fprintf(stderr,"%s: %s\n",progname,message);
+#if LUA_COMPILER
+ longjmp(ebuf, FATAL_RET_VALUE);
+#else
  exit(EXIT_FAILURE);
+#endif
 }
 
 static void cannot(const char* what)
 {
  fprintf(stderr,"%s: cannot %s %s: %s\n",progname,what,output,strerror(errno));
+#if LUA_COMPILER
+ longjmp(ebuf, CANNOT_RET_VALUE);
+#else
  exit(EXIT_FAILURE);
+#endif
 }
 
 static void usage(const char* message)
@@ -66,7 +90,11 @@ static void usage(const char* message)
  "  -cce endian     cross-compile with given endianness ('big' or 'little')\n"
  "  --       stop handling options\n",
  progname,Output);
+#if LUA_COMPILER
+ longjmp(ebuf, USAGE_RET_VALUE);
+#else
  exit(EXIT_FAILURE);
+#endif
 }
 
 #define	IS(s)	(strcmp(argv[i],s)==0)
@@ -216,7 +244,11 @@ static int pmain(lua_State* L)
  return 0;
 }
 
+#if LUA_COMPILER
+int luac_main(int argc, char *argv[])
+#else
 int main(int argc, char* argv[])
+#endif // #if LUA_COMPILER
 {
  lua_State* L;
  struct Smain s;
@@ -229,6 +261,10 @@ int main(int argc, char* argv[])
  target.lua_Number_integral=(((lua_Number)0.5)==0);
  target.is_arm_fpa=0;
 
+#if LUA_COMPILER
+ int f=setjmp(ebuf);
+ if (f == 0) {
+#endif
  int i=doargs(argc,argv);
  argc-=i; argv+=i;
  if (argc<=0) usage("no input files given");
@@ -238,5 +274,20 @@ int main(int argc, char* argv[])
  s.argv=argv;
  if (lua_cpcall(L,pmain,&s)!=0) fatal(lua_tostring(L,-1));
  lua_close(L);
+#if LUA_COMPILER
+ }
+ /*
+  * If we're using luac on the MCU,
+  * set these variables to their
+  * default value before return;
+  */
+ listing=0;            /* list bytecodes? */
+ dumping=1;            /* dump bytecodes? */
+ stripping=0;          /* strip debug information? */
+ output=Output;        /* actual output file name */
+ progname=PROGNAME;    /* actual program name */
+#endif
  return EXIT_SUCCESS;
 }
+
+#endif // #ifdef LUA_COMPILER

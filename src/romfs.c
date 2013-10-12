@@ -9,7 +9,7 @@
 #include "ioctl.h"
 #include <fcntl.h>
 #include "platform.h"
-#ifdef ELUA_SIMULATOR
+#ifdef ALCOR_SIMULATOR
 #include "hostif.h"
 #endif
 #include "platform_conf.h"
@@ -24,7 +24,7 @@
 
 static FD fd_table[ TOTAL_MAX_FDS ];
 static int romfs_num_fd;
-#ifdef ELUA_CPU_LINUX
+#ifdef ALCOR_CPU_LINUX
 static int wofs_sim_fd;
 #define WOFS_FNAME    "/tmp/wofs.dat"
 #define WOFS_SIZE     (256 * 1024)
@@ -448,7 +448,7 @@ static const FSDATA romfs_fsdata =
 // ****************************************************************************
 // WOFS functions and instance descriptor for the simulator (testing)
 
-#if defined( ELUA_CPU_LINUX ) && defined( BUILD_WOFS )
+#if defined( ALCOR_CPU_LINUX ) && defined( BUILD_WOFS )
 static u32 sim_wofs_read( void *to, u32 fromaddr, u32 size, const void *pdata )
 {
   hostif_lseek( wofs_sim_fd, ( long )fromaddr, SEEK_SET );
@@ -484,12 +484,12 @@ int wofs_format()
   return 1;
 }
 
-#endif // #ifdef ELUA_CPU_LINUX
+#endif // #ifdef ALCOR_CPU_LINUX
 
 // ****************************************************************************
 // WOFS functions and instance descriptor for real hardware
 
-#if defined( BUILD_WOFS ) && !defined( ELUA_CPU_LINUX )
+#if defined( BUILD_WOFS ) && !defined( ALCOR_CPU_LINUX )
 static u32 sim_wofs_write( const void *from, u32 toaddr, u32 size, const void *pdata )
 {
   const FSDATA *pfsdata = ( const FSDATA* )pdata;
@@ -538,7 +538,7 @@ int romfs_init()
     memset( fd_table + i, 0xFF, sizeof( FD ) );
     fd_table[ i ].flags = 0;
   }
-#if defined( ELUA_CPU_LINUX ) && defined( BUILD_WOFS )
+#if defined( ALCOR_CPU_LINUX ) && defined( BUILD_WOFS )
   // Initialize and register WOFS for the simulator
   wofs_sim_fd = hostif_open( WOFS_FNAME, 2, 0666 ); // try to open directly first
   if( -1 == wofs_sim_fd )
@@ -552,8 +552,8 @@ int romfs_init()
     wofs_sim_fd = hostif_open( WOFS_FNAME, 2, 0666 );
   }
   dm_register( "/wo", ( void* )&wofs_sim_fsdata, &romfs_device );
-#endif // #if defined( ELUA_CPU_LINUX ) && defined( BUILD_WOFS )
-#if defined( BUILD_WOFS ) && !defined( ELUA_CPU_LINUX )
+#endif // #if defined( ALCOR_CPU_LINUX ) && defined( BUILD_WOFS )
+#if defined( BUILD_WOFS ) && !defined( ALCOR_CPU_LINUX )
   // Get the start address and size of WOFS and register it
   wofs_fsdata.pbase = ( u8* )platform_flash_get_first_free_block_address( NULL );
   wofs_fsdata.max_size = INTERNAL_FLASH_SIZE - ( ( u32 )wofs_fsdata.pbase - INTERNAL_FLASH_START_ADDRESS );

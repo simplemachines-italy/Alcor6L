@@ -1,3 +1,16 @@
+xx.xx.xxxx  Martin Guy      <martinwguy@gmail.com>
+	    Nunzio Raciti   <nunzio.raciti@gmail.com>
+	    Raman Gopalan   <ramangopalan@gmail.com>
+	    Sergio Sorrenti <sergio.sorrenti@simplemachines.it>
+	    Marcus Jansson  <cmp1084@gmail.com>
+	    
+  * First official release of Alcor6L (0.1)
+  * Supports Mizar32 (avr32), lm3s, stm32 and i386
+  * Languages: PicoC, picoLisp, MY-BASIC and TinyScheme
+  * New feature: iv, a vi like text editor for Alcor6L
+  * Language specific features:
+    Lua: Option to use Lua compiler on the target
+
 04.04.2013  Bogdan Marinescu <bogdan.marinescu@gmail.com>
             Dado Sutter      <dadosutter@gmail.com>
             James Snyder     <jbsnyder@gmail.com>

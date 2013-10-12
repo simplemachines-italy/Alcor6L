@@ -4,13 +4,30 @@
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "picolisp_mod.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc_mod.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "auxmods.h"
 # include "elua_int.h"
 #endif
 
+// Generic includes.
 #include "board.h"
 #include "stacks.h"
 

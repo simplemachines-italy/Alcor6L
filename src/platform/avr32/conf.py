@@ -28,7 +28,11 @@ else :
     ldscript = "src/platform/%s/%s_%s.ld" % ( platform, comp[ 'cpu' ].lower(), comp[ 'bootloader'] )
 
 # Standard GCC Flags
-comp.Append(CCFLAGS = ['-ffunction-sections','-fdata-sections','-fno-strict-aliasing','-Wall','-DBOOTLOADER_%s' %comp['bootloader'].upper()])
+if comp[ 'lang' ] == 'picolisp':
+  comp.Append(CCFLAGS = ['-ffunction-sections','-falign-functions','-fdata-sections','-fno-strict-aliasing','-Wall','-DBOOTLOADER_%s' %comp['bootloader'].upper()])
+else:
+  comp.Append(CCFLAGS = ['-ffunction-sections','-fdata-sections','-fno-strict-aliasing','-Wall','-DBOOTLOADER_%s' %comp['bootloader'].upper()])
+
 comp.Append(LINKFLAGS = ['-nostartfiles','-nostdlib','-Wl,--gc-sections','-Wl,--allow-multiple-definition','-Wl,--relax','-Wl,--direct-data','-T',ldscript])
 comp.Append(ASFLAGS = ['-x','assembler-with-cpp','-c'])
 comp.Append(LIBS = ['c','gcc','m'])

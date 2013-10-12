@@ -11,126 +11,117 @@
 struct IncludeLibrary
 {
     const char *IncludeName;
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     void (* const SetupFunction)(void);
 #else
     void (*SetupFunction)(void);
 #endif
     const struct LibraryFunction *FuncList;
     const char *SetupCSource;
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     const struct IncludeLibrary *NextLib;
 #else
     struct IncludeLibrary *NextLib;
 #endif
 };
 
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
 /* libraries */
-extern const PICOC_REG_TYPE pd_library[];
-extern const PICOC_REG_TYPE pio_library[];
-extern const PICOC_REG_TYPE can_library[];
-extern const PICOC_REG_TYPE adc_library[];
-extern const PICOC_REG_TYPE picoc_library[];
-extern const PICOC_REG_TYPE pwm_library[];
-extern const PICOC_REG_TYPE spi_library[];
+#if PICOC_TINYRAM_ON
+
+PICOC_PLAT_LIB_DEFINE(pio);
+PICOC_PLAT_LIB_DEFINE(can);
+PICOC_PLAT_LIB_DEFINE(adc);
+PICOC_PLAT_LIB_DEFINE(pwm);
+PICOC_PLAT_LIB_DEFINE(spi);
 #ifdef BUILD_TERM
-  extern const PICOC_REG_TYPE term_library[];
+PICOC_PLAT_LIB_DEFINE(term);
 #endif
-extern const PICOC_REG_TYPE tmr_library[];
-extern const PICOC_REG_TYPE uart_library[];
-
-/**
- * FIXME: Look into the platform specific
- * module section in platform/lm3s/platform.c
- * This should not be directly included here.
- */
-extern const PICOC_REG_TYPE lm3s_display_library[];
-
-extern const PICOC_REG_TYPE cpu_library[];
+PICOC_PLAT_LIB_DEFINE(tmr);
+PICOC_PLAT_LIB_DEFINE(uart);
+PICOC_PLAT_LIB_DEFINE(cpu);
+PICOC_PLAT_LIB_DEFINE(elua);
+PICOC_PLAT_LIB_DEFINE(pd);
+PICOC_PLAT_LIB_DEFINE(i2c);
+PLATFORM_SPECIFIC_LIB_DEFINES;
 
 #ifndef NO_FP
 /* math.c */
 #define PICOC_CORE_LIB_MATH "math.h"
 #define PICOC_CORE_VAR_MATH "math"
-extern const PICOC_REG_TYPE MathFunctions[];
-extern const picoc_roentry math_variables[];
-void MathSetupFunc(void);
+PICOC_CORE_LIB_DEFINE(Math);
+PICOC_VAR_DEFINE(math);
+PICOC_CORE_SETUP_FUNC(Math);
 #endif /* #ifndef NO_FP */
 
-/* stdio.c */
-#define PICOC_CORE_LIB_STDIO "stdio.h"
-#define PICOC_CORE_VAR_STDIO "stdio"
 extern const char StdioDefs[];
-extern const PICOC_REG_TYPE StdioFunctions[];
-extern const picoc_roentry stdio_variables[];
-void StdioSetupFunc(void);
-
-/* ctype.c */
-#define PICOC_CORE_LIB_CTYPE "ctype.h"
-extern const PICOC_REG_TYPE StdCtypeFunctions[];
-
-/* string.c */
-#define PICOC_CORE_LIB_STRING "string.h"
-extern const PICOC_REG_TYPE StringFunctions[];
-void StringSetupFunc(void);
-
-/* stdlib.c */
-#define PICOC_CORE_LIB_STDLIB "stdlib.h"
-extern const PICOC_REG_TYPE StdlibFunctions[];
-void StdlibSetupFunc(void);
-
-/* errno.c */
-#define PICOC_CORE_LIB_ERRNO "errno.h"
-#define PICOC_CORE_VAR_ERRNO "errno"
-extern const picoc_roentry errno_variables[];
-void StdErrnoSetupFunc(void);
-
-/* stdbool.c */
-#define PICOC_CORE_LIB_STDBOOL "stdbool.h"
-#define PICOC_CORE_VAR_STDBOOL "stdbool"
 extern const char StdboolDefs[];
-extern const picoc_roentry stdbool_variables[];
-void StdboolSetupFunc(void);
+
+#define PICOC_CORE_LIB_CTYPE "ctype.h"
+#define PICOC_CORE_LIB_STRING "string.h"
+#define PICOC_CORE_LIB_STDLIB "stdlib.h"
+#define PICOC_CORE_LIB_STDIO "stdio.h"
+#define PICOC_CORE_LIB_ERRNO "errno.h"
+#define PICOC_CORE_LIB_STDBOOL "stdbool.h"
+
+#define PICOC_CORE_VAR_STDIO "stdio"
+#define PICOC_CORE_VAR_ERRNO "errno"
+#define PICOC_CORE_VAR_STDBOOL "stdbool"
+
+PICOC_CORE_LIB_DEFINE(Stdio);
+PICOC_CORE_LIB_DEFINE(StdCtype);
+PICOC_CORE_LIB_DEFINE(String);
+PICOC_CORE_LIB_DEFINE(Stdlib);
+
+PICOC_CORE_SETUP_FUNC(String);
+PICOC_CORE_SETUP_FUNC(Stdlib);
+PICOC_CORE_SETUP_FUNC(StdErrno);
+PICOC_CORE_SETUP_FUNC(Stdio);
+PICOC_CORE_SETUP_FUNC(Stdbool);
+
+PICOC_VAR_DEFINE(errno);
+PICOC_VAR_DEFINE(stdbool);
+PICOC_VAR_DEFINE(stdio);
 
 static const struct IncludeLibrary IncludeLibList[] = {
 #ifdef PICOC_PLATFORM_LIBS_REG
-	PICOC_PLATFORM_LIBS_REG,
+  PICOC_PLATFORM_LIBS_REG,
 #endif
 #if defined (PICOC_PLATFORM_LIBS_ROM)
 #undef _ROM
 #define _ROM(header, setup_func, lib, def)\
-	{header, setup_func, lib, def, NULL},
-	PICOC_PLATFORM_LIBS_ROM
+  {header, setup_func, lib, def, NULL},
+  PICOC_PLATFORM_LIBS_ROM
 #if defined (PICOC_CORE_LIBS_ROM)
-	PICOC_CORE_LIBS_ROM
+  PICOC_CORE_LIBS_ROM
 #endif
 #endif /* PICOC_PLATFORM_LIBS_ROM */
-	{NULL, NULL, NULL, NULL, NULL}
+  {NULL, NULL, NULL, NULL, NULL}
 };
 
 /* platform variables */
-extern const picoc_roentry can_variables[];
-extern const picoc_roentry i2c_variables[];
-extern const picoc_roentry pio_variables[];
-extern const picoc_roentry spi_variables[];
-extern const picoc_roentry term_variables[];
-extern const picoc_roentry uart_variables[];
+PICOC_VAR_DEFINE(can);
+PICOC_VAR_DEFINE(i2c);
+PICOC_VAR_DEFINE(pio);
+PICOC_VAR_DEFINE(spi);
+PICOC_VAR_DEFINE(term);
+PICOC_VAR_DEFINE(uart);
+PICOC_VAR_DEFINE(tmr);
+PLATFORM_SPECIFIC_VAR_DEFINES;
 
 /* list of RO platform variables */
 const picoc_rt picoc_rotable[] = {
 #ifdef PICOC_PLATFORM_VARS_REG
-	PICOC_PLATFORM_VARS_REG,
+  PICOC_PLATFORM_VARS_REG,
 #endif
 #if defined (PICOC_PLATFORM_VARS_ROM)
 #undef _ROM
 #define _ROM(name, var_list) {#name, var_list},
-	PICOC_PLATFORM_VARS_ROM
+  PICOC_PLATFORM_VARS_ROM
 #if defined (PICOC_CORE_VARS_ROM)
-	PICOC_CORE_VARS_ROM
+  PICOC_CORE_VARS_ROM
 #endif
 #endif /* PICOC_PLATFORM_VARS_ROM */
-	{NULL, NULL}
+  {NULL, NULL}
 };
 
 #else
@@ -138,7 +129,7 @@ const picoc_rt picoc_rotable[] = {
 /* the classical list */
 struct IncludeLibrary *IncludeLibList = NULL;
 
-#endif /* #if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB)) */
+#endif // #if PICOC_TINYRAM_ON
 
 /**
  * This is probably not going to be used without the Picoc Tiny
@@ -167,7 +158,7 @@ void IncludeInit(void)
 /* clean up space used by the include system */
 void IncludeCleanup(void)
 {
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_OFF
     struct IncludeLibrary *ThisInclude = IncludeLibList;
     struct IncludeLibrary *NextInclude;
     
@@ -179,11 +170,11 @@ void IncludeCleanup(void)
     }
 
     IncludeLibList = NULL;
-#endif /* #if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB)) */
+#endif // PICOC_TINYRAM_OFF
 }
 
-#if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB))
 /* register a new build-in include file */
+#if PICOC_TINYRAM_OFF
 void IncludeRegister(const char *IncludeName, void (*SetupFunction)(void),
 		const struct LibraryFunction *FuncList, const char *SetupCSource)
 {
@@ -195,12 +186,12 @@ void IncludeRegister(const char *IncludeName, void (*SetupFunction)(void),
     NewLib->NextLib = IncludeLibList;
     IncludeLibList = NewLib;
 }
-#endif /* #if ((PICOC_OPTIMIZE_MEMORY == 0) && defined (BUILTIN_MINI_STDLIB)) */
+#endif // PICOC_TINYRAM_OFF
 
 /* include all of the system headers */
 void PicocIncludeAllSystemHeaders(void)
 {
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined(BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     const struct IncludeLibrary *ThisInclude = &IncludeLibList[0];
     for (ThisInclude = &IncludeLibList[0]; ThisInclude->IncludeName != NULL; ThisInclude++)
         IncludeFile(TableStrRegister(ThisInclude->IncludeName));
@@ -216,7 +207,7 @@ void IncludeFile(const char *FileName)
 {
     const struct IncludeLibrary *LInclude;
 /* scan for the include file name to see if it's in our list of predefined includes */
-#if ((PICOC_OPTIMIZE_MEMORY == 2) && !defined (BUILTIN_MINI_STDLIB))
+#if PICOC_TINYRAM_ON
     for (LInclude = &IncludeLibList[0]; LInclude->IncludeName != NULL; LInclude++)
 #else
     for (LInclude = IncludeLibList; LInclude != NULL; LInclude = LInclude->NextLib)

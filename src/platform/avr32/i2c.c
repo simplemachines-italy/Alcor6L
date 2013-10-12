@@ -163,7 +163,7 @@ static void ARBITRATION_LOST(void); // Bus control was lost
 // Should be called at all valid initial i2c entry points.
 static void i2c_init()
 {
-  static bool i2c_is_initialized = 0;
+  static avr32_bool i2c_is_initialized = 0;
 
   if( i2c_is_initialized ) return;
 
@@ -378,7 +378,7 @@ static void ARBITRATION_LOST(void)
 // It returns the number of bytes that were sent and acknowledged
 // or -1 if the slave did not acknowledge its address.
 
-int i2c_send(u8 address, const u8 *data, unsigned len, bool stop)
+int i2c_send(u8 address, const u8 *data, unsigned len, avr32_bool stop)
 {
   int retval;
 
@@ -403,7 +403,7 @@ int i2c_send(u8 address, const u8 *data, unsigned len, bool stop)
 
 // i2c_recv() reads "count" bytes from a 7-bit slave device.
 // It returns the number of bytes sent or -1 if the slave did not acknowledge its address.
-int i2c_recv(u8 address, u8 *data, unsigned len, bool stop)
+int i2c_recv(u8 address, u8 *data, unsigned len, avr32_bool stop)
 {
   int retval;
 
@@ -426,7 +426,7 @@ int i2c_recv(u8 address, u8 *data, unsigned len, bool stop)
 
 // See whether a certain slave is present by writing 0 bytes from it.
 // Returns 1 if it is present or 0 if it didn't acknowledge its address.
-bool i2c_probe(u8 slave_address)
+avr32_bool i2c_probe(u8 slave_address)
 {
   return( i2c_send( slave_address, NULL, 0, true ) == 0 );
 }

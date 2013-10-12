@@ -1,8 +1,116 @@
 // Module for interfacing Lua code with a Controller Area Network (CAN)
+// Modified to include support for Alcor6L.
 
 #include "platform.h"
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************
+// CAN for tiny-basic.
+
+#include "scheme.h"
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// CAN for my-basic.
+
+#include "my_basic.h"
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+#include "pico.h"
+
+// ****************************************************************************
+// CAN for picoLisp.
+
+// (can-setup id clock) -> clock
+any can_setup(any ex) {
+  unsigned id;
+  u32 clock;
+  any x, y;
+
+  // get id.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, can, id);
+  
+  // get clock value.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  clock = unBox(y);
+
+  return box(platform_can_setup(id, clock));
+}
+
+// (can-send id canid canidtype 'message) -> message
+any can_send(any ex) {
+  size_t len;
+  int id, canid, idtype;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // id.
+  MOD_CHECK_ID(ex, can, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  canid = unBox(y); // can id.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  idtype = unBox(y); // id type.
+
+  x = cdr(x);
+  len = bufSize(y = EVAL(car(x)));
+  char data[len];
+  NeedSym(ex, y);
+  bufString(y, data); // can data.
+  
+  if (len > PLATFORM_CAN_MAXLEN)
+    err(NULL, x, "message exceeds max length");
+
+  platform_can_send(id, canid, idtype, len, (const u8 *)data);
+  return mkStr(data);
+}
+
+// (can-recv id) -> str
+any can_recv(any ex) {
+  u8 len, idtype, data[8];
+  int id;
+  u32 canid;
+  any x, y;
+  cell c1;
+
+  // get id.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y);
+  MOD_CHECK_ID(ex, can, id);
+
+  if (platform_can_recv(id,
+			&canid,
+			&idtype,
+			&len,
+			data) == PLATFORM_OK) {
+    Push(c1, y = cons(mkStr((char *)data), Nil));
+    Push(c1, y = cons(box(idtype), y));
+    Push(c1, y = cons(box(canid), y));
+    return Pop(c1);
+  } else {
+    return Nil;
+  }
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // CAN for PicoC.
@@ -12,15 +120,15 @@
 #include "rotable.h"
 
 // Platform variables
-const int id_std = ALCOR_CAN_ID_STD;
-const int id_ext = ALCOR_CAN_ID_EXT;
+static const int id_std = ELUA_CAN_ID_STD;
+static const int id_ext = ELUA_CAN_ID_EXT;
 
 // Library setup function */
 extern void can_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
-  picoc_tinyram_off("can_ID_STD", id_std);
-  picoc_tinyram_off("can_ID_EXT", id_ext);
+  picoc_def_integer("can_ID_STD", id_std);
+  picoc_def_integer("can_ID_EXT", id_ext);
 #endif
 }
 
@@ -32,10 +140,10 @@ static void can_setup(pstate *p, val *r, val **param, int n)
 
   id = param[0]->Val->UnsignedInteger;
   MOD_CHECK_ID(can, id);
-  clock = param[1]->Val->UnsignedInteger;
+  clock = param[1]->Val->UnsignedLongInteger;
   res = platform_can_setup(id, clock);
 
-  r->Val->UnsignedInteger = res;
+  r->Val->UnsignedLongInteger = res;
 }
 
 // picoc: can_send(id, canid, canidtype, message);
@@ -56,7 +164,7 @@ static void can_send(pstate *p, val *r, val **param, int n)
     return pmod_error("message exceeds max length");
 
   platform_can_send(id, canid, idtype, len, (const u8 *)data);
-  r->Val->Integer = len;
+  r->Val->UnsignedInteger = len;
 }
 
 // picoc: can_recv(id, &message);
@@ -70,7 +178,7 @@ static void can_recv(pstate *p, val *r, val **param, int n)
   MOD_CHECK_ID(can, id);
 
   if (platform_can_recv(id, &canid, &idtype, &len, data) == PLATFORM_OK) {
-    param[1]->Val->Identifier = data;
+    param[1]->Val->Identifier = (char *)data;
     r->Val->Integer = len;
   } else {
     r->Val->Integer = -1;
@@ -90,8 +198,8 @@ const PICOC_RO_TYPE can_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE can_library[] = {
-  {FUNC(can_setup), PROTO("unsigned int can_setup(unsigned int, unsigned int);")},
-  {FUNC(can_send), PROTO("int can_send(int, int, int, char *);")},
+  {FUNC(can_setup), PROTO("unsigned long can_setup(unsigned int, unsigned long);")},
+  {FUNC(can_send), PROTO("unsigned int can_send(int, int, int, char *);")},
   {FUNC(can_recv), PROTO("int can_recv(int, char *);")},
   {NILFUNC, NILPROTO}
 };
@@ -102,7 +210,9 @@ extern void can_library_init(void)
   REGISTER("can.h", &can_lib_setup_func, &can_library[0]);
 }
 
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // CAN for PicoC.
@@ -180,8 +290,8 @@ const LUA_REG_TYPE can_map[] =
   { LSTRKEY( "send" ),  LFUNCVAL( can_send ) },  
   { LSTRKEY( "recv" ),  LFUNCVAL( can_recv ) },
 #if LUA_OPTIMIZE_MEMORY > 0
-  { LSTRKEY( "ID_STD" ), LNUMVAL( ALCOR_CAN_ID_STD ) },
-  { LSTRKEY( "ID_EXT" ), LNUMVAL( ALCOR_CAN_ID_EXT ) },
+  { LSTRKEY( "ID_STD" ), LNUMVAL( ELUA_CAN_ID_STD ) },
+  { LSTRKEY( "ID_EXT" ), LNUMVAL( ELUA_CAN_ID_EXT ) },
 #endif
   { LNILKEY, LNILVAL }
 };
@@ -194,11 +304,11 @@ LUALIB_API int luaopen_can( lua_State *L )
   luaL_register( L, AUXLIB_CAN, can_map );
   
   // Module constants  
-  MOD_REG_NUMBER( L, "ID_STD", ALCOR_CAN_ID_STD );
-  MOD_REG_NUMBER( L, "ID_EXT", ALCOR_CAN_ID_EXT );
+  MOD_REG_NUMBER( L, "ID_STD", ELUA_CAN_ID_STD );
+  MOD_REG_NUMBER( L, "ID_EXT", ELUA_CAN_ID_EXT );
   
   return 1;
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA

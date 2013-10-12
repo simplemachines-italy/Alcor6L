@@ -26,10 +26,26 @@ typedef struct
 } SHELL_HELP_DATA;
 
 // Language specific includes.
-#ifdef ALCOR_LANG_PICOC
-SHELL_HELP( picoc );
-#else
-SHELL_HELP( lua );
+//
+#if defined ALCOR_LANG_TINYSCHEME
+  SHELL_HELP( tinyscheme );
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+  SHELL_HELP( mybasic );
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+  SHELL_HELP( picolisp );
+#endif
+
+#if defined ALCOR_LANG_PICOC
+  SHELL_HELP( picoc );
+#endif
+
+#if ALCOR_LANG_LUA
+  SHELL_HELP( lua );
+  SHELL_HELP( luac );
 #endif
 
 // Other shell commands.
@@ -60,10 +76,27 @@ static const char shell_help_summary_exit[] = "exit the shell";
 static const SHELL_HELP_DATA shell_help_data[] = 
 {
   SHELL_INFO( help ),
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+  SHELL_INFO( tinyscheme ),
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+  SHELL_INFO( mybasic ),
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+  SHELL_INFO( picolisp ),
+#endif
+
+#if defined ALCOR_LANG_PICOC
   SHELL_INFO( picoc ),
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
   SHELL_INFO( lua ),
+  SHELL_INFO( luac ),
 #endif
   SHELL_INFO( ls ),
   SHELL_INFO_ALIAS( dir, ls ),

@@ -1,12 +1,28 @@
 // Module for interfacing with ADC
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
-#ifdef ALCOR_LANG_PICOC
+// Language specific includes.
+//
+#if defined ALCOR_LANG_TINYSCHEME
+# include "scheme.h"
+#endif
+
+#if defined ALCOR_LANG_MYBASIC
+# include "my_basic.h"
+#endif
+
+#if defined ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#if defined ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#if defined ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -21,7 +37,135 @@
 
 #ifdef BUILD_ADC
 
-#ifdef ALCOR_LANG_PICOC
+#if defined ALCOR_LANG_TINYSCHEME
+
+// ****************************************************************************                                                
+// ADC (Analog to digital converter) module for tiny-basic.
+
+// TODO:
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// ADC (Analog to digital converter) module for my-basic.
+
+// TODO:
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// ADC (Analog to digital converter) module for picoLisp.
+
+// (adc-maxval 'num) -> num
+any adc_maxval(any ex) {
+  unsigned id;
+  u32 res;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  res = platform_adc_get_maxval(id);
+  return box(res);
+}
+
+// (adc-setclock 'num 'num 'num) -> num
+any adc_setclock(any ex) {
+  s32 sfreq; // signed version for negative checking.
+  u32 freq;
+  unsigned id, timer_id = 0;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get adc id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  sfreq = unBox(y); // get frequency.
+  if (sfreq < 0)
+    err(ex, y, "frequency must be 0 or positive");
+
+  freq = (u32) sfreq;
+  if (freq > 0) {
+    x = cdr(x);
+    NeedNum(ex, y = EVAL(car(x)));
+    timer_id = unBox(y); // get timer id.
+    MOD_CHECK_ID(ex, timer, timer_id);
+    MOD_CHECK_RES_ID(ex, adc, id, timer, timer_id);
+  }
+
+  platform_adc_set_timer(id, timer_id);
+  freq = platform_adc_set_clock(id, freq);
+  return box(freq);
+}
+
+// (adc-isdone) -> T | Nil
+any adc_isdone(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  return platform_adc_is_done(id) == 0 ?
+    T : Nil;
+}
+
+// (adc-setblocking 'num 'num) -> Nil
+any adc_setblocking(any ex) {
+  unsigned id, mode;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  mode = unBox(y); // get mode.
+
+  platform_adc_set_blocking(id, mode);
+  return Nil;
+}
+
+// (adc-setsmoothing 'num 'num) -> num
+any adc_setsmoothing(any ex) {
+  unsigned id, length, res;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  length = unBox(y); // get length.
+  if (!(length & (length - 1))) {
+    res = platform_adc_set_smoothing(id, length);
+    if (res == PLATFORM_ERR)
+      err(ex, NULL, "Buffer allocation failed.");
+    else
+      return box(res);
+  } else {
+    err(ex, y, "Length must be power of 2");
+  }
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for PicoC.
@@ -36,7 +180,7 @@ static void adc_maxval(pstate *p, val *r, val **param, int n)
   MOD_CHECK_ID(adc, id);
   res = platform_adc_get_maxval(id);
   
-  r->Val->UnsignedInteger = res;
+  r->Val->UnsignedLongInteger = res;
 }
 
 // PicoC: realclock = adc_setclock(id, freq, timer_id);
@@ -60,7 +204,7 @@ static void adc_setclock(pstate *p, val *r, val **param, int n)
   
   platform_adc_set_timer(id, timer_id);
   freq = platform_adc_set_clock(id, freq);
-  r->Val->UnsignedInteger = freq;
+  r->Val->UnsignedLongInteger = freq;
 }
 
 // PicoC: data = adc_isdone(id);
@@ -95,10 +239,12 @@ static void adc_setsmoothing(pstate *p, val *r, val **param, int n)
   length = param[1]->Val->UnsignedInteger;
   if (!(length & (length - 1))) {
     res = platform_adc_set_smoothing(id, length);
-    if (res == PLATFORM_ERR)
+    if (res == PLATFORM_ERR) {
       return pmod_error("Buffer allocation failed.");
-    else
+    } else {
+      r->Val->UnsignedInteger = res;
       return;
+    }      
   } else {
     return pmod_error("Length must be power of 2");
   }
@@ -218,11 +364,11 @@ static void adc_insertsamples(pstate *p, val *r, val **param, int n)
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE adc_library[] = {
-  {FUNC(adc_maxval), PROTO("unsigned int adc_maxval(void);")},
-  {FUNC(adc_setclock), PROTO("unsigned int adc_setclock(unsigned int, long, unsigned int);")},
+  {FUNC(adc_maxval), PROTO("unsigned long adc_maxval(unsigned int);")},
+  {FUNC(adc_setclock), PROTO("unsigned long adc_setclock(unsigned int, long, unsigned int);")},
   {FUNC(adc_isdone), PROTO("unsigned int adc_isdone(unsigned int);")},
   {FUNC(adc_setblocking), PROTO("void adc_setblocking(unsigned int, unsigned int);")},
-  {FUNC(adc_setsmoothing), PROTO("void adc_setsmoothing(void);")},
+  {FUNC(adc_setsmoothing), PROTO("unsigned int adc_setsmoothing(unsigned int, unsigned int);")},
   {FUNC(adc_sample), PROTO("int adc_sample(unsigned int, unsigned int);")},
   {FUNC(adc_getsample), PROTO("int adc_getsample(unsigned int);")},
 #if defined (BUF_ENABLE_ADC)
@@ -239,7 +385,9 @@ extern void adc_library_init(void)
   REGISTER("adc.h", NULL, &adc_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
 // ADC (Analog to digital converter) module for Lua.
@@ -486,4 +634,4 @@ LUALIB_API int luaopen_adc( lua_State *L )
 
 #endif
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
