@@ -17,6 +17,7 @@ usage="	avr32program	Use JTAG programmer instead of dfu bootloader
 	picoc,picoclong Compile picoc with floating point or without
 	picolisp	Compile picolisp
 	mybasic		Compile mybasic
+	tinyscheme	Compile tinyscheme
 	simple		Use simple allocator (default for 128)
 	multiple	Use multiple allocator (default for 256/512)
 	newlib		Use newlib's allocator
@@ -40,7 +41,7 @@ if [ "$1" = "-a" ]; then
 	for target in lua lualong lualonglong \
 		      mybasic \
 		      picoc picoclong \
-		      picolisp
+		      picolisp tinyscheme
 	do
 		echo -n "${target}: "
 		if $0 $target noprog "$@" > errs 2>&1; then
@@ -94,6 +95,7 @@ do
   picoc)  lang=picoc; target=fp ;;
   picoclong)  lang=picoc; target=long ;;
   picolisp)  lang=picolisp; target=fp ;;
+  tinyscheme)  lang=tinyscheme; target=fp ;;
 
   128|256|512) flash=$arg ;;
 
@@ -219,7 +221,7 @@ date=`date +%Y%m%d`
 case "$(basename $(pwd))" in
 elua*)	firmware=elua_${target}_${part} ;;
 *)	case "$lang" in
-	elua|mybasic|picoc|picolisp) firmware=Alcor6L_${lang}_${target}_${part}_${date} ;;
+	elua|mybasic|picoc|picolisp|tinyscheme) firmware=Alcor6L_${lang}_${target}_${part}_${date} ;;
 	*)   echo "Unrecognised lang \"$lang\"" ; exit 1 ;;
 	esac ;;
 esac
