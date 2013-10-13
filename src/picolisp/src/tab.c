@@ -336,7 +336,22 @@ void initSymbols(void) {
 #ifdef PICOLISP_MOD_SPI
    plisp_spi_master = initSym(box(PLATFORM_SPI_MASTER), "*spi-master*");
    plisp_spi_slave = initSym(box(PLATFORM_SPI_SLAVE), "*spi-slave*");
-#endif   
+#endif
+
+   // pio symbols.
+#ifdef PICOLISP_MOD_PIO
+   // these two macros are defined locally in modules/pio.c
+   // since they can't be accessed from here, we're defining
+   // them here again.
+   #define PIO_DIR_INPUT  1
+   #define PIO_DIR_OUTPUT 0
+
+   plisp_pio_input = initSym(box(PIO_DIR_INPUT), "*pio-input*");
+   plisp_pio_output = initSym(box(PIO_DIR_OUTPUT), "*pio-output*");
+   plisp_pio_pullup = initSym(box(PLATFORM_IO_PIN_PULLUP), "*pio-pullup*");
+   plisp_pio_pulldown = initSym(box(PLATFORM_IO_PIN_PULLDOWN), "*pio-pulldown*");
+   plisp_pio_nopull = initSym(box(PLATFORM_IO_PIN_NOPULL), "*pio-nopull*");
+#endif
 
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 

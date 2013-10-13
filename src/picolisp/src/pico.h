@@ -177,11 +177,22 @@ extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
 any sys_timer;
 
 // i2c symbols.
-any plisp_i2c_fast, plisp_i2c_slow, plisp_i2c_trans, plisp_i2c_recv;
+any plisp_i2c_fast;
+any plisp_i2c_slow;
+any plisp_i2c_trans;
+any plisp_i2c_recv;
 
 // spi symbols.
-any plisp_spi_master, plisp_spi_slave;
+any plisp_spi_master;
+any plisp_spi_slave;
 
+// pio symbols.
+any plisp_pio_input;
+any plisp_pio_output;
+any plisp_pio_pullup;
+any plisp_pio_pulldown;
+any plisp_pio_nopull; 
+  
 // Alcor6L platform modules.
 any pd_platform(any x);
 any pd_cpu(any x);
@@ -253,6 +264,21 @@ any plisp_spi_sson(any ex);
 any plisp_spi_ssoff(any ex);
 any plisp_spi_setup(any ex);
 any plisp_spi_write(any ex);
+
+// gpio module.
+any plisp_pio_pin_setdir(any ex);
+any plisp_pio_pin_setpull(any ex);
+any plisp_pio_pin_setval(any ex);
+any plisp_pio_pin_sethigh(any ex);
+any plisp_pio_pin_setlow(any ex);
+any plisp_pio_pin_getval(any ex);
+any plisp_pio_port_setdir(any ex);
+any plisp_pio_port_setpull(any ex);
+any plisp_pio_port_setval(any ex);
+any plisp_pio_port_sethigh(any ex);
+any plisp_pio_port_setlow(any ex);
+any plisp_pio_port_getval(any ex);
+any plisp_pio_decode(any ex);
 
 #include "platform_picolisp.h"
 

@@ -15,13 +15,13 @@
 #define PICOLISP_LIB_DEFINE(fun, mod)\
   {fun, #mod}
 
-// Platform module.
+// platform data module.
 #define PICOLISP_MOD_PD\
   PICOLISP_LIB_DEFINE(pd_platform, pd-platform),\
   PICOLISP_LIB_DEFINE(pd_cpu, pd-cpu),\
   PICOLISP_LIB_DEFINE(pd_board, pd-board),
 
-// Terminal module.
+// terminal module.
 #define PICOLISP_MOD_TERM\
   PICOLISP_LIB_DEFINE(plisp_term_clrscr, term-clrscr),\
   PICOLISP_LIB_DEFINE(plisp_term_clreol, term-clreol),\
@@ -44,6 +44,7 @@
   PICOLISP_LIB_DEFINE(elua_save_history, elua-save-history),\
   PICOLISP_LIB_DEFINE(elua_shell, elua-shell),
 
+// cpu module.
 #define PICOLISP_MOD_CPU\
   PICOLISP_LIB_DEFINE(cpu_w32, cpu-w32),\
   PICOLISP_LIB_DEFINE(cpu_r32, cpu-r32),\
@@ -53,6 +54,7 @@
   PICOLISP_LIB_DEFINE(cpu_r8, cpu-r8),\
   PICOLISP_LIB_DEFINE(cpu_clock, cpu-clock),
 
+// timer module.
 #define PICOLISP_MOD_TIMER\
   PICOLISP_LIB_DEFINE(tmr_delay, tmr-delay),\
   PICOLISP_LIB_DEFINE(tmr_read, tmr-read),\
@@ -64,6 +66,7 @@
   PICOLISP_LIB_DEFINE(tmr_setclock, tmr-setclock),\
   PICOLISP_LIB_DEFINE(tmr_getclock, tmr-getclock),
 
+// i2c module.
 #define PICOLISP_MOD_I2C\
   PICOLISP_LIB_DEFINE(plisp_i2c_setup, i2c-setup),\
   PICOLISP_LIB_DEFINE(plisp_i2c_start, i2c-start),\
@@ -72,6 +75,7 @@
   PICOLISP_LIB_DEFINE(plisp_i2c_write, i2c-write),\
   PICOLISP_LIB_DEFINE(plisp_i2c_read, i2c-read),
 
+// pwm module.
 #define PICOLISP_MOD_PWM\
   PICOLISP_LIB_DEFINE(plisp_pwm_setup, pwm-setup),\
   PICOLISP_LIB_DEFINE(plisp_pwm_start, pwm-start),\
@@ -79,11 +83,28 @@
   PICOLISP_LIB_DEFINE(plisp_pwm_setclock, pwm-setclock),\
   PICOLISP_LIB_DEFINE(plisp_pwm_getclock, pwm-getclock),
 
+// spi module.
 #define PICOLISP_MOD_SPI\
   PICOLISP_LIB_DEFINE(plisp_spi_sson, spi-sson),\
   PICOLISP_LIB_DEFINE(plisp_spi_ssoff, spi-ssoff),\
   PICOLISP_LIB_DEFINE(plisp_spi_setup, spi-setup),\
   PICOLISP_LIB_DEFINE(plisp_spi_write, spi-write),
+
+// gpio module.
+#define PICOLISP_MOD_PIO\
+  PICOLISP_LIB_DEFINE(plisp_pio_pin_setdir, pio-pin-setdir),\
+  PICOLISP_LIB_DEFINE(plisp_pio_pin_setpull, pio-pin-setpull),\
+  PICOLISP_LIB_DEFINE(plisp_pio_pin_setval, pio-pin-setval),\
+  PICOLISP_LIB_DEFINE(plisp_pio_pin_sethigh, pio-pin-sethigh),\
+  PICOLISP_LIB_DEFINE(plisp_pio_pin_setlow, pio-pin-setlow),\
+  PICOLISP_LIB_DEFINE(plisp_pio_pin_getval, pio-pin-getval),\
+  PICOLISP_LIB_DEFINE(plisp_pio_port_setdir, pio-port-setdir),\
+  PICOLISP_LIB_DEFINE(plisp_pio_port_setpull, pio-port-setpull),\
+  PICOLISP_LIB_DEFINE(plisp_pio_port_setval, pio-port-setval),\
+  PICOLISP_LIB_DEFINE(plisp_pio_port_sethigh, pio-port-sethigh),\
+  PICOLISP_LIB_DEFINE(plisp_pio_port_setlow, pio-port-setlow),\
+  PICOLISP_LIB_DEFINE(plisp_pio_port_getval, pio-port-getval),\
+  PICOLISP_LIB_DEFINE(plisp_pio_decode, pio-decode),
 
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\

@@ -51,109 +51,133 @@ static pio_type pio_masks[ PLATFORM_IO_PORTS ];
 // Generic helper functions
 
 // Helper function: clear all masks
-static void pioh_clear_masks(void)
-{
+//
+static void pioh_clear_masks(void) {
   int i;
   
   for (i = 0; i < PLATFORM_IO_PORTS; i++)
     pio_masks[i] = 0;
 }
 
-#if defined ALCOR_LANG_TINYSCHEME
+// Lua has a seperate set of helper functions.
+// We need a set of generic helper functions
+// for the other languages in ALcor6L.
+//
+#ifndef ALCOR_LANG_LUA
 
-// **************************************************************************** 
-// PIO module for tiny-scheme.
+# define emit_pio_numeric_ident()\
+  pio_value_parse(char *key)
 
-// TODO:
+#else
 
-#endif // ALCOR_LANG_TINYSCHEME
+# define emit_pio_numeric_ident()\
+  pio_mt_index(lua_State *L)
 
-#if defined ALCOR_LANG_MYBASIC
+# define emit_static static
+# define emit_ret_type int
+# define emit_pio_decode()\
+  pio_decode(lua_State *L)
 
-// ****************************************************************************
-// PIO module for my-basic.
+#endif
 
-// TODO:
+#ifdef ALCOR_LANG_PICOLISP
 
-#endif // ALCOR_LANG_MYBASIC
+# define emit_hfunc_set_pin()\
+  plisp_pioh_set_pin(any ex, any y, int v, int op)
 
-#if defined ALCOR_LANG_PICOLISP
+# define emit_hfunc_set_port()\
+  plisp_pioh_set_port(any ex, any y, int v, int op, pio_type mask)
 
-// ****************************************************************************
-// PIO module for picoLisp.
+# define emit_hfunc_setdir()\
+  plisp_pio_gen_setdir(any ex, any y, int v, int optype, int op)
 
-// TODO:
+# define emit_hfunc_setpull()\
+  plisp_pio_gen_setpull(any ex, any y, int v, int optype, int op)
+
+# define emit_hfunc_setval()\
+  plisp_pio_gen_setval(any ex, any y, int v, int optype, pio_type val)
+
+# define emit_hfunc_error(msg)\
+  err(ex, y, msg);
+
+# define emit_static
+# define emit_ret_type any
+# define emit_pio_decode()\
+  plisp_pio_decode(any ex)
 
 #endif // ALCOR_LANG_PICOLISP
 
-#if defined ALCOR_LANG_PICOC
+#ifdef ALCOR_LANG_PICOC
 
-// ****************************************************************************
-// PIO module for PicoC.
+# define emit_hfunc_set_pin()\
+  picoc_pioh_set_pin(int v, int op)
 
-// forward declare.
-static int pio_value_parse(char *key);
+# define emit_hfunc_set_port()\
+  picoc_pioh_set_port(int v, int op, pio_type mask)
 
-// Helper macro to check port/pin.
-#define PICOC_PIO_CHECK(x)\
+# define emit_hfunc_setdir()\
+  picoc_pio_gen_setdir(int v, int optype, int op)
+
+# define emit_hfunc_setpull()\
+  picoc_pio_gen_setpull(int v, int optype, int op)
+
+# define emit_hfunc_setval()\
+  picoc_pio_gen_setval(int v, int optype, pio_type val)
+
+# define emit_hfunc_error(msg)\
+  pmod_error(msg);
+
+# define emit_static static
+# define emit_ret_type void
+# define emit_pio_decode()\
+  picoc_pio_decode(pstate *p, val *r, val **param, int n)
+
+#endif // ALCOR_LANG_PICOC
+
+#ifndef ALCOR_LANG_LUA
+
+// helper macro.
+#define PIO_CHECK(x)\
   if (!x)\
-    return pmod_error("Invalid port/pin");
+    emit_hfunc_error("Invalid port/pin");
 
-// Platform variables.
-static const int input = PIO_DIR_INPUT;
-static const int output = PIO_DIR_OUTPUT;
-static const int pull_up = PLATFORM_IO_PIN_PULLUP;
-static const int pull_down = PLATFORM_IO_PIN_PULLDOWN;
-static const int no_pull = PLATFORM_IO_PIN_NOPULL;
-
-extern void pio_lib_setup_func(void)
-{
-#if PICOC_TINYRAM_OFF
-  picoc_def_integer("pio_OUTPUT", output);
-  picoc_def_integer("pio_INPUT", input);
-  picoc_def_integer("pio_PULLUP", pull_up);
-  picoc_def_integer("pio_PULLDOWN", pull_down);
-  picoc_def_integer("pio_NOPULL", no_pull);
-#endif
-}
-
-static int pioh_set_pin(int v, int op)
-{
+static int emit_hfunc_set_pin() {
   pio_type pio_mask = 0;
   int port, pin;
-  
+
   pioh_clear_masks();
   port = PLATFORM_IO_GET_PORT(v);
   pin = PLATFORM_IO_GET_PIN(v);
-  
-  if (PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port) ||
+
+  if (PLATFORM_IO_IS_PORT(v) ||
+      !platform_pio_has_port(port) ||
       !platform_pio_has_pin(port, pin))
-    pmod_error("invalid pin");
+    emit_hfunc_error("invalid pin");
 
   pio_mask |= 1 << pin;
   if (pio_mask)
     if (!platform_pio_op(port, pio_mask, op))
-      pmod_error("invalid PIO operation");
+      emit_hfunc_error("invalid PIO operation");
   return 0;
 }
 
-static int pioh_set_port(int v, int op, pio_type mask)
-{
+static int emit_hfunc_set_port() {
   int port;
   u32 port_mask = 0;
 
   port = PLATFORM_IO_GET_PORT(v);
-  if (!PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port))
-    pmod_error("invalid port");
+  if (!PLATFORM_IO_IS_PORT(v) ||
+      !platform_pio_has_port(port))
+    emit_hfunc_error("invalid port");
+
   port_mask |= (1ULL << port);
   if (port_mask & (1ULL << port))
     if (!platform_pio_op(port, mask, op))
-      pmod_error("invalid PIO operation");
+      emit_hfunc_error("invalid PIO operation");
   return 0;
 }
 
-static int pio_gen_setdir(int v, int optype, int op)
-{
+static int emit_hfunc_setdir() {
   if (op == PIO_DIR_INPUT)
     op = optype == PIO_PIN_OP ? PLATFORM_IO_PIN_DIR_INPUT :
       PLATFORM_IO_PORT_DIR_INPUT;
@@ -161,235 +185,102 @@ static int pio_gen_setdir(int v, int optype, int op)
     op = optype == PIO_PIN_OP ? PLATFORM_IO_PIN_DIR_OUTPUT :
       PLATFORM_IO_PORT_DIR_OUTPUT;
   else
-    pmod_error("invalid direction");
+    emit_hfunc_error("invalid direction");
 
-  if (optype == PIO_PIN_OP)
-    pioh_set_pin(v, op);
-  else
-    pioh_set_port(v, op, PLATFORM_IO_ALL_PINS);
+  // Language specific function calls start
+  // here.
+  //
+
+  // Check if pin operation.
+  if (optype == PIO_PIN_OP) {
+#ifdef ALCOR_LANG_PICOC
+    picoc_pioh_set_pin(v, op);
+#endif
+#ifdef ALCOR_LANG_PICOLISP
+    plisp_pioh_set_pin(ex, y, v, op);
+#endif
+  // else, we have a port operation.
+  } else {
+#ifdef ALCOR_LANG_PICOC
+    picoc_pioh_set_port(v, op, PLATFORM_IO_ALL_PINS);
+#endif
+#ifdef ALCOR_LANG_PICOLISP
+    plisp_pioh_set_port(ex, y, v, op, PLATFORM_IO_ALL_PINS);
+#endif
+  }
   return 0;
 }
 
-static int pio_gen_setpull(int v, int optype, int op)
-{
+static int emit_hfunc_setpull() {
   if ((op != PLATFORM_IO_PIN_PULLUP) &&
       (op != PLATFORM_IO_PIN_PULLDOWN) &&
       (op != PLATFORM_IO_PIN_NOPULL))
-    pmod_error("invalid pull type");
+    emit_hfunc_error("invalid pull type");
 
-  if (optype == PIO_PIN_OP)
-    pioh_set_pin(v, op);
-  else
-    pioh_set_port(v, op, PLATFORM_IO_ALL_PINS);
-
-  return 0;
-}
-
-static int pio_gen_setval(int v, int optype, pio_type val)
-{
-  if ((optype == PIO_PIN_OP) && (val != 1) && (val != 0))
-    pmod_error("invalid pin value");
-
-  if (optype == PIO_PIN_OP)
-    pioh_set_pin(v, val == 1 ? PLATFORM_IO_PIN_SET : PLATFORM_IO_PIN_CLEAR);
-  else
-    pioh_set_port(v, val == 1 ? PLATFORM_IO_PIN_SET : PLATFORM_IO_PIN_CLEAR, val);
-  return 0;
-}
-
-// ****************************************************************************
-// Pin operations
-
-// PicoC: pin_setdir(dir, "pin");
-static void pio_pin_setdir(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[1]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-  int dir = param[0]->Val->Integer;
-
-  r->Val->Integer = pio_gen_setdir(ret, PIO_PIN_OP, dir);
-}
-
-// PicoC: pio_pin_setpull(pull, "pin");
-static void pio_pin_setpull(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[1]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-  int dir = param[0]->Val->Integer;
-
-  r->Val->Integer = pio_gen_setpull(ret, PIO_PIN_OP, dir);
-}
-
-// PicoC: pio_pin_setval(val, "pin");
-static void pio_pin_setval(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[1]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-  pio_type val = (pio_type)param[0]->Val->UnsignedInteger;
-
-  r->Val->Integer = pio_gen_setval(ret, PIO_PIN_OP, val);
-}
-
-// PicoC: pio_pin_sethigh("pin");
-static void pio_pin_sethigh(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[0]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-
-  r->Val->Integer = pio_gen_setval(ret, PIO_PIN_OP, 1);
-}
-
-// PicoC: pio_pin_setlow("pin");
-static void pio_pin_setlow(pstate *p , val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[0]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-
-  r->Val->Integer = pio_gen_setval(ret, PIO_PIN_OP, 0);
-}
-
-// PicoC: pin_val = pio_pin_getval("pin");
-static void pio_pin_getval(pstate *p, val *r, val **param, int n)
-{
-  pio_type value;
-  int v, port, pin;
-  
-  v = pio_value_parse(param[0]->Val->Identifier);
-  PICOC_PIO_CHECK(v);
-  port = PLATFORM_IO_GET_PORT(v);
-  pin = PLATFORM_IO_GET_PIN(v);
-  
-  if (PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port) ||
-      !platform_pio_has_pin(port, pin)) {
-    return pmod_error("Invalid pin");
-  } else {
-    value = platform_pio_op(port, 1 << pin, PLATFORM_IO_PIN_GET);
-    r->Val->UnsignedInteger = value;
-  }
-}
-
-// ****************************************************************************
-// Port operations
-
-// PicoC: pio_port_setdir(dir, "port");
-static void pio_port_setdir(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[1]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-  int dir = param[0]->Val->Integer;
-
-  r->Val->Integer = pio_gen_setdir(ret, PIO_PORT_OP, dir);
-}
-
-// PicoC: pio_port_setpull(pull, "port");
-static void pio_port_setpull(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[1]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-  int dir = param[0]->Val->Integer;
-  
-  r->Val->Integer = pio_gen_setpull(ret, PIO_PORT_OP, dir);
-}
-
-// PicoC: pio_port_setval(val, "port");
-static void pio_port_setval(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[1]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-  pio_type val = (pio_type)param[0]->Val->UnsignedInteger;
-  
-  r->Val->Integer = pio_gen_setval(ret, PIO_PORT_OP, val);
-}
-
-// PicoC: pio_port_sethigh("port");
-static void pio_port_sethigh(pstate *p, val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[0]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-
-  r->Val->Integer = pio_gen_setval(ret, PIO_PORT_OP, 1);
-}
-
-// PicoC: pio_port_setlow("port");
-static void pio_port_setlow(pstate *p , val *r, val **param, int n)
-{
-  int ret = pio_value_parse(param[0]->Val->Identifier);
-  PICOC_PIO_CHECK(ret);
-
-  r->Val->Integer = pio_gen_setval(ret, PIO_PORT_OP, 0);
-}
-
-// PicoC: val = pio_port_getval("port");
-static void pio_port_getval(pstate *p, val *r, val **param, int n)
-{
-  pio_type value;
-  int v, port;
-
-  v = pio_value_parse(param[0]->Val->Identifier);
-  PICOC_PIO_CHECK(v);
-  port = PLATFORM_IO_GET_PORT(v);
-  
-  if (!PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port)) {
-    pmod_error("Invalid port");
-  } else {
-    value = platform_pio_op(port, PLATFORM_IO_ALL_PINS, PLATFORM_IO_PORT_GET_VALUE);
-    r->Val->UnsignedInteger = value;
-  }
-}
-
-// The 'decode' function returns a port/pin pair
-// from a platform code.
-// PicoC: pio_decode(code, &pin_code, &port_code);
-static void pio_decode(pstate *p, val *r, val **param, int n)
-{
-  int code = param[0]->Val->Integer;
-  int port = PLATFORM_IO_GET_PORT(code);
-  int pin = PLATFORM_IO_GET_PIN(code);
-  
-#ifdef ALCOR_PLATFORM_AVR32
-  /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
-   * random areas of hardware ports 2 and 3:
-   * PX00-PX04 = GPIO100-GPIO96     //Port 3 pins 04-00
-   * PX05-PX10 = GPIO95-GPIO90      //Port 2 pins 31-26
-   * PX11-PX14 = GPIO109-GPIO106    //Port 3 pins 13-10
-   * PX15-PX34 = GPIO89-GPIO70      //Port 2 pins 25-06
-   * PX35-PX39 = GPIO105-GPIO101    //Port 3 pins 09-05
-   *
-   * Here, we reverse the decode the hardware port/pins to the PX pin names.
-   * This is the inverse of the code above in pio_mt_index().
-   */
-  if ((port == 2 && pin >= 6) ||
-      (port == 3 && pin <= 13)) {
-    switch (port) {
-    case 2:
-      if (pin >= 26)
-	pin = (26 + 10) - pin;  // PX05-PX10
-      else
-	pin = (25 + 15) - pin;  // PX15-PX34
-      break;
-    case 3:
-      if (pin <= 4)
-	pin = 4 - pin;          // PX00-PX04
-      else if (pin <= 9)
-	pin = (35 + 9) - pin;   // PX35-PX39
-      else /* 10-13 */
-	pin = (13 + 11) - pin;  // PX11-PX14
-      break;
-    }
-    port = 'X' - 'A';   // 'A','B','C' are returned as 0,1,2 so 'X' is 23
-  }
+  // Check if pin operation.
+  if (optype == PIO_PIN_OP) {
+#ifdef ALCOR_LANG_PICOC
+    picoc_pioh_set_pin(v, op);
 #endif
+#ifdef ALCOR_LANG_PICOLISP
+    plisp_pioh_set_pin(ex, y, v, op);
+#endif
+  // else, we have a port operation.
+  } else {
+#ifdef ALCOR_LANG_PICOC
+    picoc_pioh_set_port(v, op, PLATFORM_IO_ALL_PINS);
+#endif
+#ifdef ALCOR_LANG_PICOLISP
+    plisp_pioh_set_port(ex, y, v, op, PLATFORM_IO_ALL_PINS);
+#endif
+  }
 
-  *((int *)param[1]->Val->Pointer) = port;
-  *((int *)param[2]->Val->Pointer) = pin;
+  return 0;
 }
+
+static int emit_hfunc_setval() {
+  if ((optype == PIO_PIN_OP) &&
+      (val != 1) &&
+      (val != 0))
+    emit_hfunc_error("invalid pin value");
+ 
+  // Check if a pin operation.
+  if (optype == PIO_PIN_OP) {
+#ifdef ALCOR_LANG_PICOC
+    picoc_pioh_set_pin(v, val == 1 ?
+		       PLATFORM_IO_PIN_SET :
+		       PLATFORM_IO_PIN_CLEAR);
+#endif
+#ifdef ALCOR_LANG_PICOLISP
+    plisp_pioh_set_pin(ex, y, v, val == 1 ?
+		       PLATFORM_IO_PIN_SET :
+		       PLATFORM_IO_PIN_CLEAR);
+#endif
+  // else, we have a port operation.
+  } else {
+#ifdef ALCOR_LANG_PICOC
+    picoc_pioh_set_port(v, val == 1 ?
+			PLATFORM_IO_PIN_SET :
+			PLATFORM_IO_PIN_CLEAR, val);
+#endif
+#ifdef ALCOR_LANG_PICOLISP
+    plisp_pioh_set_port(ex, y, v, val == 1 ?
+			PLATFORM_IO_PIN_SET :
+			PLATFORM_IO_PIN_CLEAR, val);
+#endif
+  }
+  return 0;
+}
+
+#endif // #ifndef ALCOR_LANG_LUA
 
 // Helper function.
 // returns pin/port numeric identifiers.
-static int pio_value_parse(char *key)
-{
+static int emit_pio_numeric_ident() {
   int port = 0xFFFF, pin = 0xFFFF, isport = 0, sz;
- 
+#ifdef ALCOR_LANG_LUA
+  const char *key = luaL_checkstring(L, 2);
+#endif
   if (!key || *key != 'P')
     return 0;
   if (isupper(key[1])) { // PA, PB, ...
@@ -413,7 +304,7 @@ static int pio_value_parse(char *key)
        *
        * This "Port X" exists in EVK1100 and MIZAR32 but not on EVK1101, which
        * only has ports A and B. On EXK1101, the PC and PX syntax will still be
-       * accepted but will return nil thanks to the checks against NUM_PIO.
+       * accepted but will return nil thanks to the checks against NUM_PIO. 
        */
 
       // Disallow "PC_06-PC_31" as aliases for PX pins
@@ -466,10 +357,549 @@ static int pio_value_parse(char *key)
     if (platform_pio_has_port(port) && platform_pio_has_pin(port, pin))
       sz = PLATFORM_IO_ENCODE(port, pin, 0);
   }
-  if (sz == -1)
+  if (sz == -1) {
     return 0;
-  else
+  } else {
+#ifdef ALCOR_LANG_LUA
+    lua_pushinteger(L, sz);
+    return 1;
+#else
     return sz;
+#endif
+  }
+}
+
+// The 'decode' function returns a port/pin pair
+// from a platform code.
+//
+emit_static emit_ret_type emit_pio_decode() {
+  int code, port, pin;
+
+  // Lua specific code here.
+#ifdef ALCOR_LANG_LUA
+  code = (int)luaL_checkinteger(L, 1);
+#endif
+
+  // PicoC specific code here.
+#ifdef ALCOR_LANG_PICOC
+  code = param[0]->Val->Integer;
+#endif
+
+  // picoLisp specific code here.
+#ifdef ALCOR_LANG_PICOLISP
+  any x, y;
+  cell c1;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  code = unBox(y); // get code.
+#endif
+
+  // finally, something common for all
+  // languages.
+  //
+  // get pin and port values.
+  port = PLATFORM_IO_GET_PORT(code);
+  pin = PLATFORM_IO_GET_PIN(code);
+
+#ifdef ALCOR_PLATFORM_AVR32
+  /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
+   * random areas of hardware ports 2 and 3:
+   * PX00-PX04 = GPIO100-GPIO96     //Port 3 pins 04-00
+   * PX05-PX10 = GPIO95-GPIO90      //Port 2 pins 31-26
+   * PX11-PX14 = GPIO109-GPIO106    //Port 3 pins 13-10                       
+   * PX15-PX34 = GPIO89-GPIO70      //Port 2 pins 25-06
+   * PX35-PX39 = GPIO105-GPIO101    //Port 3 pins 09-05
+   *
+   * Here, we reverse the decode the hardware port/pins to the PX pin names.
+   * This is the inverse of the code above in pio_mt_index().
+   */
+  if ((port == 2 && pin >= 6) ||
+      (port == 3 && pin <= 13)) {
+    switch (port) {
+    case 2:
+      if (pin >= 26)
+        pin = (26 + 10) - pin;  // PX05-PX10
+      else
+        pin = (25 + 15) - pin;  // PX15-PX34
+      break;
+    case 3:
+      if (pin <= 4)
+        pin = 4 - pin;          // PX00-PX04
+      else if (pin <= 9)
+        pin = (35 + 9) - pin;   // PX35-PX39
+      else /* 10-13 */
+        pin = (13 + 11) - pin;  // PX11-PX14
+      break;
+    }
+    port = 'X' - 'A';   // 'A','B','C' are returned as 0,1,2 so 'X' is 23
+  }
+#endif
+
+#ifdef ALCOR_LANG_PICOC
+  *((int *)param[1]->Val->Pointer) = port;
+  *((int *)param[2]->Val->Pointer) = pin;
+#endif
+
+#ifdef ALCOR_LANG_PICOLISP
+  Push(c1, y = cons(box(port), Nil));
+  Push(c1, y = cons(box(pin), y));
+  return Pop(c1);
+#endif
+
+#ifdef ALCOR_LANG_LUA
+  lua_pushinteger(L, port);
+  lua_pushinteger(L, pin);
+  return 2;
+#endif
+}
+
+#if defined ALCOR_LANG_TINYSCHEME
+
+// **************************************************************************** 
+// PIO module for tiny-scheme.
+
+// TODO:
+
+#endif // ALCOR_LANG_TINYSCHEME
+
+#if defined ALCOR_LANG_MYBASIC
+
+// ****************************************************************************
+// PIO module for my-basic.
+
+// TODO:
+
+#endif // ALCOR_LANG_MYBASIC
+
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// PIO module for picoLisp.
+//
+// Pin operations.
+
+// (pio-pin-setdir 'sym 'num) -> Nil
+any plisp_pio_pin_setdir(any ex) {
+  any x, y;
+  int ret, dir;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  // get direction.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
+  plisp_pio_gen_setdir(ex, NULL, ret, PIO_PIN_OP, dir);
+  return Nil;
+}
+
+// (pio-pin-setpull 'sym 'num) -> Nil
+any plisp_pio_pin_setpull(any ex) {
+  any x, y;
+  int ret, dir;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+  
+  // get direction.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+  
+  plisp_pio_gen_setpull(ex, NULL, ret, PIO_PIN_OP, dir);
+  return Nil;
+}
+
+// (pio-pin-setval 'sym 'num) -> Nil
+any plisp_pio_pin_setval(any ex) {
+  any x, y;
+  int ret; pio_type val;
+
+  // get symbol. 
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  // get direction.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  val = unBox(y);
+
+  plisp_pio_gen_setval(ex, NULL, ret, PIO_PIN_OP, val);
+  return Nil;
+}
+
+// (pio-pin-sethigh 'sym) -> Nil
+any plisp_pio_pin_sethigh(any ex) {
+  any x, y;
+  int ret;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  plisp_pio_gen_setval(ex, NULL, ret, PIO_PIN_OP, 1);
+  return Nil;
+}
+
+// (pio-pin-setlow 'sym) -> Nil
+any plisp_pio_pin_setlow(any ex) {
+  any x, y;
+  int ret;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  plisp_pio_gen_setval(ex, NULL, ret, PIO_PIN_OP, 0);
+  return Nil;
+}
+
+// (pio-pin-getval 'sym) -> num
+any plisp_pio_pin_getval(any ex) {
+  pio_type value;
+  int v, port, pin;
+  any x, y;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  v = pio_value_parse(s);
+  PIO_CHECK(v);
+
+  port = PLATFORM_IO_GET_PORT(v);
+  pin = PLATFORM_IO_GET_PIN(v);
+
+  if (PLATFORM_IO_IS_PORT(v) ||
+      !platform_pio_has_port(port) ||
+      !platform_pio_has_pin(port, pin)) {
+    emit_hfunc_error("invalid pin");
+  } else {
+    value = platform_pio_op(port,
+			    1 << pin,
+			    PLATFORM_IO_PIN_GET);
+    return box(value);
+  }
+}
+
+// ****************************************************************************
+// Port operations
+
+// (pio-port-setdir 'sym 'num) -> Nil
+any plisp_pio_port_setdir(any ex) {
+  any x, y;
+  int ret, dir;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  // get direction.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
+  plisp_pio_gen_setdir(ex, NULL, ret, PIO_PORT_OP, dir);
+  return Nil;
+}
+
+// (pio-pin-setpull 'sym 'num) -> Nil 
+any plisp_pio_port_setpull(any ex) {
+  any x, y;
+  int ret, dir;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  // get pull.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
+  plisp_pio_gen_setpull(ex, NULL, ret, PIO_PORT_OP, dir);
+  return Nil;
+}
+
+// (pio-pin-setval 'sym) -> Nil
+any plisp_pio_port_setval(any ex) {
+  any x, y;
+  int ret; pio_type val;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  // get value.
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  val = (pio_type)unBox(y);
+
+  plisp_pio_gen_setval(ex, NULL, ret, PIO_PORT_OP, val);
+  return Nil;
+}
+
+// (pio-pin-sethigh 'sym) -> Nil
+any plisp_pio_port_sethigh(any ex) {
+  any x, y;
+  int ret;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  plisp_pio_gen_setval(ex, NULL, ret, PIO_PORT_OP, 1);
+  return Nil;
+}
+
+// (pio-pin-setlow 'sym) -> Nil
+any plisp_pio_port_setlow(any ex) {
+  any x, y;
+  int ret;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  ret = pio_value_parse(s);
+  PIO_CHECK(ret);
+
+  plisp_pio_gen_setval(ex, NULL, ret, PIO_PORT_OP, 0);
+  return Nil;
+}
+
+// (pio-pin-getval 'sym) -> Nil
+any plisp_pio_port_getval(any ex) {
+  pio_type value;
+  int v, port;
+  any x, y;
+
+  // get symbol.
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSym(ex, y);
+  char s[bufSize(y)];
+  bufString(y, s);
+  v = pio_value_parse(s);
+  PIO_CHECK(v);
+  port = PLATFORM_IO_GET_PORT(v);
+
+  if (!PLATFORM_IO_IS_PORT(v) ||
+      !platform_pio_has_port(port)) {
+    emit_hfunc_error("invalid port");
+  } else {
+    value = platform_pio_op(port,
+			    PLATFORM_IO_ALL_PINS,
+			    PLATFORM_IO_PORT_GET_VALUE);
+  }
+  return box(value);
+}
+
+#endif // ALCOR_LANG_PICOLISP
+
+#if defined ALCOR_LANG_PICOC
+
+// ****************************************************************************
+// PIO module for PicoC.
+
+// Platform variables.
+static const int pio_input = PIO_DIR_INPUT;
+static const int pio_output = PIO_DIR_OUTPUT;
+static const int pio_pull_up = PLATFORM_IO_PIN_PULLUP;
+static const int pio_pull_down = PLATFORM_IO_PIN_PULLDOWN;
+static const int pio_no_pull = PLATFORM_IO_PIN_NOPULL;
+
+extern void pio_lib_setup_func(void)
+{
+#if PICOC_TINYRAM_OFF
+  picoc_def_integer("pio_OUTPUT", pio_output);
+  picoc_def_integer("pio_INPUT", pio_input);
+  picoc_def_integer("pio_PULLUP", pio_pull_up);
+  picoc_def_integer("pio_PULLDOWN", pio_pull_down);
+  picoc_def_integer("pio_NOPULL", pio_no_pull);
+#endif
+}
+
+// ****************************************************************************
+// Pin operations
+
+// PicoC: pin_setdir(dir, "pin");
+static void pio_pin_setdir(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+
+  r->Val->Integer = picoc_pio_gen_setdir(ret, PIO_PIN_OP, dir);
+}
+
+// PicoC: pio_pin_setpull(pull, "pin");
+static void pio_pin_setpull(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+
+  r->Val->Integer = picoc_pio_gen_setpull(ret, PIO_PIN_OP, dir);
+}
+
+// PicoC: pio_pin_setval(val, "pin");
+static void pio_pin_setval(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PIO_CHECK(ret);
+  pio_type val = (pio_type)param[0]->Val->UnsignedInteger;
+
+  r->Val->Integer = picoc_pio_gen_setval(ret, PIO_PIN_OP, val);
+}
+
+// PicoC: pio_pin_sethigh("pin");
+static void pio_pin_sethigh(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PIO_CHECK(ret);
+
+  r->Val->Integer = picoc_pio_gen_setval(ret, PIO_PIN_OP, 1);
+}
+
+// PicoC: pio_pin_setlow("pin");
+static void pio_pin_setlow(pstate *p , val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PIO_CHECK(ret);
+
+  r->Val->Integer = picoc_pio_gen_setval(ret, PIO_PIN_OP, 0);
+}
+
+// PicoC: pin_val = pio_pin_getval("pin");
+static void pio_pin_getval(pstate *p, val *r, val **param, int n)
+{
+  pio_type value;
+  int v, port, pin;
+  
+  v = pio_value_parse(param[0]->Val->Identifier);
+  PIO_CHECK(v);
+  port = PLATFORM_IO_GET_PORT(v);
+  pin = PLATFORM_IO_GET_PIN(v);
+  
+  if (PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port) ||
+      !platform_pio_has_pin(port, pin)) {
+    return pmod_error("Invalid pin");
+  } else {
+    value = platform_pio_op(port, 1 << pin, PLATFORM_IO_PIN_GET);
+    r->Val->UnsignedInteger = value;
+  }
+}
+
+// ****************************************************************************
+// Port operations
+
+// PicoC: pio_port_setdir(dir, "port");
+static void pio_port_setdir(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+
+  r->Val->Integer = picoc_pio_gen_setdir(ret, PIO_PORT_OP, dir);
+}
+
+// PicoC: pio_port_setpull(pull, "port");
+static void pio_port_setpull(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PIO_CHECK(ret);
+  int dir = param[0]->Val->Integer;
+  
+  r->Val->Integer = picoc_pio_gen_setpull(ret, PIO_PORT_OP, dir);
+}
+
+// PicoC: pio_port_setval(val, "port");
+static void pio_port_setval(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[1]->Val->Identifier);
+  PIO_CHECK(ret);
+  pio_type val = (pio_type)param[0]->Val->UnsignedInteger;
+  
+  r->Val->Integer = picoc_pio_gen_setval(ret, PIO_PORT_OP, val);
+}
+
+// PicoC: pio_port_sethigh("port");
+static void pio_port_sethigh(pstate *p, val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PIO_CHECK(ret);
+
+  r->Val->Integer = picoc_pio_gen_setval(ret, PIO_PORT_OP, 1);
+}
+
+// PicoC: pio_port_setlow("port");
+static void pio_port_setlow(pstate *p , val *r, val **param, int n)
+{
+  int ret = pio_value_parse(param[0]->Val->Identifier);
+  PIO_CHECK(ret);
+
+  r->Val->Integer = picoc_pio_gen_setval(ret, PIO_PORT_OP, 0);
+}
+
+// PicoC: val = pio_port_getval("port");
+static void pio_port_getval(pstate *p, val *r, val **param, int n)
+{
+  pio_type value;
+  int v, port;
+
+  v = pio_value_parse(param[0]->Val->Identifier);
+  PIO_CHECK(v);
+  port = PLATFORM_IO_GET_PORT(v);
+  
+  if (!PLATFORM_IO_IS_PORT(v) || !platform_pio_has_port(port)) {
+    pmod_error("Invalid port");
+  } else {
+    value = platform_pio_op(port, PLATFORM_IO_ALL_PINS, PLATFORM_IO_PORT_GET_VALUE);
+    r->Val->UnsignedInteger = value;
+  }
 }
 
 #define MIN_OPT_LEVEL 2
@@ -478,11 +908,11 @@ static int pio_value_parse(char *key)
 // Rotable for platform variables.
 #if PICOC_TINYRAM_ON
 const PICOC_RO_TYPE pio_variables[] = {
-  {STRKEY("pio_INPUT"), INT(input)},
-  {STRKEY("pio_OUTPUT"), INT(output)},
-  {STRKEY("pio_PULLUP"), INT(pull_up)},
-  {STRKEY("pio_PULLDOWN"), INT(pull_down)},
-  {STRKEY("pio_NOPULL"), INT(no_pull)},
+  {STRKEY("pio_INPUT"), INT(pio_input)},
+  {STRKEY("pio_OUTPUT"), INT(pio_output)},
+  {STRKEY("pio_PULLUP"), INT(pio_pull_up)},
+  {STRKEY("pio_PULLDOWN"), INT(pio_pull_down)},
+  {STRKEY("pio_NOPULL"), INT(pio_no_pull)},
   {NILKEY, NILVAL}
 };
 #endif
@@ -506,7 +936,7 @@ const PICOC_REG_TYPE pio_library[] = {
   {FUNC(pio_port_getval), PROTO("unsigned int pio_port_getval(char *);")},
 
   // decode function.
-  {FUNC(pio_decode), PROTO("int pio_decode(int, int *, int *);")},
+  {FUNC(picoc_pio_decode), PROTO("int pio_decode(int, int *, int *);")},
   {NILFUNC, NILPROTO}
 };
 
@@ -738,152 +1168,6 @@ static int pio_port_getval( lua_State *L )
   return total;
 }
 
-// ****************************************************************************
-// The __index metamethod will return pin/port numeric identifiers
-
-static int pio_mt_index( lua_State* L )
-{
-  const char *key = luaL_checkstring( L ,2 );
-  int port = 0xFFFF, pin = 0xFFFF, isport = 0, sz;
-  
-  if( !key || *key != 'P' )
-    return 0;
-  if( isupper( key[ 1 ] ) ) // PA, PB, ...
-  {
-    if( PIO_PREFIX != 'A' )
-      return 0;
-    port = key[ 1 ] - 'A';
-    if( key[ 2 ] == '\0' )
-      isport = 1;
-    else if( key[ 2 ] == '_' )      
-    {
-      if( sscanf( key + 3, "%d%n", &pin, &sz ) != 1 || sz != strlen( key ) - 3 )
-        return 0;      
-
-#ifdef ALCOR_PLATFORM_AVR32
-      /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
-       * random areas of hardware ports 2 and 3:
-       * PX00-PX10 = GPIO100-GPIO90     //Port 3 pins 04-00; port 2 pins 31-26
-       * PX11-PX14 = GPIO109-GPIO106    //Port 3 pins 13-10
-       * PX15-PX34 = GPIO89-GPIO70      //Port 2 pins 25-06
-       * PX35-PX39 = GPIO105-GPIO101    //Port 3 pins 09-05
-       * Then port = trunc(GPIO/32) and pin = GPIO % 32
-       *
-       * This "Port X" exists in EVK1100 and MIZAR32 but not on EVK1101, which
-       * only has ports A and B. On EXK1101, the PC and PX syntax will still be
-       * accepted but will return nil thanks to the checks against NUM_PIO.
-       */
-
-      // Disallow "PC_06-PC_31" as aliases for PX pins
-      if (key[1] == 'C' && pin > 5)
-        return 0;
-
-      // Disallow "PD_nn" as aliases for PX pins
-      if (key[1] == 'D')
-        return 0;
-
-      // Map PX pins 00-39 to their ports/pins in the hardware register layout.
-      if (key[1] == 'X')
-      {
-        unsigned gpio;
-
-        // You cannot perform port operations on port X because it
-        // doesn't exist in hardware.
-        if (pin == 0xFFFF)
-          return 0;
-
-        // Map PX pin numbers to GPIO pin numbers
-        if( pin < 0 ) return 0;
-        if( pin <= 10 ) gpio = 100 - pin;
-        else if( pin <= 14 ) gpio = 109 - (pin - 11);
-        else if( pin <= 34 ) gpio = 89 - (pin - 15);
-        else if( pin <= 39 ) gpio = 105 - (pin - 35);
-        else return 0;
-
-        port = gpio >> 5;
-        pin = gpio & 0x1F;
-      }
-#endif
-    }
-  }
-  else // P0, P1, ...
-  {
-    if( PIO_PREFIX != '0' )
-      return 0;
-    if( !strchr( key, '_' ) )   // parse port
-    {
-      if( sscanf( key + 1, "%d%n", &port, &sz ) != 1  || sz != strlen( key ) - 1 )
-        return 0;
-      isport = 1;
-    }
-    else    // parse port_pin
-      if( sscanf( key + 1, "%d_%d%n", &port, &pin, &sz ) != 2 || sz != strlen( key ) - 1 )
-        return 0;
-  }
-  sz = -1;
-  if( isport )
-  {
-    if( platform_pio_has_port( port ) )
-      sz = PLATFORM_IO_ENCODE( port, 0, 1 );
-  }
-  else
-  {
-    if( platform_pio_has_port( port ) && platform_pio_has_pin( port, pin ) )
-      sz = PLATFORM_IO_ENCODE( port, pin, 0 );
-  }
-  if( sz == -1 )
-    return 0;
-  else
-  {
-    lua_pushinteger( L, sz );
-    return 1;
-  }
-}
-
-// *****************************************************************************
-// The 'decode' functions returns a port/pin pair from a platform code
-
-static int pio_decode( lua_State *L )
-{
-  int code = ( int )luaL_checkinteger( L, 1 );
-  int port = PLATFORM_IO_GET_PORT( code );
-  int pin  = PLATFORM_IO_GET_PIN( code );
-
-#ifdef ALCOR_PLATFORM_AVR32
-  /* AVR32UC3A0 has a bizarre "port" called "PX" with 40 pins which map to
-   * random areas of hardware ports 2 and 3:
-   * PX00-PX04 = GPIO100-GPIO96     //Port 3 pins 04-00
-   * PX05-PX10 = GPIO95-GPIO90      //Port 2 pins 31-26
-   * PX11-PX14 = GPIO109-GPIO106    //Port 3 pins 13-10
-   * PX15-PX34 = GPIO89-GPIO70      //Port 2 pins 25-06
-   * PX35-PX39 = GPIO105-GPIO101    //Port 3 pins 09-05
-   *
-   * Here, we reverse the decode the hardware port/pins to the PX pin names.
-   * This is the inverse of the code above in pio_mt_index().
-   */
-  if ( ( port == 2 && pin >= 6 ) ||
-       ( port == 3 && pin <= 13 ) )
-  {
-    switch ( port ) {
-    case 2:
-      if( pin >= 26 ) pin = (26 + 10) - pin;      // PX05-PX10
-      else            pin = (25 + 15) - pin;      // PX15-PX34
-      break;
-    case 3:
-      if( pin <= 4 )      pin = 4 - pin;          // PX00-PX04
-      else if( pin <= 9 ) pin = (35 + 9) - pin;   // PX35-PX39
-      else /* 10-13 */    pin = (13 + 11) - pin;  // PX11-PX14
-      break;
-    }
-    port = 'X' - 'A';   // 'A','B','C' are returned as 0,1,2 so 'X' is 23
-  }
-#endif
-
-  lua_pushinteger( L, port );
-  lua_pushinteger( L, pin );
-  return 2;
-}
-
 // *****************************************************************************
 // Pin function map
 
@@ -913,6 +1197,8 @@ static const LUA_REG_TYPE pio_port_map[] =
 
 const LUA_REG_TYPE pio_map[] =
 {
+  // The 'decode' functions returns a port/pin
+  // pair from a platform code.
   { LSTRKEY( "decode" ), LFUNCVAL( pio_decode ) },  
 #if LUA_OPTIMIZE_MEMORY > 0
   { LSTRKEY( "pin" ), LROVAL( pio_pin_map ) },
@@ -924,6 +1210,8 @@ const LUA_REG_TYPE pio_map[] =
   { LSTRKEY( "NOPULL" ), LNUMVAL( PLATFORM_IO_PIN_NOPULL ) },
   { LSTRKEY( "__metatable" ), LROVAL( pio_map ) },
 #endif
+  // The __index metamethod will return pin/port
+  // numeric identifiers
   { LSTRKEY( "__index" ), LFUNCVAL( pio_mt_index ) },
   { LNILKEY, LNILVAL }
 };
