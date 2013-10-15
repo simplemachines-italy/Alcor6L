@@ -313,12 +313,12 @@ void initSymbols(void) {
    Meth  = initSym(boxSubr(doMeth), "meth");
    Quote = initSym(boxSubr(doQuote), "quote");
 
-   // system timer symbols.
+// system timer symbols.
 #ifdef PICOLISP_MOD_TIMER
    sys_timer = initSym(box(PLATFORM_TIMER_SYS_ID), "*tmr-sys-timer*");
 #endif
    
-   // i2c symbols.
+// i2c symbols.
 #ifdef PICOLISP_MOD_I2C
    plisp_i2c_fast = initSym(box(PLATFORM_I2C_SPEED_FAST), "*i2c-fast*");
    plisp_i2c_slow = initSym(box(PLATFORM_I2C_SPEED_SLOW), "*i2c-slow*");
@@ -326,19 +326,19 @@ void initSymbols(void) {
    plisp_i2c_recv = initSym(box(PLATFORM_I2C_DIRECTION_RECEIVER), "*i2c-receiver*");
 #endif
 
-   // can symbols.
+// can symbols.
 #ifdef PICOLISP_MOD_CAN
    can_id_ext = initSym(box(ELUA_CAN_ID_EXT), "*can-id-ext*");
    can_id_std = initSym(box(ELUA_CAN_ID_STD), "*can-id-std*");
 #endif
 
-   // spi symbols.
+// spi symbols.
 #ifdef PICOLISP_MOD_SPI
    plisp_spi_master = initSym(box(PLATFORM_SPI_MASTER), "*spi-master*");
    plisp_spi_slave = initSym(box(PLATFORM_SPI_SLAVE), "*spi-slave*");
 #endif
 
-   // pio symbols.
+// pio symbols.
 #ifdef PICOLISP_MOD_PIO
    // these two macros are defined locally in modules/pio.c
    // since they can't be accessed from here, we're defining
@@ -351,6 +351,16 @@ void initSymbols(void) {
    plisp_pio_pullup = initSym(box(PLATFORM_IO_PIN_PULLUP), "*pio-pullup*");
    plisp_pio_pulldown = initSym(box(PLATFORM_IO_PIN_PULLDOWN), "*pio-pulldown*");
    plisp_pio_nopull = initSym(box(PLATFORM_IO_PIN_NOPULL), "*pio-nopull*");
+#endif
+
+// term symbols.
+#ifdef PICOLISP_MOD_TERM
+   // support header file.
+# include "term.h"
+   // the macros TERM_INPUT_WAIT and TERM_INPUT_DONT_WAIT
+   // are defined in the support header file above.
+   plisp_term_wait = initSym(box(TERM_INPUT_WAIT), "*term-wait*");
+   plisp_term_nowait = initSym(box(TERM_INPUT_DONT_WAIT), "*term-nowait*");
 #endif
 
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol

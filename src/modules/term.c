@@ -41,20 +41,6 @@
 #define _D(x) #x
 static const char* term_key_names[] = {TERM_KEYCODES};
 
-#if defined ALCOR_LANG_TINYSCHEME && defined BUILD_TERM
-
-// ****************************************************************************
-// Terminal module for tiny-scheme.
-
-#endif
-
-#if defined ALCOR_LANG_MYBASIC && defined BUILD_TERM
-
-// ****************************************************************************
-// Terminal module for my-basic.
-
-#endif
-
 #if defined ALCOR_LANG_PICOLISP && defined BUILD_TERM
 
 // ****************************************************************************
@@ -233,22 +219,22 @@ any plisp_term_getcy(any x) {
   return x;
 }
 
-// (term-getchar) -> num
-// (term-getchar 'sym) -> num
-any plisp_term_getchar(any x) {
-  any y;
-  x = cdr(x), y = EVAL(car(x));
+// (term-getchar ['sym]) -> num
+any plisp_term_getchar(any ex) {
+  any x, y;
+  int temp = TERM_INPUT_WAIT;
 
-  if (equal(mkStr("wait"), y) || isNil(y))
-    x = box(term_getch(TERM_INPUT_WAIT));
-  else if (equal(mkStr("nowait"), y))
-    x = box(term_getch(TERM_INPUT_DONT_WAIT));
-  else
-    err(NULL, x, "invalid parameter");
-  return x;
+  x = cdr(ex), y = EVAL(car(x));
+  if (plen(ex) > 0) {
+    NeedNum(x, y);
+    temp = unBox(y);
+    return box(term_getch(temp));
+  }
+  
+  return box(term_getch(temp));
 }
 
-// (term-decode 'sym) -> num|Nil
+// (term-decode 'sym) -> num | Nil
 any plisp_term_decode(any ex) {
   any x;
   int n, i, c;

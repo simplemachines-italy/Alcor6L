@@ -191,7 +191,11 @@ any plisp_pio_input;
 any plisp_pio_output;
 any plisp_pio_pullup;
 any plisp_pio_pulldown;
-any plisp_pio_nopull; 
+any plisp_pio_nopull;
+
+// term modules.
+any plisp_term_wait;
+any plisp_term_nowait;
   
 // Alcor6L platform modules.
 any pd_platform(any x);
