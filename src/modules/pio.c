@@ -484,18 +484,18 @@ any plisp_pio_pin_setdir(any ex) {
   any x, y;
   int ret, dir;
 
+  // get dir.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
   PIO_CHECK(ret);
-
-  // get direction.
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  dir = unBox(y);
 
   plisp_pio_gen_setdir(ex, NULL, ret, PIO_PIN_OP, dir);
   return Nil;
@@ -506,18 +506,18 @@ any plisp_pio_pin_setpull(any ex) {
   any x, y;
   int ret, dir;
 
+  // get dir.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
   PIO_CHECK(ret);
-  
-  // get direction.
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  dir = unBox(y);
   
   plisp_pio_gen_setpull(ex, NULL, ret, PIO_PIN_OP, dir);
   return Nil;
@@ -528,18 +528,18 @@ any plisp_pio_pin_setval(any ex) {
   any x, y;
   int ret; pio_type val;
 
+  // get value to set first.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  val = unBox(y);
+  
   // get symbol. 
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
   PIO_CHECK(ret);
-
-  // get direction.
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  val = unBox(y);
 
   plisp_pio_gen_setval(ex, NULL, ret, PIO_PIN_OP, val);
   return Nil;
@@ -551,8 +551,8 @@ any plisp_pio_pin_sethigh(any ex) {
   int ret;
 
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(ex);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
@@ -568,8 +568,8 @@ any plisp_pio_pin_setlow(any ex) {
   int ret;
 
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(ex);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
@@ -586,8 +586,8 @@ any plisp_pio_pin_getval(any ex) {
   any x, y;
 
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(ex);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   v = pio_value_parse(s);
@@ -616,75 +616,75 @@ any plisp_pio_port_setdir(any ex) {
   any x, y;
   int ret, dir;
 
+  // get direction first.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
   PIO_CHECK(ret);
-
-  // get direction.
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  dir = unBox(y);
 
   plisp_pio_gen_setdir(ex, NULL, ret, PIO_PORT_OP, dir);
   return Nil;
 }
 
-// (pio-pin-setpull 'sym 'num) -> Nil 
+// (pio-port-setpull 'sym 'num) -> Nil 
 any plisp_pio_port_setpull(any ex) {
   any x, y;
   int ret, dir;
 
+  // get pull value first.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  dir = unBox(y);
+
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
   PIO_CHECK(ret);
-
-  // get pull.
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  dir = unBox(y);
 
   plisp_pio_gen_setpull(ex, NULL, ret, PIO_PORT_OP, dir);
   return Nil;
 }
 
-// (pio-pin-setval 'sym) -> Nil
+// (pio-port-setval 'sym) -> Nil
 any plisp_pio_port_setval(any ex) {
   any x, y;
   int ret; pio_type val;
 
+  // get set value first.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  val = (pio_type)unBox(y);
+
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
   PIO_CHECK(ret);
 
-  // get value.
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  val = (pio_type)unBox(y);
-
   plisp_pio_gen_setval(ex, NULL, ret, PIO_PORT_OP, val);
   return Nil;
 }
 
-// (pio-pin-sethigh 'sym) -> Nil
+// (pio-port-sethigh 'sym) -> Nil
 any plisp_pio_port_sethigh(any ex) {
   any x, y;
   int ret;
 
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(ex);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
@@ -694,14 +694,14 @@ any plisp_pio_port_sethigh(any ex) {
   return Nil;
 }
 
-// (pio-pin-setlow 'sym) -> Nil
+// (pio-port-setlow 'sym) -> Nil
 any plisp_pio_port_setlow(any ex) {
   any x, y;
   int ret;
 
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(ex);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   ret = pio_value_parse(s);
@@ -711,15 +711,15 @@ any plisp_pio_port_setlow(any ex) {
   return Nil;
 }
 
-// (pio-pin-getval 'sym) -> Nil
+// (pio-port-getval 'sym) -> Nil
 any plisp_pio_port_getval(any ex) {
   pio_type value;
   int v, port;
   any x, y;
 
   // get symbol.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedSym(ex, y);
+  x = cdr(ex);
+  NeedSym(ex, y = EVAL(car(x)));
   char s[bufSize(y)];
   bufString(y, s);
   v = pio_value_parse(s);
