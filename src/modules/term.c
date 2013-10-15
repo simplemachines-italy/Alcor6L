@@ -224,9 +224,12 @@ any plisp_term_getchar(any ex) {
   any x, y;
   int temp = TERM_INPUT_WAIT;
 
-  x = cdr(ex), y = EVAL(car(x));
+  // if number of args is > 0
+  // get value; else getchar()
+  // will wait.
   if (plen(ex) > 0) {
-    NeedNum(x, y);
+    x = cdr(ex);
+    NeedNum(ex, y = EVAL(car(x)));
     temp = unBox(y);
     return box(term_getch(temp));
   }
