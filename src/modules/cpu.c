@@ -52,45 +52,24 @@ static const cpu_const_t cpu_constants[] =
 };
 #endif
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// CPU module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// CPU module for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // CPU module for picoLisp.
-
-// helpers.
-#define get_addr_data(a, d)			\
-  x = cdr(ex);					\
-  NeedNum(ex, y = EVAL(car(x)));		\
-  a = unBox(y);					\
-  x = cdr(x);					\
-  NeedNum(ex, y = EVAL(car(x)));		\
-  d = unBox(y)
-
-#define get_addr(a)				\
-  x = cdr(ex);					\
-  NeedNum(ex, y = EVAL(car(x)));		\
-  a = unBox(y)
 
 // (cpu-w32 'addr 'data) -> num
 any cpu_w32(any ex) {
   u32 addr, data;
   any x, y;
 
-  get_addr_data(addr, data);
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  addr = unBox(y); // get address.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  data = unBox(y); // get data.
+
   *(u32 *)addr = data;
   return box(data);
 }
@@ -100,7 +79,10 @@ any cpu_r32(any ex) {
   u32 addr;
   any x, y;
 
-  get_addr(addr);
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  addr = unBox(y); // get address.
+
   return box(*(u32 *)addr);
 }
 
@@ -109,8 +91,15 @@ any cpu_w16(any ex) {
   u32 addr;
   u16 data;
   any x, y;
-  
-  get_addr_data(addr, data);
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  addr = unBox(y); // get address.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  data = unBox(y); // get data.
+
   *(u16 *)addr = data;
   return box(data);
 }
@@ -120,7 +109,10 @@ any cpu_r16(any ex) {
   u32 addr;
   any x, y;
 
-  get_addr(addr);
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  addr = unBox(y); // get address.
+
   return box(*(u16 *)addr);
 }
 
@@ -130,17 +122,27 @@ any cpu_w8(any ex) {
   u8 data;
   any x, y;
 
-  get_addr_data(addr, data);
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  addr = unBox(y); // get address.
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  data = unBox(y); // get data.
+
   *(u8 *)addr = data;
   return box(data);
 }
 
-// (cpu-r8 'addr) -> data 
+// (cpu-r8 'addr) -> data
 any cpu_r8(any ex) {
   u32 addr;
   any x, y;
-  
-  get_addr(addr);
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  addr = unBox(y); // get address.
+
   return box(*(u8 *)addr);
 }
 
