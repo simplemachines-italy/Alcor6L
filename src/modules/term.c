@@ -239,32 +239,25 @@ any plisp_term_getchar(any ex) {
 
 // (term-decode 'sym) -> num | Nil
 any plisp_term_decode(any ex) {
-  any x;
-  int n, i, c;
-  word w;
-  /* should hold the longest entry in TERM_KEYCODES */
-  char key[15];
-  for (i = 0; i < 15; i++) key[i] = 0;
-  unsigned total = sizeof(term_key_names)/sizeof(char*);
-  
-  x = EVAL(cadr(ex));
-  if (isSym(x)) {
-    if (isNil(x))
-      return Nil;
-    x = name(x);
-    for (n = 0, c = getByte1(&i, &w, &x); c; ++n, c = getByte(&i, &w, &x))
-      key[n] = c;
-    if (!key[0] || key[0] != 'K')
-      err(NULL, ex, "Key invalid. Parse error");
-    for (i = 0; i < total; i++)
-      if (!strcmp(key, term_key_names[i]))
-	break;
-    if (i == total)
-      return Zero;
-    else
-      return box(i + TERM_FIRST_KEY);
-  }
-  return Nil;
+  any x, y;
+  unsigned i, total = sizeof(term_key_names) / sizeof(char*);
+
+  x = cdr(ex), y = EVAL(car(x));
+  NeedSymb(ex, y);
+  char key[bufSize(y)];
+  bufString(y, key);
+
+  if (*key != 'K')
+    return Nil;
+
+  for (i = 0; i < total; i++)
+    if (!strcmp(key, term_key_names[i]))
+      break;
+
+  if (i == total)
+    return Nil;
+  else
+    return box(i + TERM_FIRST_KEY);
 }
 
 #endif // ALCOR_LANG_PICOLISP
