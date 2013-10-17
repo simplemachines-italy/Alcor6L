@@ -56,7 +56,7 @@ any can_send(any ex) {
   bufString(y, data); // can data.
   
   if (len > PLATFORM_CAN_MAXLEN)
-    err(NULL, x, "message exceeds max length");
+    err(ex, y, "message exceeds max length");
 
   platform_can_send(id, canid, idtype, len, (const u8 *)data);
   return mkStr(data);
