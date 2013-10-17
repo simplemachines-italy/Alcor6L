@@ -103,13 +103,14 @@ any plisp_i2c_address(any ex) {
   NeedNum(ex, y = EVAL(car(x)));
   add = unBox(y); // get address.
 
+  // check address.
+  if (add < 0 || add > 127)
+    err(ex, y, "slave address must be from 0 to 127");
+
   x = cdr(x);
   NeedNum(ex, y = EVAL(car(x)));
   dir = unBox(y); // get direction.
   
-  if (add < 0 || add > 127)
-    err(NULL, NULL, "slave address must be from 0 to 127");
-
   ret = platform_i2c_send_address(id, (u16)add, dir);
   return box(ret);
 
