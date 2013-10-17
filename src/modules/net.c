@@ -40,6 +40,8 @@
 
 #include "platform_conf.h"
 
+#if defined ALCOR_LANG_LUA
+
 // ****************************************************************************
 // Net module for Lua.
 
