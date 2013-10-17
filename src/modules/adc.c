@@ -37,24 +37,6 @@
 
 #ifdef BUILD_ADC
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************                                                
-// ADC (Analog to digital converter) module for tiny-basic.
-
-// TODO:
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// ADC (Analog to digital converter) module for my-basic.
-
-// TODO:
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************

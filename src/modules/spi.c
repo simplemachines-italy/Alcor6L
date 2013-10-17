@@ -32,20 +32,6 @@
 
 #include "platform.h"
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// SPI module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// SPI module for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************

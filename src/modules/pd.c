@@ -6,13 +6,6 @@
 #define MACRO_NAME( x ) MACRO_AGAIN( x )
 #define MACRO_AGAIN( x ) #x
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// Platform module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
 #if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************

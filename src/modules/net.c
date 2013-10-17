@@ -40,60 +40,6 @@
 
 #include "platform_conf.h"
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// Net module for tiny-scheme.
-
-#ifdef BUILD_UIP
-
-#else
-
-#endif
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// Net module for my-basic.
-
-#ifdef BUILD_UIP
-
-#else
-
-#endif
-
-#endif // ALCOR_LANG_MYBASIC
-
-#if defined ALCOR_LANG_PICOLISP
-
-// ****************************************************************************
-// Net module for picoLisp.
-
-#ifdef BUILD_UIP
-
-#else
-
-#endif
-
-#endif // ALCOR_LANG_PICOLISP
-
-#if defined ALCOR_LANG_PICOC
-
-// ****************************************************************************
-// Net module for PicoC.
-
-#ifdef BUILD_UIP
-
-#else
-
-#endif
-
-#endif
-
-#if defined ALCOR_LANG_LUA
-
 // ****************************************************************************
 // Net module for Lua.
 

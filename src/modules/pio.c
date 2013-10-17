@@ -454,24 +454,6 @@ emit_static emit_ret_type emit_pio_decode() {
 #endif
 }
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// **************************************************************************** 
-// PIO module for tiny-scheme.
-
-// TODO:
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// PIO module for my-basic.
-
-// TODO:
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************

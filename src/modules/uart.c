@@ -50,27 +50,6 @@ enum
 
 #define UART_INFINITE_TIMEOUT PLATFORM_TIMER_INF_TIMEOUT
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// UART module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// UART module for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
-#if defined ALCOR_LANG_PICOLISP
-
-// ****************************************************************************
-// UART module for picoLisp.
-
-#endif // ALCOR_LANG_PICOLISP
-
 #if defined ALCOR_LANG_PICOC
 
 // ****************************************************************************

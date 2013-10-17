@@ -3,27 +3,9 @@
 
 #include "platform.h"
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// CAN for tiny-basic.
-
-#include "scheme.h"
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// CAN for my-basic.
-
-#include "my_basic.h"
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
-#include "pico.h"
+# include "pico.h"
 
 // ****************************************************************************
 // CAN for picoLisp.

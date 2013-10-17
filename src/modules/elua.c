@@ -44,13 +44,6 @@
 #include "version.h"
 #endif
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// eLua core module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
 #if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************

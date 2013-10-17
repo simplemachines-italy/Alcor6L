@@ -35,20 +35,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// I2C module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// I2C module for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
