@@ -144,20 +144,6 @@ static int set_cursor( u8 command_byte )
     return send_command( cursor_type );
 }
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// **************************************************************************** 
-// LCD display module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// LCD display module for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
@@ -347,7 +333,7 @@ any lcd_cursor(any x) {
   else if (equal(mkStr(args[4]), y))
     set_cursor(LCD_CMD_SHIFT_CURSOR_RIGHT);
   else
-    err(NULL, x, "invalid cursor argument");
+    err(NULL, y, "invalid cursor argument");
 
   return Nil;
 }
