@@ -113,15 +113,6 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// *****************************************************************************
-// Language configurations: tiny-scheme.
-
-// TODO:
-
-#endif // ALCOR_LANG_TINYSCHEME
-
 #if defined ALCOR_LANG_MYBASIC
 
 // ****************************************************************************
@@ -149,7 +140,8 @@
   _ROM(I2C)\
   _ROM(PWM)\
   _ROM(SPI)\
-  _ROM(PIO)
+  _ROM(PIO)\
+  _ROM(UART)
 
 #endif // ALCOR_LANG_PICOLISP
 

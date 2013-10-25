@@ -106,6 +106,16 @@
   PICOLISP_LIB_DEFINE(plisp_pio_port_getval, pio-port-getval),\
   PICOLISP_LIB_DEFINE(plisp_pio_decode, pio-decode),
 
+// uart module.
+#define PICOLISP_MOD_UART\
+  PICOLISP_LIB_DEFINE(plisp_uart_setup, uart-setup),\
+  PICOLISP_LIB_DEFINE(plisp_uart_write, uart-write),\
+  PICOLISP_LIB_DEFINE(plisp_uart_set_flow_control, uart-set-flow-control),\
+  PICOLISP_LIB_DEFINE(plisp_uart_set_buffer, uart-set-buffer),\
+  PICOLISP_LIB_DEFINE(plisp_uart_getchar, uart-getchar),\
+  PICOLISP_LIB_DEFINE(plisp_uart_vuart_tmr_ident, uart-vuart-tmr-ident),\
+  PICOLISP_LIB_DEFINE(plisp_uart_read, uart-read),
+
 #define MOD_CHECK_ID(pvar, mod, id)					\
   if (!platform_ ## mod ## _exists(id))					\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)

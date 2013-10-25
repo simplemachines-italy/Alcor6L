@@ -193,6 +193,19 @@ any plisp_pio_pullup;
 any plisp_pio_pulldown;
 any plisp_pio_nopull;
 
+// uart symbols.
+any plisp_uart_par_even;
+any plisp_uart_par_odd;
+any plisp_uart_par_none;
+any plisp_uart_stop_1;
+any plisp_uart_stop_1_5;
+any plisp_uart_stop_2;
+any plisp_uart_no_timeout;
+any plisp_uart_inf_timeout;
+any plisp_uart_flow_none;
+any plisp_uart_flow_rts;
+any plisp_uart_flow_cts;
+
 // term modules.
 any plisp_term_wait;
 any plisp_term_nowait;
@@ -283,6 +296,15 @@ any plisp_pio_port_sethigh(any ex);
 any plisp_pio_port_setlow(any ex);
 any plisp_pio_port_getval(any ex);
 any plisp_pio_decode(any ex);
+
+// uart module.
+any plisp_uart_setup(any ex);
+any plisp_uart_write(any ex);
+any plisp_uart_set_buffer(any ex);
+any plisp_uart_set_flow_control(any ex);
+any plisp_uart_getchar(any ex);
+any plisp_uart_vuart_tmr_ident(any ex);
+any plisp_uart_read(any ex);
 
 #include "platform_picolisp.h"
 

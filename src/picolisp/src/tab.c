@@ -356,11 +356,26 @@ void initSymbols(void) {
 // term symbols.
 #ifdef PICOLISP_MOD_TERM
    // support header file.
-# include "term.h"
+#  include "term.h"
    // the macros TERM_INPUT_WAIT and TERM_INPUT_DONT_WAIT
    // are defined in the support header file above.
    plisp_term_wait = initSym(box(TERM_INPUT_WAIT), "*term-wait*");
    plisp_term_nowait = initSym(box(TERM_INPUT_DONT_WAIT), "*term-nowait*");
+#endif
+
+// uart symbols.
+#ifdef PICOLISP_MOD_UART
+   plisp_uart_par_even = initSym(box(PLATFORM_UART_PARITY_EVEN), "*uart-par-even*");
+   plisp_uart_par_odd = initSym(box(PLATFORM_UART_PARITY_ODD), "*uart-par-odd*");
+   plisp_uart_par_none = initSym(box(PLATFORM_UART_PARITY_NONE), "*uart-par-none*");
+   plisp_uart_stop_1 = initSym(box(PLATFORM_UART_STOPBITS_1), "*uart-stop-1*");
+   plisp_uart_stop_1_5 = initSym(box(PLATFORM_UART_STOPBITS_1_5), "*uart-stop-1-5*");
+   plisp_uart_stop_2 = initSym(box(PLATFORM_UART_STOPBITS_2), "*uart-stop-2*");
+   plisp_uart_no_timeout = initSym(Zero, "*uart-no-timeout*");
+   plisp_uart_inf_timeout = initSym(box(PLATFORM_TIMER_INF_TIMEOUT), "*uart-inf-timeout*");
+   plisp_uart_flow_none = initSym(box(PLATFORM_UART_FLOW_NONE), "*uart-flow-none*");
+   plisp_uart_flow_rts = initSym(box(PLATFORM_UART_FLOW_RTS), "*uart-flow-rts*");
+   plisp_uart_flow_cts = initSym(box(PLATFORM_UART_FLOW_CTS), "*uart-flow-cts*");
 #endif
 
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
