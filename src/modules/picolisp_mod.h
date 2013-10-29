@@ -116,19 +116,19 @@
   PICOLISP_LIB_DEFINE(plisp_uart_vuart_tmr_ident, uart-vuart-tmr-ident),\
   PICOLISP_LIB_DEFINE(plisp_uart_read, uart-read),
 
-#define MOD_CHECK_ID(pvar, mod, id)					\
-  if (!platform_ ## mod ## _exists(id))					\
+#define MOD_CHECK_ID(pvar, mod, id)\
+  if (!platform_ ## mod ## _exists(id))\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)
 
-#define MOD_CHECK_RES_ID(pvar, mod, id, resmod, resid)			\
-  if (!platform_ ## mod ## _check_ ## resmod ## _id(id, resid))		\
-    err(pvar, NULL, #resmod" %d not valid with " #mod " %d",		\
+#define MOD_CHECK_RES_ID(pvar, mod, id, resmod, resid)\
+  if (!platform_ ## mod ## _check_ ## resmod ## _id(id, resid))\
+    err(pvar, NULL, #resmod" %d not valid with " #mod " %d",\
 	(unsigned)resid, (unsigned)id)
 
-#define MOD_CHECK_TIMER(pvar, id)					\
-  if (id == PLATFORM_TIMER_SYS_ID && !platform_timer_sys_available())	\
-    err(pvar, NULL, "the system timer is not available on this platform"); \
-  if (!platform_timer_exists(id))					\
-    err(pvar, NULL, "timer %d does not exist", (unsigned)id)		\
+#define MOD_CHECK_TIMER(pvar, id)\
+  if (id == PLATFORM_TIMER_SYS_ID && !platform_timer_sys_available())\
+    err(pvar, NULL, "the system timer is not available on this platform");\
+  if (!platform_timer_exists(id))\
+    err(pvar, NULL, "timer %d does not exist", (unsigned)id)\
 
 #endif
