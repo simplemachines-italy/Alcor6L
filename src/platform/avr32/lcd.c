@@ -372,8 +372,48 @@ any lcd_display(any x) {
   return Nil;
 }
 
-// TODO:
-// any lcd_definechar(any ex) {}
+// (mizar32-lcd-definechar 'num 'lst) -> Nil
+// code: 0-7
+// glyph: a list of up to 8 numbers with values 0-31.
+//        If less than 8 are supplied, the bottom rows are blanked.
+//        If more than 8 are supplied, the extra are ignored.
+// The current cursor position in the character display RAM is preserved.
+any plisp_lcd_definechar(any ex) {
+  int code;        // The character code we are defining, 0-7
+  size_t datalen;  // The number of elements in the glyph table
+  size_t line = 0; // Which line of the char are we defining?
+  u8 data[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  int old_address; // The coded value for the current cursor position
+  any x, y;
+
+  // First parameter: glyph code to define.
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  code = unBox(y);
+  if (code < 0 || code > 7)
+    err(ex, y, "user-defined characters have codes 0-7");
+
+  // Second parameter: list of integer values to define the glyph
+  x = cdr(x);
+  NeedLst(ex, y = EVAL(car(x)));
+  datalen = length(y);
+
+  // Check all parameters before starting the I2C command.
+  if (datalen >= 8) datalen = 8; // Ignore extra parameters
+  for (line = 0; line < datalen; line++) {
+    NeedNum(y, car(y));
+    data[line] = unBox(car(y));
+    y = EVAL(cdr(y));
+  }
+
+  old_address = recv_address_counter();
+  send_command(LCD_CMD_CGADDR + code * 8);
+  send_data(data, sizeof(data));
+
+  // Move back to where we were
+  send_command(LCD_CMD_DDADDR + old_address);
+  return Nil;
+}
 
 #endif // ALCOR_LANG_PICOLISP
 
