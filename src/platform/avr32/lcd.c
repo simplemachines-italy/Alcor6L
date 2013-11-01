@@ -213,7 +213,7 @@ any lcd_goto(any ex) {
   return Nil;
 }
 
-// Helpers for picoLisp LCD print function.
+/***
 static void outString_lcd(char *s) {
   while (*s)
     send_data((const u8 *)s++, 1);
@@ -224,12 +224,16 @@ static void outNum_lcd(long n) {
 
   bufNum(buf, n);
   outString_lcd(buf);
-}
+} ***/
 
+// Helpers for picoLisp LCD print function.
 static void lcdh_prin(any x) {
   if (!isNil(x)) {
-    if (isNum(x))
-      outNum_lcd(unBox(x));
+    if (isNum(x)) {
+      u8 byte = (u8)unBox(x);
+      send_data(&byte, 1);
+      // outNum_lcd(unBox(x));
+    }
     else if (isSym(x)) {
       int i, c;
       word w;
@@ -769,7 +773,7 @@ static int lcd_print( lua_State *L )
         send_data( &byte, 1 );
       }
       break;
-
+ 
       case LUA_TSTRING:
       {
         size_t len;  // Number of chars in string
