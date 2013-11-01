@@ -24,7 +24,8 @@
   PICOLISP_PROTO(lcd_getpos)\
   PICOLISP_PROTO(lcd_buttons)\
   PICOLISP_PROTO(lcd_cursor)\
-  PICOLISP_PROTO(lcd_display)
+  PICOLISP_PROTO(lcd_display)\
+  PICOLISP_PROTO(plisp_lcd_definechar)
 
 #define PICOLISP_TARGET_SPECIFIC_LIBS\
   PICOLISP_MOD_MIZAR32_LCD
@@ -39,6 +40,7 @@
   PICOLISP_LIB_DEFINE(lcd_getpos, mizar32-lcd-getpos),\
   PICOLISP_LIB_DEFINE(lcd_buttons, mizar32-lcd-buttons),\
   PICOLISP_LIB_DEFINE(lcd_cursor, mizar32-lcd-cursor),\
-  PICOLISP_LIB_DEFINE(lcd_display, mizar32-lcd-display),
+  PICOLISP_LIB_DEFINE(lcd_display, mizar32-lcd-display),\
+  PICOLISP_LIB_DEFINE(plisp_lcd_definechar, mizar32-lcd-definechar),
  
 #endif // #ifndef __PLATFORM_PICOLISP_H__
