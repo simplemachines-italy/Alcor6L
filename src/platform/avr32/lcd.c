@@ -150,7 +150,7 @@ static int set_cursor( u8 command_byte )
 // LCD display module for picoLisp.
 
 // (lcd-reset) -> Nil
-any lcd_reset(any ex) {
+any plisp_lcd_reset(any ex) {
   cursor_type = DEFAULT_CURSOR_TYPE;
   display_is_off = 0;
   
@@ -159,7 +159,7 @@ any lcd_reset(any ex) {
 }
 
 // (lcd-setup shift_disp r-to-l) -> Nil
-any lcd_setup(any ex) {
+any plisp_lcd_setup(any ex) {
   any x, y;
   long shift_disp, r_to_l;
 
@@ -177,14 +177,14 @@ any lcd_setup(any ex) {
 
 // (lcd-clear) -> Nil
 // Clear the display, reset its shiftedness and put the cursor at 1,1
-any lcd_clear(any ex) {
+any plisp_lcd_clear(any ex) {
   send_command(LCD_CMD_CLEAR);
   return Nil;
 }
 
 // (lcd-home) -> Nil
 // Reset the display's shiftedness and put the cursor at 1,1
-any lcd_home(any ex) {
+any plisp_lcd_home(any ex) {
   send_command(LCD_CMD_HOME);
   return Nil;
 }
@@ -192,7 +192,7 @@ any lcd_home(any ex) {
 // (lcd-goto row col) -> Nil
 // Move the cursor to the specified row (1 or 2) and
 // column (1-40) in the character memory.
-any lcd_goto(any ex) {
+any plisp_lcd_goto(any ex) {
   any x, y;
   unsigned row, col, address;
   
@@ -227,7 +227,7 @@ static void outNum_lcd(long n) {
 } ***/
 
 // Helpers for picoLisp LCD print function.
-static void lcdh_prin(any x) {
+static void plisp_lcdh_prin(any x) {
   if (!isNil(x)) {
     if (isNum(x)) {
       u8 byte = (u8)unBox(x);
@@ -260,9 +260,9 @@ static void lcdh_prin(any x) {
       }
     }
     else {
-      while (lcdh_prin(car(x)), !isNil(x = cdr(x))) {
+      while (plisp_lcdh_prin(car(x)), !isNil(x = cdr(x))) {
 	if (!isCell(x)) {
-	  lcdh_prin(x);
+	  plisp_lcdh_prin(x);
 	  break;
 	}
       }
@@ -271,16 +271,16 @@ static void lcdh_prin(any x) {
 }
 
 // (mizar32-lcd-prinl 'any ..) -> any
-any lcd_prinl(any x) {
+any plisp_lcd_prinl(any x) {
   any y = Nil;
 
   while (isCell(x = cdr(x)))
-    lcdh_prin(y = EVAL(car(x)));
+    plisp_lcdh_prin(y = EVAL(car(x)));
   return y;
 }
 
 // (mizar32-lcd-getpos) -> lst
-any lcd_getpos(any x) {
+any plisp_lcd_getpos(any x) {
   u8 addr = recv_address_counter();
   any y;
   cell c1;
@@ -292,7 +292,7 @@ any lcd_getpos(any x) {
 }
 
 // (mizar32-lcd-buttons) -> sym
-any lcd_buttons(any x) {
+any plisp_lcd_buttons(any x) {
   u8 code;                // bit code for buttons held
   char string[6];         // Up to 5 buttons and a \0
   char *stringp = string; // Where to write the next character;
@@ -313,7 +313,7 @@ any lcd_buttons(any x) {
 // parameter.
 //
 // (mizar32-lcd-cursor 'sym) -> Nil
-any lcd_cursor(any x) {
+any plisp_lcd_cursor(any x) {
   static const char const *args[] = {
     "none",
     "block",
@@ -346,7 +346,7 @@ any lcd_cursor(any x) {
 // selected by a string parameter.
 //
 // (mizar32-lcd-display 'sym) -> Nil
-any lcd_display(any x) {
+any plisp_lcd_display(any x) {
   static const char const *args[] = {
     "off",
     "on",
