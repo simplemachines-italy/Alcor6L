@@ -298,11 +298,11 @@ any plisp_lcd_buttons(any x) {
   char *stringp = string; // Where to write the next character;
   
   code = recv_buttons();
-  if(code & LCD_BUTTON_SELECT) *stringp++ = 'S';
-  if(code & LCD_BUTTON_LEFT) *stringp++ = 'L';
-  if(code & LCD_BUTTON_RIGHT) *stringp++ = 'R';
-  if(code & LCD_BUTTON_UP) *stringp++ = 'U';
-  if(code & LCD_BUTTON_DOWN) *stringp++ = 'D';
+  if (code & LCD_BUTTON_SELECT) *stringp++ = 'S';
+  if (code & LCD_BUTTON_LEFT) *stringp++ = 'L';
+  if (code & LCD_BUTTON_RIGHT) *stringp++ = 'R';
+  if (code & LCD_BUTTON_UP) *stringp++ = 'U';
+  if (code & LCD_BUTTON_DOWN) *stringp++ = 'D';
   *stringp = '\0';
 
   return mkStr(string);
