@@ -222,7 +222,7 @@ any plisp_term_getcy(any x) {
 // (term-getchar ['sym]) -> num
 any plisp_term_getchar(any ex) {
   any x, y;
-  int temp = TERM_INPUT_WAIT;
+  int temp = TERM_INPUT_WAIT, ret;
 
   // if number of args is > 0
   // get value; else getchar()
@@ -230,11 +230,11 @@ any plisp_term_getchar(any ex) {
   if (plen(ex) > 0) {
     x = cdr(ex);
     NeedNum(ex, y = EVAL(car(x)));
-    temp = unBox(y);
-    return box(term_getch(temp));
+    return ((ret = term_getch(temp = unBox(y))) == -1?
+	    Nil : box(ret));
   }
-  
-  return box(term_getch(temp));
+  return ((ret = term_getch(temp)) == -1?
+	  Nil : box(ret));
 }
 
 // (term-decode 'sym) -> num | Nil
