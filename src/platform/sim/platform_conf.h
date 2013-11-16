@@ -6,8 +6,14 @@
 
 #ifdef ALCOR_LANG_PICOC
 # include "picoc_mod.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "auxmods.h"
+#endif
+
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
 #endif
 
 #include "type.h"
@@ -32,6 +38,20 @@
 #define PLATFORM_HAS_SYSTIMER
 
 // Auxiliary libraries that will be compiled for this platform
+
+#ifdef ALCOR_LANG_PICOLISP
+
+// *****************************************************************************
+// Language configurations: picoLisp.
+
+// platform library functions
+#define PICOLISP_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(TERM)\
+  _ROM(ELUA)\
+  _ROM(CPU)
+
+#endif
 
 #ifdef ALCOR_LANG_PICOC
 
@@ -88,7 +108,9 @@
 // PicoC stack configuration.
 #define PICOC_STACK_SIZE      (16*1024)
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#ifdef ALCOR_LANG_LUA
 
 // *****************************************************************************
 // Language configurations: Lua.
@@ -100,7 +122,7 @@
   _ROM( AUXLIB_ELUA, luaopen_elua, elua_map )\
   _ROM( AUXLIB_TMR, luaopen_tmr, tmr_map )\
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
 
 // Bogus defines for common.c
 #define CON_UART_ID           0
