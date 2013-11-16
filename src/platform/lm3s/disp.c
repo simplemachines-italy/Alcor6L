@@ -3,12 +3,18 @@
 // from Luminary Micro
 // Modified to include support for PicoC.
 
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
 #ifdef ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -118,7 +124,9 @@ extern void lm3s_disp_library_init(void)
   REGISTER("disp.h", NULL, &lm3s_disp_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // LM3S OLED display module for Lua.
@@ -217,4 +225,4 @@ const LUA_REG_TYPE disp_map[] =
   { LNILKEY, LNILVAL }
 };
 
-#endif
+#endif // ALCOR_LANG_LUA

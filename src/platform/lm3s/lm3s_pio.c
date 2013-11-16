@@ -1,12 +1,18 @@
 // LM3S specific PIO support
 // Modified to include support for PicoC.
 
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
 #ifdef ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "rotable.h"
 # include "picoc_mod.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -25,13 +31,13 @@
 # if PICOC_OPTIMIZE_MEMORY == 0
 #  error lm3s_pio can only be compiled with Tiny RAM on (optram=true)
 # endif
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # if LUA_OPTIMIZE_MEMORY == 0
 #  error lm3s.pio can only be compiled with LTR on (optram=true)
 # endif
 #endif
-
-
 
 // Alternate function setting is not available on all CPUs
 #if defined( ALCOR_CPU_LM3S9B92 ) || defined( ALCOR_CPU_LM3S9D92 )
@@ -414,14 +420,7 @@ static const LM3S_PIN_DATA lm3s_pin_data[] =
   { NULL, 0 }
 };
 
-#ifdef ALCOR_LANG_PICOC
-
-// ****************************************************************************
-// LM3S specific PIO support for PicoC.
-
-// TODO
-
-#else
+#ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // LM3S specific PIO support for Lua.
@@ -453,18 +452,14 @@ static int lm3s_pio_set_function( lua_State *L )
   return 0;
 }
 
-#endif // #ifdef LM3S_HAS_ALTERNATE_PIO
+#endif // #ifdef ALCOR_LANG_LUA
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef LM3S_HAS_ALTERNATE_PIO
 
 // ****************************************************************************
 // Other LM3S PIO specific functions for PicoC.
 
-#ifdef ALCOR_LANG_PICOC
-
-// TODO
-
-#else
+#ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Other LM3S PIO specific functions for Lua.
@@ -558,4 +553,4 @@ const LUA_REG_TYPE lm3s_pio_map[] =
   { LNILKEY, LNILVAL }
 };
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
