@@ -19,13 +19,16 @@
 #define PICOLISP_WORD ((int)sizeof(long))
 #define BITS (8*PICOLISP_WORD)
 
-#if defined ALCOR_BOARD_MIZAR32
+#if defined ALCOR_SIM_LINUX
+# define PC_MUL 64
+#elif defined ALCOR_BOARD_MIZAR32
 # define PC_MUL 1024
 #elif defined ALCOR_BOARD_HEXAGON
 # define PC_MUL 64
 #else
 # error "Unknown board/CPU. PC_MUL not defined."
 #endif
+
 #define CELLS (PC_MUL*1024/sizeof(cell))
 
 typedef unsigned long word;
