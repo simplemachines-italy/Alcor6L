@@ -12,7 +12,11 @@ specific_files = " ".join( [ "src/platform/%s/%s" % ( platform, f ) for f in spe
 ldscript = "src/platform/%s/%s" % ( platform, ldscript )
 
 # Standard GCC Flags
-comp.Append(CCFLAGS = ['-ffunction-sections','-fdata-sections','-fno-strict-aliasing','-Wall'])
+if comp['lang'] == 'picolisp':
+  comp.Append(CCFLAGS = ['-ffunction-sections','-falign-functions','-fdata-sections','-fno-strict-aliasing','-Wall'])
+else:
+  comp.Append(CCFLAGS = ['-ffunction-sections','-fdata-sections','-fno-strict-aliasing','-Wall'])
+
 comp.Append(LINKFLAGS = ['-nostartfiles','-nostdlib','-T',ldscript,'-Wl,--gc-sections','-Wl,--allow-multiple-definition'])
 #comp.Append(ASFLAGS = ['-x','assembler-with-cpp','-c','-Wall','$_CPPDEFFLAGS'])
 comp.Append(LIBS = ['c','gcc','m'])
@@ -32,4 +36,3 @@ def progfunc_dummy( target, source, env ):
   print "Run the simulator and enjoy :)"
   
 tools[ 'sim' ][ 'progfunc' ] = progfunc_dummy
-
