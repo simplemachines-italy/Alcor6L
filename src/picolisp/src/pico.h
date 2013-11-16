@@ -19,7 +19,9 @@
 #define PICOLISP_WORD ((int)sizeof(long))
 #define BITS (8*PICOLISP_WORD)
 
-#if defined ALCOR_SIM_LINUX
+#if defined ALCOR_BOARD_EKLM3S8962
+# define PC_MUL 32
+#elif defined ALCOR_SIM_LINUX
 # define PC_MUL 64
 #elif defined ALCOR_BOARD_MIZAR32
 # define PC_MUL 1024
