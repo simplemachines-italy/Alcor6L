@@ -548,9 +548,13 @@ any xSym(any x) {
 }
 
 any boxSubr(fun f) {
+#ifndef ALCOR_SIM_LINUX
    if (num(f) & 3)
       giveup("Unaligned Function");
    return (any)(num(f) | 2);
+#else
+   return (any)((num(f) << 2) + 2);
+#endif
 }
 
 // (args) -> flg
