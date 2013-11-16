@@ -1,12 +1,18 @@
 // eLua platform configuration
-// Modified to include support for PicoC.
+// Modified to include support for Alcor6L.
 
 #ifndef __PLATFORM_CONF_H__
 #define __PLATFORM_CONF_H__
 
 #ifdef ALCOR_LANG_PICOC
 # include "picoc_mod.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "auxmods.h"
 #endif
 
