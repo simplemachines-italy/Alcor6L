@@ -21,6 +21,8 @@
 
 #if defined ALCOR_BOARD_EKLM3S8962
 # define PC_MUL 32
+#elif defined ALCOR_BOARD_PC
+# define PC_MUL 64
 #elif defined ALCOR_SIM_LINUX
 # define PC_MUL 64
 #elif defined ALCOR_BOARD_MIZAR32
