@@ -1,12 +1,18 @@
 // Module to interface with the LCD on the STM3210E board.
 // Modified to include support for PicoC.
 
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
 #ifdef ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -102,7 +108,9 @@ extern void lcd_library_init(void)
   REGISTER("lcd.h", NULL, &lcd_library[0]);
 }
 
-#else
+#endif // ALCOR_LANG_PICOC
+
+#ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // LCD module (for STM3201E_EVAL) for Lua.
@@ -208,6 +216,6 @@ LUALIB_API int luaopen_lcd(lua_State * L)
 #endif // #if LUA_OPTIMIZE_MEMORY > 0  
 }
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
 
 #endif // #ifdef FORSTM3210E_EVAL

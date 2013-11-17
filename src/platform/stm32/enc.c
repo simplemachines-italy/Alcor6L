@@ -3,12 +3,18 @@
 // from ST
 // Modified to include support for PicoC.
 
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
 #ifdef ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
 # include "picoc_mod.h"
 # include "rotable.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "lua.h"
 # include "lualib.h"
 # include "lauxlib.h"
@@ -99,7 +105,9 @@ extern void enc_library_init(void)
   REGISTER("enc.h", NULL, &enc_library);
 }
 
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Timer encoder module for Lua.
@@ -174,4 +182,4 @@ LUALIB_API int luaopen_enc( lua_State *L )
   LREGISTER( L, AUXLIB_ENC, enc_map );
 }  
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
