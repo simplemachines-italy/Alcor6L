@@ -151,7 +151,7 @@ typedef struct catchFrame {
 /* Evaluation */
 #define EVAL(x)         (isNum(x)? x : isSym(x)? val(x) : evList(x))
 
-#ifndef ALCOR_SIM_LINUX
+#ifdef ALCOR_BOARD_MIZAR32
 # define evSubr(f,x)     (*(fun)(num(f) & ~2))(x)
 #else
 # define evSubr(f,x)     (*(fun)(num(f) >> 2))(x)
