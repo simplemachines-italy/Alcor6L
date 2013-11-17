@@ -52,6 +52,10 @@ comp.Append(LINKFLAGS = ['-nostartfiles','-nostdlib','-T',ldscript,'-Wl,--gc-sec
 comp.Append(ASFLAGS = ['-x','assembler-with-cpp','-c','-Wall','$_CPPDEFFLAGS'])
 comp.Append(LIBS = ['c','m','gcc'])
 
+# Language specific options for GCC.
+if comp['lang'] == 'picolisp':
+  comp.Prepend(CCFLAGS = ['-falign-functions'])
+
 TARGET_FLAGS = ['-mcpu=cortex-m3','-mthumb']
 
 # Configure General Flags for Target
