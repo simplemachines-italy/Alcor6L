@@ -134,7 +134,9 @@ static void pioh_clear_masks(void) {
 
 #endif // ALCOR_LANG_PICOC
 
-#ifndef ALCOR_LANG_LUA
+#if !defined ALCOR_LANG_LUA &&\
+    !defined ALCOR_LANG_MYBASIC &&\
+    !defined ALCOR_LANG_TINYSCHEME
 
 // helper macro.
 #define PIO_CHECK(x)\
@@ -272,7 +274,11 @@ static int emit_hfunc_setval() {
   return 0;
 }
 
-#endif // #ifndef ALCOR_LANG_LUA
+#endif
+
+#if defined ALCOR_LANG_PICOLISP ||\
+    defined ALCOR_LANG_PICOC ||\
+    defined ALCOR_LANG_LUA
 
 // Helper function.
 // returns pin/port numeric identifiers.
@@ -453,6 +459,8 @@ emit_static emit_ret_type emit_pio_decode() {
   return 2;
 #endif
 }
+
+#endif
 
 #if defined ALCOR_LANG_PICOLISP
 
