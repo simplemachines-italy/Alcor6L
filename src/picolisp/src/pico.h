@@ -19,7 +19,9 @@
 #define PICOLISP_WORD ((int)sizeof(long))
 #define BITS (8*PICOLISP_WORD)
 
-#if defined ALCOR_BOARD_ETSTM32
+#if defined ALCOR_BOARD_STM3210EEVAL
+# define PC_MUL 64
+#elif defined ALCOR_BOARD_ETSTM32
 # define PC_MUL 32
 #elif defined ALCOR_BOARD_EKLM3S8962
 # define PC_MUL 32
