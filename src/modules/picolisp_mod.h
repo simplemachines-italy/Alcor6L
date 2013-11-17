@@ -116,6 +116,12 @@
   PICOLISP_LIB_DEFINE(plisp_uart_vuart_tmr_ident, uart-vuart-tmr-ident),\
   PICOLISP_LIB_DEFINE(plisp_uart_read, uart-read),
 
+// can module.
+#define PICOLISP_MOD_CAN\
+  PICOLISP_LIB_DEFINE(can_setup, can-setup),\
+  PICOLISP_LIB_DEFINE(can_send, can-send),\
+    PICOLISP_LIB_DEFINE(can_recv, can-recv),
+
 #define MOD_CHECK_ID(pvar, mod, id)\
   if (!platform_ ## mod ## _exists(id))\
     err(pvar, NULL, #mod " %d does not exist", (unsigned int)id)
