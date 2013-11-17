@@ -53,8 +53,26 @@
 #define TERM_LINES            25
 #define TERM_COLS             80
 
-// *****************************************************************************
 // Auxiliary libraries that will be compiled for this platform
+
+#ifdef ALCOR_LANG_PICOLISP
+
+// *****************************************************************************
+// Language configurations: PicoLisp.
+
+#define PICOLISP_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(TERM)\
+  _ROM(ELUA)\
+  _ROM(CPU)\
+  _ROM(TIMER)\
+  _ROM(PWM)\
+  _ROM(SPI)\
+  _ROM(PIO)\
+  _ROM(UART)\
+  _ROM(CAN)
+
+#endif
 
 #ifdef ALCOR_LANG_PICOC
 
@@ -128,7 +146,9 @@
 // PicoC stack configuration.
 #define PICOC_STACK_SIZE      (16*1024)
 
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 
 // ****************************************************************************
 // Language configurations: Lua.
@@ -188,7 +208,7 @@
   _ROM( LUA_MATHLIBNAME, luaopen_math, math_map )\
   PLATLINE
 
-#endif // #ifdef ALCOR_LANG_PICOC
+#endif // #ifdef ALCOR_LANG_LUA
 
 // *****************************************************************************
 // Configuration data
