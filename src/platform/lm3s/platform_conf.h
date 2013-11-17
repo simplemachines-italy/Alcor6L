@@ -90,6 +90,25 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
+#if defined ALCOR_LANG_PICOLISP
+
+// ****************************************************************************
+// Language configurations: picoLisp.
+
+// platform library functions
+#define PICOLISP_PLATFORM_LIBS_ROM\
+  _ROM(PD)\
+  _ROM(TERM)\
+  _ROM(ELUA)\
+  _ROM(CPU)\
+  _ROM(TIMER)\
+  _ROM(PWM)\
+  _ROM(SPI)\
+  _ROM(PIO)\
+  _ROM(UART)
+
+#endif // ALCOR_LANG_PICOLISP
+
 #ifdef ALCOR_LANG_PICOC
 
 // *****************************************************************************
