@@ -225,6 +225,10 @@ any plisp_uart_flow_cts;
 // term modules.
 any plisp_term_wait;
 any plisp_term_nowait;
+
+// can symbols.
+any can_id_ext;
+any can_id_std;
   
 // Alcor6L platform modules.
 any pd_platform(any x);
