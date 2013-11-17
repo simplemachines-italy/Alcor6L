@@ -222,7 +222,7 @@ any plisp_uart_flow_none;
 any plisp_uart_flow_rts;
 any plisp_uart_flow_cts;
 
-// term modules.
+// term symbols.
 any plisp_term_wait;
 any plisp_term_nowait;
 
