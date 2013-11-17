@@ -19,10 +19,16 @@
 #include "buf.h"
 #include "utils.h"
 
+#ifdef ALCOR_LANG_PICOLISP
+# include "pico.h"
+#endif
+
 #ifdef ALCOR_LANG_PICOC
 # include "picoc.h"
 # include "interpreter.h"
-#else
+#endif
+
+#ifdef ALCOR_LANG_LUA
 # include "lua.h"
 # include "lauxlib.h"
 # include "lrotable.h"
