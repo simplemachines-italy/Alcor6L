@@ -105,7 +105,8 @@
   _ROM(PWM)\
   _ROM(SPI)\
   _ROM(PIO)\
-  _ROM(UART)
+  _ROM(UART)\
+  _ROM(CAN)
 
 #endif // ALCOR_LANG_PICOLISP
 
