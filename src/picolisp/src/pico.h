@@ -266,9 +266,9 @@ any cpu_r8(any x);
 any cpu_clock(any x);
 
 // can module.
-any can_setup(any x);
-any can_send(any x);
-any can_recv(any x);
+any plisp_can_setup(any x);
+any plisp_can_send(any x);
+any plisp_can_recv(any x);
 
 // timer module.
 any tmr_delay(any ex);

@@ -11,7 +11,7 @@
 // CAN for picoLisp.
 
 // (can-setup id clock) -> clock
-any can_setup(any ex) {
+any plisp_can_setup(any ex) {
   unsigned id;
   u32 clock;
   any x, y;
@@ -31,7 +31,7 @@ any can_setup(any ex) {
 }
 
 // (can-send id canid canidtype 'message) -> message
-any can_send(any ex) {
+any plisp_can_send(any ex) {
   size_t len;
   int id, canid, idtype;
   any x, y;
@@ -63,7 +63,7 @@ any can_send(any ex) {
 }
 
 // (can-recv id) -> str
-any can_recv(any ex) {
+any plisp_can_recv(any ex) {
   u8 len, idtype, data[8];
   int id;
   u32 canid;
@@ -106,7 +106,7 @@ static const int id_std = ELUA_CAN_ID_STD;
 static const int id_ext = ELUA_CAN_ID_EXT;
 
 // Library setup function */
-extern void can_lib_setup_func(void)
+extern void picoc_can_lib_setup_func(void)
 {
 #if PICOC_TINYRAM_OFF
   picoc_def_integer("can_ID_STD", id_std);
@@ -115,7 +115,7 @@ extern void can_lib_setup_func(void)
 }
 
 // picoc: can_setup(id, clock);
-static void can_setup(pstate *p, val *r, val **param, int n)
+static void picoc_can_setup(pstate *p, val *r, val **param, int n)
 {
   unsigned id;
   u32 clock, res;
@@ -129,7 +129,7 @@ static void can_setup(pstate *p, val *r, val **param, int n)
 }
 
 // picoc: can_send(id, canid, canidtype, message);
-static void can_send(pstate *p, val *r, val **param, int n)
+static void picoc_can_send(pstate *p, val *r, val **param, int n)
 {
   size_t len;
   int id, canid, idtype;
@@ -150,7 +150,7 @@ static void can_send(pstate *p, val *r, val **param, int n)
 }
 
 // picoc: can_recv(id, &message);
-static void can_recv(pstate *p, val *r, val **param, int n)
+static void picoc_can_recv(pstate *p, val *r, val **param, int n)
 {
   u8 len, idtype, data[8];
   int id;
@@ -189,7 +189,9 @@ const PICOC_REG_TYPE can_library[] = {
 // Init library.
 extern void can_library_init(void)
 {
-  REGISTER("can.h", &can_lib_setup_func, &can_library[0]);
+  REGISTER("can.h",
+	   &can_lib_setup_func,
+	   &can_library[0]);
 }
 
 #endif
