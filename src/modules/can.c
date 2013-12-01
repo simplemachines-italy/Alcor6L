@@ -180,9 +180,9 @@ const PICOC_RO_TYPE can_variables[] = {
 
 // List of all library functions and their prototypes
 const PICOC_REG_TYPE can_library[] = {
-  {FUNC(can_setup), PROTO("unsigned long can_setup(unsigned int, unsigned long);")},
-  {FUNC(can_send), PROTO("unsigned int can_send(int, int, int, char *);")},
-  {FUNC(can_recv), PROTO("int can_recv(int, char *);")},
+  {FUNC(picoc_can_setup), PROTO("unsigned long can_setup(unsigned int, unsigned long);")},
+  {FUNC(picoc_can_send), PROTO("unsigned int can_send(int, int, int, char *);")},
+  {FUNC(picoc_can_recv), PROTO("int can_recv(int, char *);")},
   {NILFUNC, NILPROTO}
 };
 
