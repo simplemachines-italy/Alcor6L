@@ -145,6 +145,53 @@ any plisp_adc_setsmoothing(any ex) {
   }
 }
 
+// (adc-sample 'num 'num) -> Nil
+any plisp_adc_sample(any ex) {
+  unsigned id, count = 0, nchans = 1;
+  int res, i;
+  any x, y;
+
+  // get count value, the second parameter
+  // in the picoLisp function call.
+  x = cadr(ex), y = EVAL(car(x));
+  if (isNum(y))
+    count = unBox(y);
+
+  // validate count.
+  if ((count == 0) || count & (count - 1))
+    err(ex, y, "count must be power of 2 and > 0");
+
+  // get first parameter in the function
+  // call.
+  x = cdr(ex), y = EVAL(car(x));
+  // If first parameter is a table,
+  // extract channel list.
+  if (isCell(y)) {
+    nchans = length(y);
+    for (i = 0; i < nchans; i++) {
+      NeedNum(y, car(y));
+      id = unBox(car(y));
+      MOD_CHECK_ID(ex, adc, id);
+      res = adc_setup_channel(id, intlog2(count));
+      if (res != PLATFORM_OK)
+	err(ex, y, "sampling setup failed");
+    }
+    // initiate sampling.
+    platform_adc_start_sequence();
+  } else if (isNum(y)) {
+    NeedNum(ex, y);
+    id = unBox(y);
+    MOD_CHECK_ID(ex, adc, id);
+    res = adc_setup_channel(id, intlog2(count));
+    if (res != PLATFORM_OK)
+      err(ex, y, "sampling setup failed");
+    platform_adc_start_sequence();
+  } else {
+    err(ex, y, "invalid channel selection");
+  }
+  return Nil;
+}
+
 #endif // ALCOR_LANG_PICOLISP
 
 #if defined ALCOR_LANG_PICOC
