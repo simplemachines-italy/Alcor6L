@@ -192,6 +192,23 @@ any plisp_adc_sample(any ex) {
   return Nil;
 }
 
+// (adc-sample 'num) -> num
+any plisp_adc_getsample(any ex) {
+  unsigned id;
+  any x, y;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id.
+  MOD_CHECK_ID(ex, adc, id);
+
+  // If we have at least one sample, return it.
+  if (adc_wait_samples(id, 1) >= 1)
+    return box(adc_get_processed_sample(id));
+
+  return Nil;
+}
+
 #endif // ALCOR_LANG_PICOLISP
 
 #if defined ALCOR_LANG_PICOC
