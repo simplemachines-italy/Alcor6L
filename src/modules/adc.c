@@ -43,7 +43,7 @@
 // ADC (Analog to digital converter) module for picoLisp.
 
 // (adc-maxval 'num) -> num
-any adc_maxval(any ex) {
+any plisp_adc_maxval(any ex) {
   unsigned id;
   u32 res;
   any x, y;
@@ -58,7 +58,7 @@ any adc_maxval(any ex) {
 }
 
 // (adc-setclock 'num 'num 'num) -> num
-any adc_setclock(any ex) {
+any plisp_adc_setclock(any ex) {
   s32 sfreq; // signed version for negative checking.
   u32 freq;
   unsigned id, timer_id = 0;
@@ -90,7 +90,7 @@ any adc_setclock(any ex) {
 }
 
 // (adc-isdone) -> T | Nil
-any adc_isdone(any ex) {
+any plisp_adc_isdone(any ex) {
   unsigned id;
   any x, y;
 
@@ -104,7 +104,7 @@ any adc_isdone(any ex) {
 }
 
 // (adc-setblocking 'num 'num) -> Nil
-any adc_setblocking(any ex) {
+any plisp_adc_setblocking(any ex) {
   unsigned id, mode;
   any x, y;
 
@@ -122,7 +122,7 @@ any adc_setblocking(any ex) {
 }
 
 // (adc-setsmoothing 'num 'num) -> num
-any adc_setsmoothing(any ex) {
+any plisp_adc_setsmoothing(any ex) {
   unsigned id, length, res;
   any x, y;
 
@@ -509,7 +509,7 @@ static int adc_sample( lua_State* L )
 static int adc_getsample( lua_State* L )
 {
   unsigned id;
-  
+
   id = luaL_checkinteger( L, 1 );
   MOD_CHECK_ID( adc, id );
   
