@@ -1,0 +1,173 @@
+=Overview=
+
+This module contains functions for accessing the CPU's PIO (Programmable Input Output) pins. It contains two set of functions with identical names and behaviour. One set groups the functions used to access individual pins from ports, the other groups the functions used to access full ports.
+
+With the pio module, you specifiy names of ports as they appear in your eLua's CPU datasheet. For example, if your CPU's ports are named PA, PB and PC, you can refer to them using <code>pio.PA</code>, <code>pio.PB</code> and <code>pio.PC</code>, respectively. If your CPU uses P0, P1, P2 instead of PA, PB and PC, you can simply use <code>pio.P0</code>, <code>pio.P1</code> and <code>pio.P2</code> instead.
+
+You can also refer to individual pins instead of ports. With the same notation as above, <code>pio.PA_0</code> refers to the first pin of port PA, <code>pio.P0_15</code> refers to the 16th pin of port P0 and so on.
+
+=Functions=
+
+==pio.pin.setdir==
+
+Set pin(s) direction
+
+ pio.pin.setdir( direction, pin1, pin2, ..., pinn )
+
+* pio.pin.setdir( direction, pin1, pin2, ..., pinn )
+* <code>direction</code> - the pin direction, can be either <code>pio.INPUT</code> or <code>pio.OUTPUT</code>
+* <code>pin1</code> - the first pin
+* <code>pin2</code> (optional) - the second pin
+* <code>pinn</code> (optional) - the n-th pin
+
+Returns: nothing.
+
+==pio.pin.setpull==
+
+Enable/disable pullups/pulldowns on the specified pin(s)
+
+ pio.pin.setpull( type, pin1, pin2, ..., pinn )
+
+* <code>type</code> - 'pull' type, can be either <code>pio.PULLUP</code> to enable pullups, <code>pio.PULLDOWN</code> to enable pulldowns, or <code>pio.NOPULL</code> to disable both pullups and pulldowns
+* <code>pin1</code> - the first pin
+* <code>pin2</code> (optional) - the second pin
+* <code>pinn</code> (optional) - the n-th pin
+
+Returns: nothing.
+
+==pio.pin.setval==
+
+Set pin(s) value
+
+ pio.pin.setval( value, pin1, pin2, ..., pinn )
+
+* <code>value</code> - pin value, can be either 0 or 1
+* <code>pin1</code> - the first pin
+* <code>pin2</code> (optional) - the second pin
+* <code>pinn</code> (optional) - the n-th pin
+
+Returns: nothing.
+
+==pio.pin.getval==
+
+Get value of pin(s)
+
+ val1, val2, ..., valn = pio.pin.getval( pin1, pin2, ..., pinn )
+
+* pin1 - the first pin
+* pin2 (optional) - the second pin
+* pinn (optional) - the n-th pin
+
+Returns: The value(s) of the pin(s), either 0 or 1
+
+==pio.pin.sethigh==
+
+Set pin(s) to 1 (high)
+
+ pio.pin.sethigh( pin1, pin2, ..., pinn )
+
+* pin1 - the first pin
+* pin2 (optional) - the second pin
+* pinn (optional) - the n-th pin
+
+Returns: nothing.
+
+==pio.pin.setlow==
+
+Set pin(s) to 0 (low)
+
+ pio.pin.setlow( pin1, pin2, ..., pinn )
+
+* pin1 - the first pin
+* pin2 (optional) - the second pin
+* pinn (optional) - the n-th pin
+
+Returns: nothing.
+
+==pio.port.setdir==
+
+Set port(s) direction
+
+ pio.port.setdir( direction, port1, port2, ..., portn )
+
+* direction - the port direction, can be either pio.INPUT or pio.OUTPUT
+* port1 - the first port
+* port2 (optional) - the second port
+* portn (optional) - the n-th port
+
+Returns: nothing.
+
+==pio.port.setpull==
+
+Enable/disable pullups/pulldowns on the specified port(s)
+
+ pio.port.setpull( type, port1, port2, ..., portn )
+
+* type - 'pull' type, can be either pio.PULLUP to enable pullups, pio.PULLDOWN to enable pulldowns, or pio.NOPULL to disable both pullups and pulldowns
+* port1 - the first port
+* port2 (optional) - the second port
+* portn (optional) - the n-th port
+
+Returns: nothing.
+
+==pio.port.setval==
+
+Set port(s) value
+
+ pio.port.setval( value, port1, port2, ..., portn )
+
+* value - port value
+* port1 - the first port
+* port2 (optional) - the second port
+* portn (optional) - the n-th port
+
+Returns: nothing.
+
+==pio.port.getval==
+
+Get value of port(s)
+
+ val1, val2, ..., valn = pio.port.getval( port1, port2, ..., portn )
+
+* port1 - the first port
+* port2 (optional) - the second port
+* portn (optional) - the n-th port
+
+Returns: The value(s) of the port(s)
+
+==pio.port.sethigh==
+
+Set port(s) to all 1 (high)
+
+ pio.port.sethigh( port1, port2, ..., portn )
+
+* port1 - the first port
+* port2 (optional) - the second port
+* portn (optional) - the n-th port
+
+Returns: nothing.
+
+==pio.port.setlow==
+
+Set port(s) to all 0 (low)
+
+ pio.port.setlow( port1, port2, ..., portn )
+
+* port1 - the first port
+* port2 (optional) - the second port
+* portn (optional) - the n-th port
+
+Returns: nothing.
+
+==pio.decode==
+
+Convert a PIO resource number to the corresponding port and pin. This is most commonly used in GPIO edge interrupt routines to convert the Lua interrupt routine's argument to the port and pin that caused the interrupt but it can also be used on the values returned by the pin names pio.PA_0, pio.P2_15 and so on.
+
+ port, pin = pio.decode( resnum )
+
+* resnum - the resource number of the pin
+
+Returns:
+* port - the index of the port, starting from 0 (so port A is 0, port B is 1 and so on)
+* pin - the pin number, usually from 0 to 31
+

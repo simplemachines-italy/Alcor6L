@@ -1,0 +1,90 @@
+=Overview=
+
+This module contains functions for accessing the serial ports (UARTs) of the eLua CPU.
+
+UART ids can be
+* 0, 1, etc for physical serial ports,
+* <code>uart.VUART0</code> to <code>uart.VUART7</code> if virtual UART support is enabled in eLua, or
+* 176 for the USB CDC serial port.
+
+=Functions=
+
+==uart.setup==
+
+Setup the serial port. Note that you can't call this function for a virtual UART.
+
+ baud = uart.setup( id, baud, databits, parity, stopbits )
+
+* id - the ID of the serial port
+* baud - serial baud rate
+* databits - number of data bits
+* parity - parity type, can be <code>uart.PAR_EVEN</code>, <code>uart.PAR_ODD</code> or <code>uart.PAR_NONE</code>
+* stopbits - the number of stop bits, can be <code>uart.STOP_1</code>, <code>uart.STOP_1_5</code> or <code>uart.STOP_2</code>
+
+Returns:
+* baud - The actual baud rate set on the serial port. Depending on the hardware, this might have a different value than the baud parameter
+
+==uart.write==
+
+Write one or more strings or 8-bit integers (raw data) to the serial port. If writing raw data, its value (represented by an integer) must be between 0 and 255.
+
+ uart.write( id, data1, [data2], ..., [datan] )
+
+* id - the ID of the serial port.
+* data1 - the first string/8-bit integer to write.
+* data2 (optional) - the second string/8-bit integer to write.
+* datan (optional) - the n-th string/8-bit integer to write.
+
+==uart.getchar==
+
+Read a single character from the serial port
+
+ str = uart.getchar( id, [timeout], [timer_id] )
+
+* id - the ID of the serial port
+* timeout (optional) - timeout of the operation, can be either uart.NO_TIMEOUT or 0 for non-blocking operation, uart.INF_TIMEOUT for blocking operation, or a positive number that specifies the timeout in microseconds. The default value of this argument is uart.INF_TIMEOUT.
+* timer_id (optional) - the ID of the timer used for measuring the timeout. If not specified it defaults to the system timer.
+
+Returns:
+* str - The character read from the serial port as a string, or the empty string it timeout occured while waiting for the character.
+
+==uart.read==
+
+Reads one or more characters from the serial port according to a format specifier
+
+ str = uart.read( id, format, [timeout], [timer_id] )
+
+* id - the ID of the serial port
+* format - format of data to read. This can be either:
+**      '*l' - read until an end of line character (a \n) is found (the \n is not returned) or a timeout occurs.
+**      '*n' - read an integer. The integer can optionally have a sign. Reading continues until the first non-digit character is detected or a timeout occurs. This is the only case in which read returns a number instead of an integer.
+**      '*s' - read until a spacing character (like a space or a TAB) is found (the spacing character is not returned) or a timeout occurs.
+**      a positive number - read at most this many characters before returning (reading can stop earlier if a timeout occurs).
+* timeout (optional) - timeout of the operation, can be either uart.NO_TIMEOUT or 0 for non-blocking operation, uart.INF_TIMEOUT for blocking operation, or a positive number that specifies the timeout in microseconds. The default value of this argument is uart.INF_TIMEOUT.
+* timer_id (optional) - the ID of the timer used for measuring the timeout. If not specified it defaults to the system timer.
+
+Returns:
+* str - The data read from the serial port as a string (or as a number if format is '*n'). If a timeout occures, only the data read before the timeout is returned. If the function times out while trying to read the first character, the empty string is returned
+
+==uart.set_buffer==
+
+Sets the size of the UART buffer. Note that calling this function with bufsize = 0 for a virtual UART is not allowed.
+
+ uart.set_buffer( id, bufsize )
+
+* id - the ID of the serial port
+* bufsize - the size of the buffer (must be a power of 2) or 0 to disable buffering on the specified UART.
+
+==uart.set_flow_control==
+
+Sets the flow control on the UART. Note that this function works only on physical ports, it will return an error if called on a virtual UART.
+
+ uart.set_flow_control( id, type )
+
+* id - the ID of the serial port.
+* type - the flow control type, it can be:
+** <code>uart.FLOW_NONE</code> (no flow control),
+** <code>uart.FLOW_RTS</code> for RTS flow control,
+** <code>uart.FLOW_CTS</code> for CTS flow control or
+** <code>uart.FLOW_RTS + uart.FLOW_CTS</code> for full RTS/CTS flow control.
+

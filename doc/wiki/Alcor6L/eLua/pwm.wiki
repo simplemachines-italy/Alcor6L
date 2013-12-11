@@ -1,0 +1,62 @@
+=Overview=
+
+This module contains functions for accessing the PWM (Pulse Width Modulation) modules of the eLua CPU.
+
+=Functions=
+
+==pwm.setup==
+
+Setup the PWM modules.
+
+ frequency = pwm.setup( id, frequency, duty )
+
+* id - the ID of the PWM module.
+* frequency - the frequency of the PWM module (in Hz).
+* duty - the duty cycle of the PWM module given in percents. This must be an integer between 0 and 100. Depending on the hardware, some duty cycles (particulary 0 and 100) might not be achievable.
+
+Returns:
+* frequency - The actual frequency set on the PWM module. Depending on the hardware, this might have a different value than the frequency argument.
+
+==pwm.start==
+
+Start the PWM signal on the given module.
+
+ pwm.start( id )
+
+* id - the ID of the PWM module.
+
+Returns: nothing.
+
+==pwm.stop==
+
+Stop the PWM signal on the given module.
+
+ pwm.stop( id )
+
+* id - the ID of the PWM module.
+
+Returns: nothing.
+
+==pwm.setclock==
+
+Set the base clock of the given PWM module.
+
+ clock = pwm.setclock( id, clock )
+
+* id - the ID of the PWM module.
+* clock - the desired base clock.
+
+Returns:
+* clock - The actual base clock set on the PWM module. Depending on the hardware, this might have a different value than the clock argument.
+
+==pwm.getclock==
+
+Get the base clock of the given PWM module.
+
+ clock = pwm.getclock( id )
+
+* id - the ID of the PWM module.
+
+Returns:
+* clock - The base clock of the PWM module.
+

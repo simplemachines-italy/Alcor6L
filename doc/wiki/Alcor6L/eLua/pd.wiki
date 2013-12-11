@@ -1,0 +1,33 @@
+=Overview=
+
+This module contains functions that access specific platform data. Useful if the code needs to know on which platform it runs.
+
+=Functions=
+
+==pd.platform==
+
+ platform = pd.platform()
+
+Get platform name.
+
+Returns:
+* platform - the name of the platform on which eLua is running.
+
+==pd.cpu==
+
+Get CPU name.
+
+ cpu = pd.cpu()
+
+Returns:
+* cpu - the name of the CPU of the platform on which eLua is running.
+
+==pd.board==
+
+Get board name.
+
+ board = pd.board()
+
+Returns:
+* board - the name of the board on which eLua is running.
+

@@ -1,0 +1,143 @@
+=Overview=
+
+This module deals with low-level access to CPU (and related modules) functionality, such as reading and writing memory, or enabling and disabling interrupts. It also offers access to platform specific CPU-related constants.
+
+=Functions=
+
+==cpu.w32==
+
+Writes a 32-bit word to memory.
+
+ cpu.w32( address, data )
+
+* address - the memory address.
+* data - the 32-bit data to write.
+
+Returns: nothing.
+
+==cpu.r32==
+
+Read a 32-bit word from memory.
+
+ data = cpu.r32( address )
+
+* address - the memory address.
+
+Returns:
+* data - the 32-bit word read from memory.
+
+==cpu.w16==
+
+Writes a 16-bit word to memory.
+
+ cpu.w16( address, data )
+
+* address - the memory address.
+* data - the 16-bit data to write.
+
+Returns: nothing.
+
+==cpu.r16==
+
+Reads a 16-bit word from memory.
+
+ data = cpu.r16( address )
+
+* address - the memory address.
+
+Returns:
+* data - the 16-bit word read from memory.
+
+==cpu.w8==
+
+Writes a byte to memory.
+
+ cpu.w8( address, data )
+
+* address - the memory address.
+* data - the byte to write.
+
+Returns: nothing.
+
+==cpu.r8==
+
+Reads a byte from memory.
+
+ data = cpu.r8( address )
+
+* address - the memory address
+
+Returns:
+* data - the byte read from memory.
+
+==cpu.cli==
+
+Disables the global CPU interrupt flag if called without arguments, or a specific interrupt for a list of resource IDs if called with arguments.
+
+ cpu.cli( [id], [resnum1], [resnum2], ... [resnumn])
+
+* id - the interrupt ID. If specified, at least one resource ID must also be specified.
+* resnum1 - the first resource ID, required if id is specified.
+* resnum2 (optional) - the second resource ID.
+* resnumn (optional) - the #n#-th resource ID.
+
+Returns: nothing.
+
+==cpu.sei==
+
+Enables the global CPU interrupt flag if called without arguments, or a specific interrupt for a list of resource IDs if called with arguments.
+
+ cpu.sei( [id], [resnum1], [resnum2], ... [resnumn])
+
+* id - the interrupt ID. If specified, at least one resource ID must also be specified.
+* resnum1 - the first resource ID, required if id is specified.
+* resnum2 (optional) - the second resource ID.
+* resnumn (optional) - the #n#-th resource ID.
+
+Returns: nothing.
+
+==cpu.clock==
+
+Get the CPU core frequency.
+
+ clock = cpu.clock()
+
+Arguments: none.
+
+Returns:
+* clock - the CPU clock (in Hertz).
+
+==cpu.set_int_handler==
+
+Sets the Lua interrupt handler for interrupt *id* to function *handler*. *handler* can be #nil# to disable the interrupt handler. Only available if interrupt support is enabled, check here for details.
+
+ prev_handler = cpu.set_int_handler( id, handler )
+
+* id - the interrup ID.
+* handler - the Lua interrupt handler function, or *nil* to disable the Lua interrupt handler feature.
+
+Returns:
+* prev_handler - the previous interrupt handler for interrupt *id*, or *nil* if an interrupt handler was not set for interrupt *id*.
+
+==cpu.get_int_handler==
+
+Returns the Lua interrupt handler for interrupt *id*
+
+ handler = cpu.get_int_handler( id )
+
+* id - the interrup ID.
+
+Returns: handler - the interrupt handler for interrupt *id*, or *nil* if an interrupt handler is not set for interrupt *id*.
+
+==cpu.get_int_flag==
+
+Get the interrupt pending flag of an interrupt ID/resource ID combination, and optionally clear the pending flag. Only available if interrupt support is enabled, check here for details.
+
+ cpu.get_int_flag( id, resnum, [clear] )
+
+* id - the interrupt ID.
+* resnum - the resource ID.
+* clear (optional) - true to clear the interrupt pending flag or false to leave the interrupt pending flag untouched. Defaults to true if not specified.
+
+Returns: nothing.
+

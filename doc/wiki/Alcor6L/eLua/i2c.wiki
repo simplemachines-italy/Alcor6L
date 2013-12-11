@@ -1,0 +1,78 @@
+=Overview=
+
+This module contains functions for accessing the I2C interfaces of the eLua CPU.
+
+Only master I2C mode is implemented in eLua.
+
+=Functions=
+
+==i2c.setup==
+
+Setup the I2C interface.
+
+speed = i2c.setup( id, speed )
+
+* id - the ID of the I2C interface.
+* speed - the clock frequency of the I2C interface. It can be i2c.FAST (400KHz), i2c.SLOW (100KHz) or a number giving the required I2C bus clock speed in Hz.
+
+Returns:
+* speed - the actual speed of the I2C interface.
+
+==i2c.start==
+
+Send a START on the specified I2C interface.
+
+ i2c.start( id )
+
+* id - the ID of the I2C interface.
+
+Returns: nothing.
+
+==i2c.stop==
+
+Send a STOP on the specified I2C interface.
+
+ i2c.stop( id )
+
+* id - the ID of the I2C interface.
+
+Returns: nothing.
+
+==i2c.address==
+
+Send an address on the I2C interface.
+
+ acked = i2c.address( id, address, direction )
+
+* id - the ID of the I2C interface.
+* address - the address.
+* direction - i2c.TRANSMITTER if the master wants to send data, or i2c.RECEIVER if the master wants to receive data.
+
+Returns:
+* acked - true if the address was acknowledged by an I2C slave, false otherwise.
+
+==i2c.write==
+
+Writes data to a slave that has already acknowledged an i2c.address call.
+
+ wrote = i2c.write( id, data1, [data2], ..., [datan] )
+
+* id - the ID of the I2C interface.
+* data1 - the data to send. It can be either a number between 0 and 255, a string or a table (array) of numbers.
+* data2 (optional) - the second data to send.
+* datan (optional) - the n-th data to send.
+
+Returns:
+* wrote - the number of bytes actually written.
+
+==i2c.read==
+
+ data = i2c.read( id, numbytes )
+
+Reads a number of bytes from a slave that has already acknowledged an i2c.address call. It acknowledges all the bytes received except for the last one.
+
+* id - the ID of the I2C interface.
+* numbytes - the number of bytes to read.
+
+Returns:
+* data - a string with all the data read from the I2C interface.

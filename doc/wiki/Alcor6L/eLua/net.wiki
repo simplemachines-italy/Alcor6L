@@ -1,0 +1,143 @@
+=Overview=
+
+This module contains functions for accessing a TCP/IP network from eLua. It can be enabled only if networking support is also enabled (see building for details).
+
+NOTE: TCP/IP support is experimental in eLua. While functional, it's still slow and suffers from a number of other issues. It will most likely change a lot in the future, so expect major changes to this module as well. Only TCP sockets are supported by eLua.
+
+Most of the network functions return an error code to say whether the operation was successful or not:
+* net.ERR_OK - the operation was successful.
+* net.ERR_TIMEDOUT - the operation timed out
+* net.ERR_CLOSED - you tried to connect to a closed port
+* net.ERR_ABORTED - the operation aborted
+* net.ERR_OVERFLOW - the operation overflowed
+
+=Functions=
+
+==net.packip==
+
+Returns an internal representation of an IP address that can be used with all function from the net module that expect an IP address argument. The IP is considered to be in the format ip1.ip2.ip3.ip4.
+
+ ip = net.packip( ip1, ip2, ip3, ip4 )
+
+* ip1 - the first part of the IP address.
+* ip2 - the second part of the IP address.
+* ip3 - the third part of the IP address.
+* ip4 - the fourth part of the IP address.
+
+ ip = net.packip( str )
+
+* str - the IP address in string format, for example '192.168.1.1'.
+
+Returns:
+* ip - An integer that encodes the IP address in an internal format.
+
+==net.unpackip==
+
+Returns an unpacked representation of an IP address encoded by net.packip.
+
+ ip1, ip2, ip3, ip4 = net.unpackip( ip, '*n' )
+
+* ip - the encoded IP address.
+
+Returns:
+* ip1 - the first part of the IP address.
+* ip2 - the second part of the IP address.
+* ip3 - the third part of the IP address.
+* ip4 - the fourth part of the IP address.
+
+ ip = net.unpackip( ip, '*s' )
+
+* ip - the encoded IP address.
+
+Returns:
+* ip - The IP address in string format.
+
+==net.lookup==
+
+Does a DNS lookup.
+
+ ip = net.lookup( hostname )
+
+* hostname - the name of the computer.
+
+Returns:
+* ip - The IP address of the computer.
+
+==net.socket==
+
+Create a socket for TCP/IP communication.
+
+ socket = net.socket( type )
+
+* type - can be either net.SOCK_STREAM for TCP sockets or net.SOCK_DGRAM for UDP sockets (not yet supported).
+
+Returns: The socket that will be used in subsequent operations.
+
+==net.close==
+
+Close a socket.
+
+ res = net.close( socket )
+
+* socket - the socket to close.
+
+Returns:
+* res - An error code.
+
+==net.connect==
+
+Connect a socket to a remote system.
+
+ err = net.connect( sock, ip, port )
+
+* sock - a socket obtained from net.socket.
+* ip - the IP address obtained from net.packip.
+* port - the port to connecto to.
+
+Returns:
+* err - the error code.
+
+==net.accept==
+
+Accept a connection from a remote system with an optional timeout.
+
+ socket, remoteip, err = net.accept( port, [timer_id, timeout] )
+
+* port - the port to wait for connections from the remote system.
+* timer_id (optional) - the ID of the timer used for measuring the timeout. Use nil or tmr.SYS_TIMER to specify the system timer.
+* timeout (optional) - timeout of the operation, can be either net.NO_TIMEOUT or 0 for non-blocking operation, net.INF_TIMEOUT for blocking operation, or a positive number that specifies the timeout in microseconds. The default value of this argument is unet.INF_TIMEOUT.
+
+Returns:
+* socket - the socket created after accepting the remote connection.
+* remoteip - the IP of the remote system.
+* err - an error code.
+
+==net.send==
+
+Send data to a socket.
+
+ res, err = net.send( sock, str )
+
+* sock - the socket.
+* str - the data to send.
+
+Returns:
+* res - the number of bytes actually sent or -1 for error.
+* err - the error code.
+
+==net.recv==
+
+Read data from a socket.
+
+ res, err = net.recv( sock, format, [timer_id, timeout] )
+
+* sock - the socket.
+* format - how to read the data. This can be either:
+** "*l": read a line (until the next '\n' character).
+** an integer: read up to that many bytes.
+* timer_id (optional) - the ID of the timer used for measuring the timeout. Use nil or tmr.SYS_TIMER to specify the system timer.
+* timeout (optional) - timeout of the operation, can be either net.NO_TIMEOUT or 0 for non-blocking operation, net.INF_TIMEOUT for blocking operation, or a positive number that specifies the timeout in microseconds. The default value of this argument is net.INF_TIMEOUT.
+
+Returns:
+* res - the number of bytes read.
+* err - the error code.

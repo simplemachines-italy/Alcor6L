@@ -1,0 +1,48 @@
+=Overview=
+
+This module contains functions for accessing the CAN interfaces of the eLua CPU
+
+Two types of CAN identifier numbers are used:
+* can.ID_STD: Standard CAN identifiers are 11 bits in length
+* can.ID_EXT: Extended identifiers are 29 bits.
+
+=Functions=
+
+==can.setup==
+
+Setup the CAN interface
+
+ clock = can.setup( id, clock )
+
+* id - the ID of the CAN interface
+* clock - the clock of the CAN interface.
+
+Returns:
+* clock - The actual clock set on the CAN interface. Depending on the hardware, this might have a different value than the clock parameter.
+
+==can.send==
+
+Send message over the CAN bus.
+
+ can.send( id, canid, canidtype, message )
+
+* id - the ID of the CAN interface.
+* canid - CAN identifier number.
+* canidtype - identifier type: can.ID_STD or can.ID_EXT
+* message - message in string format, 8 or fewer bytes.
+
+Returns: nothing.
+
+==can.recv==
+
+Receive CAN bus message.
+
+ canid, canidtype, message = can.recv( id )
+
+* id - the ID of the CAN interface.
+
+Returns:
+* canid - CAN identifier number.
+* canidtype - identifier type: can.ID_STD or can.ID_EXT
+* message - message in string format, 8 or fewer bytes.
+

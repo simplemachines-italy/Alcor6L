@@ -1,0 +1,41 @@
+==term.getchar==
+
+Read a char (a key press) from the terminal
+
+ ch = term.getchar( [ mode ] )
+
+* mode (optional) - terminal input mode. It can be either:
+** <code>term.WAIT</code> - wait for a key to be pressed, then return it. This is the default behaviour if mode is not specified.
+** <code>term.NOWAIT</code> - if a key was pressed on the terminal return it, otherwise return -1.
+
+Returns:
+* ch - The char read from a terminal or -1 if no char is available. The 'char' can be an actual ASCII char, or a 'pseudo-char' which encodes special keys on the keyboard. The list of the special chars and their meaning is given in the table below:
+{| class="wikitable"
+|-
+! Key code !!	Meaning
+|-
+|KC_UP 	|| the UP key on the terminal
+|-
+|KC_DOWN 	|| the DOWN key on the terminal
+|-
+|KC_LEFT 	|| the LEFT key on the terminal
+|-
+|KC_RIGHT 	|| the RIGHT key on the terminal
+|-
+|KC_HOME 	|| the HOME key on the terminal
+|-
+|KC_END 	|| the END key on the terminal
+|-
+|KC_PAGEUP 	|| the PAGE UP key on the terminal
+|-
+|KC_PAGEDOWN 	|| the PAGE DOWN key on the terminal
+|-
+|KC_ENTER 	|| the ENTER (CR) key on the terminal
+|-
+|KC_TAB 	|| the TAB key on the terminal
+|-
+|KC_BACKSPACE 	|| the BACKSPACE key on the terminal
+|-
+|KC_ESC 	|| the ESC (escape) key on the terminal
+|}
+

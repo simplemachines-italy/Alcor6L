@@ -1,0 +1,45 @@
+Alcor6L is a simple-to-use multi-language interactive programming environment that runs on a variety of embedded hardware devices.
+
+It runs programs in:
+* Lua using [http://eluaproject.net eLua]
+* C using PicoC
+* Lisp using PicoLisp
+and in development:
+* BASIC using MY-BASIC
+* Scheme using TinyScheme 
+* Forth
+on cheap 32-bit single-board computers:
+* The [http://simplemachines.it/mizar32 Mizar32] models A and B by simplemachines.it, available from [http://4star.it 4star.it]
+* LM3S and STM32 ARM boards 
+
+The source code is available from: http://github.com/simplemachines-italy/Alcor6L
+
+Compiled firmware images can be downloaded from: http://simplemachines.it/downloads/Alcor6L
+
+and it has a mailing list at http://groups.google.com/forum/#!forum/alcor6l
+
+This wikibook is a work-in progress to produce its reference manual and tutorial.
+
+=Language modules=
+[[Alcor6L/eLua|eLua]] has:
+[[Alcor6L/eLua/adc|adc]]
+[[Alcor6L/eLua/bit|bit]]
+[[Alcor6L/eLua/cpu|cpu]]
+[[Alcor6L/eLua/elua|elua]]
+[[Alcor6L/eLua/i2c|i2c]]
+[[Alcor6L/eLua/net|net]]
+[[Alcor6L/eLua/pack|pack]]
+[[Alcor6L/eLua/pd|pd]]
+[[Alcor6L/eLua/pio|pio]]
+[[Alcor6L/eLua/pwm|pwm]]
+[[Alcor6L/eLua/spi|spi]]
+[[Alcor6L/eLua/term|term]]
+[[Alcor6L/eLua/tmr|tmr]]
+[[Alcor6L/eLua/uart|uart]]
+[[Alcor6L/eLua/mizar32.lcd|mizar32.lcd]]
+[[Alcor6L/eLua/mizar32.rtc|mizar32.rtc]]
+
+[[Alcor6L/PicoC|PicoC]] has:
+
+[[Alcor6L/PicoLisp|PicoC]] has:
+
