@@ -1,0 +1,26 @@
+=Overview=
+
+This module contains functions to drive the Real-Time Clock present on the Mizar32's ethernet module.
+
+The functions accept and return the time and date as a table in the same format at Lua's <code>os.date()</code> and <code>os.time()</code> functions, with fields <code>year</code> (1900-2099), <code>month</code> (1-12), <code>day</code> (1-31), <code>wday</code> (1-7), <code>hour</code> (0-23), <code>min</code> (0-59) and <code>sec</code> (0-59). For <code>wday</code>, the day of the week, by convention, 1 is Sunday.
+
+=Functions=
+
+==mizar32.rtc.set==
+
+Sets the time and/or date into the RTC hardware.
+
+ mizar32.rtc.set(datetime)
+
+* datetime - A table with the time and/or date fields to set. Any fields which are not present (or are nil) are not changed, so you can set the time, the date or individual fields separately. Setting nonexistent dates like the 31st of February is possible but what will happen next is unpredictable.
+
+==mizar32.rtc.get==
+
+ datetime = mizar32.rtc.get()
+
+Reads the current date and time from the RTC hardware.
+
+Returns:
+* datetime - A table with fields year, month, day, wday, hour, min and sec.
+
+
