@@ -1,5 +1,4 @@
-// eLua shell - modified to support Alcor's
-// requirements.
+// eLua shell - modified for Alcor6L.
 
 #ifndef __SHELL_H__
 #define __SHELL_H__
