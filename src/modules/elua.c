@@ -151,11 +151,10 @@ any plisp_elua_save_history(any x) {
 #endif
 }
 
-// (elua-shell 'sym) -> sym|Nil
+// (elua-shell 'sym) -> Nil
 any plisp_elua_shell(any x) {
   any y = cdr(x);
   char *cmdcpy;
-  const SHELL_COMMAND *t;
 
   y = EVAL(car(y));
   char pcmd[bufSize(y)];
@@ -166,12 +165,10 @@ any plisp_elua_shell(any x) {
   if ((cmdcpy = (char *)malloc(strlen(pcmd) + 2)) == NULL)
     err(NULL, NULL, "not enough memory for elua-shell");
   strcpy(cmdcpy, pcmd);
-  t = shellh_execute_command(cmdcpy, 0);
+  shellh_execute_command(cmdcpy, 0);
+
   free(cmdcpy);
-  if (!t)
-    return Nil;
-  else
-    return mkStr(t->cmd);
+  return Nil;
 }
 
 #endif // ALCOR_LANG_PICOLISP
