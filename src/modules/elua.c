@@ -125,6 +125,7 @@ any plisp_elua_version(any x) {
   return mkStr(ELUA_STR_VERSION);
 }
 
+// (elua-save-history 'sym) -> Nil
 any plisp_elua_save_history(any x) {
 #ifdef BUILD_LINENOISE
   int res; // holds result.
@@ -145,7 +146,7 @@ any plisp_elua_save_history(any x) {
     outString("History empty, nothing to save.\n");
   else
     printf("Unable to save history to %s.\n", fname);
-  return y;
+  return NIL;
 #else
   err(NULL, NULL, "linenoise support not enabled.");
 #endif
