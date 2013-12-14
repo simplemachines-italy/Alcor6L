@@ -7,7 +7,27 @@
 #include "type.h"
 
 #define SHELL_WELCOMEMSG                "\nAlcor6L %s  Copyright (C) 2013 simplemachines-italy\n"
-#define SHELL_PROMPT                    "alcor# "
+
+#ifdef ALCOR_LANG_PICOLISP
+# define SHELL_PROMPT                   "Alcor6L/picolisp# "
+#endif
+
+#ifdef ALCOR_LANG_PICOC
+# define SHELL_PROMPT                   "Alcor6L/picoc# "
+#endif
+
+#ifdef ALCOR_LANG_LUA
+# define SHELL_PROMPT                   "Alcor6L/lua# "
+#endif
+
+#ifdef ALCOR_LANG_TINYSCHEME
+# define SHELL_PROMPT                   "Alcor6L/tinyscheme# "
+#endif
+
+#ifdef ALCOR_LANG_MYBASIC
+# define SHELL_PROMPT                   "Alcor6L/mybasic# "
+#endif
+
 #define SHELL_ERRMSG                    "Invalid command, type 'help' for help\n"
 #define SHELL_MAXSIZE                   50
 #define SHELL_MAX_LUA_ARGS              8
