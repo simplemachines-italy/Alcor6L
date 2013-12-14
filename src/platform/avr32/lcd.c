@@ -149,7 +149,7 @@ static int set_cursor( u8 command_byte )
 // ****************************************************************************
 // LCD display module for picoLisp.
 
-// (lcd-reset) -> Nil
+// (mizar32-lcd-reset) -> Nil
 any plisp_lcd_reset(any ex) {
   cursor_type = DEFAULT_CURSOR_TYPE;
   display_is_off = 0;
@@ -158,7 +158,7 @@ any plisp_lcd_reset(any ex) {
   return Nil;
 }
 
-// (lcd-setup shift_disp r-to-l) -> Nil
+// (mizar32-lcd-setup shift_disp r-to-l) -> Nil
 any plisp_lcd_setup(any ex) {
   any x, y;
   long shift_disp, r_to_l;
@@ -175,21 +175,21 @@ any plisp_lcd_setup(any ex) {
   return Nil;
 }
 
-// (lcd-clear) -> Nil
+// (mizar32-lcd-clear) -> Nil
 // Clear the display, reset its shiftedness and put the cursor at 1,1
 any plisp_lcd_clear(any ex) {
   send_command(LCD_CMD_CLEAR);
   return Nil;
 }
 
-// (lcd-home) -> Nil
+// (mizar32-lcd-home) -> Nil
 // Reset the display's shiftedness and put the cursor at 1,1
 any plisp_lcd_home(any ex) {
   send_command(LCD_CMD_HOME);
   return Nil;
 }
 
-// (lcd-goto row col) -> Nil
+// (mizar32-lcd-goto row col) -> Nil
 // Move the cursor to the specified row (1 or 2) and
 // column (1-40) in the character memory.
 any plisp_lcd_goto(any ex) {
