@@ -187,23 +187,37 @@ static void ptermh_prin(any x) {
   }
 }
 
-// (term-prinl 'num 'num 'any ..) -> any
+// (term-prinl ['num 'num] 'any ..) -> any
 any plisp_term_prinl(any ex) {
   any x, y;
   long n1, n2;
-  
-  // get coordinates.
-  x = cdr(ex), y = EVAL(car(x));
-  NeedNum(ex, y);
-  n1 = unBox(y);
-  x = cdr(x), y = EVAL(car(x));
-  NeedNum(ex, y);
-  n2 = unBox(y);
-  term_gotoxy(n1, n2);
 
-  // and now, print.
-  x = cdr(x), y = EVAL(car(x));
-  ptermh_prin(y);
+  // if number of args > 1, we accept
+  // a min of 3 args - x, y and the value
+  // to print.
+  if (plen(ex) > 1 && isNum(cadr(ex)) && isNum(caddr(ex))) {
+    x = cdr(ex), y = EVAL(car(x));
+    NeedNum(ex, y);
+    n1 = unBox(y); // we get x here.
+    x = cdr(x), y = EVAL(car(x));
+    NeedNum(ex, y);
+    n2 = unBox(y); // we get y here.
+    term_gotoxy(n1, n2);
+    // now, get the rest of the params
+    // and prinl.
+    while (isCell(x = cdr(x)))
+      ptermh_prin(y = EVAL(car(x)));
+  } else {
+    // We don't have the coordinates.
+    // we just print the first value
+    // in the list (including NIL).
+    x = cdr(ex), y = EVAL(car(x));
+    ptermh_prin(y);
+    while (isCell(x = cdr(x)))
+      ptermh_prin(y = EVAL(car(x)));
+  }
+
+  newline();
   return y;
 }
 
