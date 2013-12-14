@@ -121,6 +121,7 @@ int elua_shell(mb_interpreter_t* s, void **l) {
 // ****************************************************************************
 // eLua core module for picoLisp.
 
+// (elua-version) -> sym
 any plisp_elua_version(any x) {
   return mkStr(ELUA_STR_VERSION);
 }
