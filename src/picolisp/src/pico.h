@@ -252,9 +252,9 @@ any plisp_term_getchar(any x);
 any plisp_term_decode(any x);
 
 // eLua module.
-any elua_version(any x);
-any elua_save_history(any x);
-any elua_shell(any x);
+any plisp_elua_version(any x);
+any plisp_elua_save_history(any x);
+any plisp_elua_shell(any x);
 
 // cpu module.
 any cpu_w32(any x);

@@ -121,11 +121,11 @@ int elua_shell(mb_interpreter_t* s, void **l) {
 // ****************************************************************************
 // eLua core module for picoLisp.
 
-any elua_version(any x) {
+any plisp_elua_version(any x) {
   return mkStr(ELUA_STR_VERSION);
 }
 
-any elua_save_history(any x) {
+any plisp_elua_save_history(any x) {
 #ifdef BUILD_LINENOISE
   int res; // holds result.
   any y;   // cdr(x)
@@ -152,7 +152,7 @@ any elua_save_history(any x) {
 }
 
 // (elua-shell 'sym) -> sym|Nil
-any elua_shell(any x) {
+any plisp_elua_shell(any x) {
   any y = cdr(x);
   char *cmdcpy;
   const SHELL_COMMAND *t;

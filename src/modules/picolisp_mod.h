@@ -40,9 +40,9 @@
 
 // eLua module.
 #define PICOLISP_MOD_ELUA\
-  PICOLISP_LIB_DEFINE(elua_version, elua-version),\
-  PICOLISP_LIB_DEFINE(elua_save_history, elua-save-history),\
-  PICOLISP_LIB_DEFINE(elua_shell, elua-shell),
+  PICOLISP_LIB_DEFINE(plisp_elua_version, elua-version),\
+  PICOLISP_LIB_DEFINE(plisp_elua_save_history, elua-save-history),\
+  PICOLISP_LIB_DEFINE(plisp_elua_shell, elua-shell),
 
 // cpu module.
 #define PICOLISP_MOD_CPU\
