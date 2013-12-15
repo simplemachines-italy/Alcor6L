@@ -158,20 +158,22 @@ any plisp_lcd_reset(any ex) {
   return Nil;
 }
 
-// (mizar32-lcd-setup shift_disp r-to-l) -> Nil
+// (mizar32-lcd-setup shift-disp r-to-l) -> Nil
 any plisp_lcd_setup(any ex) {
   any x, y;
-  long shift_disp, r_to_l;
+  unsigned shift_disp, r_to_l;
 
   x = cdr(ex);
-  NeedNum(ex, y = EVAL(car(x)));
-  shift_disp = unBox(y);
-  x = cdr(x);
-  NeedNum(ex, y = EVAL(car(x)));
-  r_to_l = unBox(y);
+  NeedSym(ex, y = EVAL(car(x)));
+  shift_disp = (y == T) ? 1 : 0;
 
-  send_command(LCD_CMD_ENTRYMODE + (unsigned)shift_disp +
-	       (!(unsigned)r_to_l) * 2);
+  x = cdr(x);
+  NeedSym(ex, y = EVAL(car(x)));
+  r_to_l = (y == T) ? 1 : 0;
+
+  send_command(LCD_CMD_ENTRYMODE +
+	       shift_disp +
+	       (!r_to_l) * 2);
   return Nil;
 }
 
