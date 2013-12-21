@@ -147,7 +147,7 @@ any plisp_elua_save_history(any x) {
     outString("History empty, nothing to save.\n");
   else
     printf("Unable to save history to %s.\n", fname);
-  return NIL;
+  return Nil;
 #else
   err(NULL, NULL, "linenoise support not enabled.");
 #endif
