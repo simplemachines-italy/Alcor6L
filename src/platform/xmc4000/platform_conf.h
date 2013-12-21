@@ -58,7 +58,8 @@
   _ROM(TERM)\
   _ROM(ELUA)\
   _ROM(CPU)\
-  _ROM(TIMER)
+  _ROM(TIMER)\
+  _ROM(PIO)
 
 #elif defined ALCOR_LANG_PICOC
 
