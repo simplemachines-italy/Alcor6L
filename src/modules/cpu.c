@@ -58,7 +58,7 @@ static const cpu_const_t cpu_constants[] =
 // CPU module for picoLisp.
 
 // (cpu-w32 'addr 'data) -> num
-any cpu_w32(any ex) {
+any plisp_cpu_w32(any ex) {
   u32 addr, data;
   any x, y;
 
@@ -75,7 +75,7 @@ any cpu_w32(any ex) {
 }
 
 // (cpu-r32 'addr) -> data
-any cpu_r32(any ex) {
+any plisp_cpu_r32(any ex) {
   u32 addr;
   any x, y;
 
@@ -87,7 +87,7 @@ any cpu_r32(any ex) {
 }
 
 // (cpu-w16 'addr 'data) -> num
-any cpu_w16(any ex) {
+any plisp_cpu_w16(any ex) {
   u32 addr;
   u16 data;
   any x, y;
@@ -105,7 +105,7 @@ any cpu_w16(any ex) {
 }
 
 // (cpu-r16 'addr) -> data
-any cpu_r16(any ex) {
+any plisp_cpu_r16(any ex) {
   u32 addr;
   any x, y;
 
@@ -117,7 +117,7 @@ any cpu_r16(any ex) {
 }
 
 // (cpu-w8 'addr 'data) -> num
-any cpu_w8(any ex) {
+any plisp_cpu_w8(any ex) {
   u32 addr;
   u8 data;
   any x, y;
@@ -135,7 +135,7 @@ any cpu_w8(any ex) {
 }
 
 // (cpu-r8 'addr) -> data
-any cpu_r8(any ex) {
+any plisp_cpu_r8(any ex) {
   u32 addr;
   any x, y;
 
@@ -147,7 +147,7 @@ any cpu_r8(any ex) {
 }
 
 // (cpu-clock) -> num
-any cpu_clock(any ex) {
+any plisp_cpu_clock(any ex) {
   return box(platform_cpu_get_frequency());
 }
 

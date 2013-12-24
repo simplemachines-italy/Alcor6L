@@ -257,13 +257,13 @@ any plisp_elua_save_history(any x);
 any plisp_elua_shell(any x);
 
 // cpu module.
-any cpu_w32(any x);
-any cpu_r32(any x);
-any cpu_w16(any x);
-any cpu_r16(any x);
-any cpu_w8(any x);
-any cpu_r8(any x);
-any cpu_clock(any x);
+any plisp_cpu_w32(any x);
+any plisp_cpu_r32(any x);
+any plisp_cpu_w16(any x);
+any plisp_cpu_r16(any x);
+any plisp_cpu_w8(any x);
+any plisp_cpu_r8(any x);
+any plisp_cpu_clock(any x);
 
 // can module.
 any plisp_can_setup(any x);
