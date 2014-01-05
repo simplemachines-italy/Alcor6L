@@ -1,0 +1,10 @@
+
+This C module can be used to control a 128x64 glcd device
+in a language supported by Alcor6L. This is a modified version
+of the code written by Marcelo Politzer. The original code
+base can be found here [1].
+
+Thanks to Marcelo Politzer for his work.
+
+References:
+[1]: https://github.com/elua/ks0108b
