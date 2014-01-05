@@ -282,7 +282,7 @@ static int emit_hfunc_setval() {
 
 // Helper function.
 // returns pin/port numeric identifiers.
-static int emit_pio_numeric_ident() {
+int emit_pio_numeric_ident() {
   int port = 0xFFFF, pin = 0xFFFF, isport = 0, sz;
 #ifdef ALCOR_LANG_LUA
   const char *key = luaL_checkstring(L, 2);
