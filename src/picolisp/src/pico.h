@@ -326,6 +326,15 @@ any plisp_uart_getchar(any ex);
 any plisp_uart_vuart_tmr_ident(any ex);
 any plisp_uart_read(any ex);
 
+// ks0108b glcd module.
+any plisp_ks0108b_init(any ex);
+any plisp_ks0108b_setall(any ex);
+any plisp_ks0108b_clear(any ex);
+any plisp_ks0108b_on(any ex);
+any plisp_ks0108b_off(any ex);
+any plisp_ks0108b_gotoxy(any ex);
+any plisp_ks0108b_write(any ex);
+
 #include "platform_picolisp.h"
 
 // Include prototypes for target/
