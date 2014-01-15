@@ -592,7 +592,7 @@ any plisp_ks0108b_write(any x) {
  *	\return 
  *	\arg None
  */
-static int ks0108b_init( lua_State *L )
+static int lua_ks0108b_init( lua_State *L )
 {
   ks_data = luaL_checkinteger( L, 1 );
   platform_pio_op(
@@ -629,7 +629,7 @@ static int ks0108b_init( lua_State *L )
  *  if \b x and \b y are used, \b sz must be used too.
  */
 
-static int ks0108b_write( lua_State *L )
+static int lua_ks0108b_write( lua_State *L )
 {
   const char *str = luaL_checkstring( L, 1 );
   u8 x = luaL_optinteger( L, 3, 1 );
@@ -652,7 +652,7 @@ static int ks0108b_write( lua_State *L )
  *  \endcode
  * Set all pixels and gotoxy( 0, 0 )
  */
-static int ks0108b_setall( lua_State *L )
+static int lua_ks0108b_setall( lua_State *L )
 {
   ks0108bh_setall();
   return 0;
@@ -663,7 +663,7 @@ static int ks0108b_setall( lua_State *L )
  *  \endcode
  *  Clear all pixels and gotoxy( 0, 0 )
  */
-static int ks0108b_clear( lua_State *L )
+static int lua_ks0108b_clear( lua_State *L )
 {
   ks0108bh_clear();
   return 0;
@@ -676,7 +676,7 @@ static int ks0108b_clear( lua_State *L )
  *  ks0108b.on()
  *  \endcode
  * Turn the display on. */
-static int ks0108b_on( lua_State *L )
+static int lua_ks0108b_on( lua_State *L )
 {
   ks0108bh_write_cmd( KS0108B_CMD_ON );
   return 0;
@@ -686,7 +686,7 @@ static int ks0108b_on( lua_State *L )
  *  ks0108b.off()
  *  \endcode
  *  Turn the display off. */
-static int ks0108b_off( lua_State *L ){
+static int lua_ks0108b_off( lua_State *L ){
   ks0108bh_write_cmd( KS0108B_CMD_OFF );
   return 0;
 }
@@ -697,7 +697,7 @@ static int ks0108b_off( lua_State *L ){
  *  \arg 1 <= x <= 128
  *  \arg 1 <= y <= 8
  */
-static int ks0108b_gotoxy( lua_State *L )
+static int lua_ks0108b_gotoxy( lua_State *L )
 {
   int x = luaL_checkinteger( L, 1 );
   int y = luaL_checkinteger( L, 2 );
@@ -714,13 +714,13 @@ static int ks0108b_gotoxy( lua_State *L )
 const LUA_REG_TYPE ks0108b_map[] = 
 {
   // functions:
-  { LSTRKEY( "init" ), LFUNCVAL( ks0108b_init ) },
-  { LSTRKEY( "write" ), LFUNCVAL( ks0108b_write ) },
-  { LSTRKEY( "clear" ), LFUNCVAL( ks0108b_clear ) },
-  { LSTRKEY( "setall" ), LFUNCVAL( ks0108b_setall ) },
-  { LSTRKEY( "gotoxy" ), LFUNCVAL( ks0108b_gotoxy ) },
-  { LSTRKEY( "on" ), LFUNCVAL( ks0108b_on ) },
-  { LSTRKEY( "off" ), LFUNCVAL( ks0108b_off ) },
+  { LSTRKEY( "init" ), LFUNCVAL( lua_ks0108b_init ) },
+  { LSTRKEY( "write" ), LFUNCVAL( lua_ks0108b_write ) },
+  { LSTRKEY( "clear" ), LFUNCVAL( lua_ks0108b_clear ) },
+  { LSTRKEY( "setall" ), LFUNCVAL( lua_ks0108b_setall ) },
+  { LSTRKEY( "gotoxy" ), LFUNCVAL( lua_ks0108b_gotoxy ) },
+  { LSTRKEY( "on" ), LFUNCVAL( lua_ks0108b_on ) },
+  { LSTRKEY( "off" ), LFUNCVAL( lua_ks0108b_off ) },
 
   // constants:
   { LSTRKEY( "SMALL" ), LNUMVAL( KS0108B_SMALL ) },
