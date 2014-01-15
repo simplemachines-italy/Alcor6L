@@ -19,6 +19,8 @@
 /** \defgroup low_level Hardware Interface Functions
  * \ingroup gKS0108B \{  */
 
+#ifdef BUILD_KS0108B
+
 // common files.
 #include "platform.h"
 #include "common.h"
@@ -741,4 +743,4 @@ LUALIB_API int luaopen_ks0108b( lua_State *L )
 
 /** \} */ // KS0108B group
 
-
+#endif // #ifdef BUILD_KS0108B
