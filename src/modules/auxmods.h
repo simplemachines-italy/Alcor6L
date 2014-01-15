@@ -58,7 +58,7 @@ LUALIB_API int ( luaopen_elua )( lua_State *L );
 LUALIB_API int ( luaopen_i2c )( lua_State *L );
 
 #define AUXLIB_KS0108B  "glcd"
-LUALIB_API int ( luaopen_glcd )( lua_State *L );
+LUALIB_API int ( luaopen_ks0108b )( lua_State *L );
 
 // Helper macros
 #define MOD_CHECK_ID( mod, id )\
