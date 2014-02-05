@@ -552,6 +552,10 @@ if not GetOption( 'help' ):
   iv_names = "iv.c"
   iv_files = " " + " ".join( ["src/iv/%s" % name for name in iv_names.split() ] )
 
+  # ks0108b glcd files
+  ks0108b_names = "ks0108b.c"
+  ks0108b_files = " " + " ".join( ["src/modules/ks0108b/%s" % name for name in ks0108b_names.split() ] )
+
   # Optimizer flags (speed or size)
   comp.Append(CCFLAGS = ['-Os','-fomit-frame-pointer'])
   #opt += " -ffreestanding"
@@ -564,7 +568,7 @@ if not GetOption( 'help' ):
   execfile( "src/platform/%s/conf.py" % platform )
 
   # Complete file list
-  source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files )
+  source_files = Split( app_files + specific_files + newlib_files + uip_files + module_files + rfs_files + shell_files + iv_files + ks0108b_files )
 
   # Language specific files.
   if comp['lang'] == 'tinyscheme':
