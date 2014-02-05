@@ -7,6 +7,7 @@
     (Stamp module), STM3210E-EVAL and PC.
   * Languages: PicoC, PicoLisp, MY-BASIC and TinyScheme
   * New feature: iv, a vi like text editor for Alcor6L
+  * New feature: ks0108b 128x64 glcd module for PicoLisp
   * Language specific features:
     Lua: Option to use Lua compiler on the target
 
