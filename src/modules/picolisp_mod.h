@@ -122,6 +122,18 @@
   PICOLISP_LIB_DEFINE(plisp_can_send, can-send),\
   PICOLISP_LIB_DEFINE(plisp_can_recv, can-recv),
 
+// adc module
+#define PICOLISP_MOD_ADC\
+  PICOLISP_LIB_DEFINE(plisp_adc_maxval, adc-maxval),\
+  PICOLISP_LIB_DEFINE(plisp_adc_setclock, adc-setclock),\
+  PICOLISP_LIB_DEFINE(plisp_adc_isdone, adc-isdone),\
+  PICOLISP_LIB_DEFINE(plisp_adc_setblocking, adc-setblocking),\
+  PICOLISP_LIB_DEFINE(plisp_adc_setsmoothing, adc-setsmoothing),\
+  PICOLISP_LIB_DEFINE(plisp_adc_sample, adc-sample),\
+  PICOLISP_LIB_DEFINE(plisp_adc_getsample, adc-getsample),\
+  PICOLISP_LIB_DEFINE(plisp_adc_getsamples, adc-getsamples),\
+  PICOLISP_LIB_DEFINE(plisp_adc_insertsamples, adc-insertsamples),
+
 // ks0108b glcd module.
 #define PICOLISP_MOD_KS0108B\
   PICOLISP_LIB_DEFINE(plisp_ks0108b_init, glcd-init),\
