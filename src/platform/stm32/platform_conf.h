@@ -67,6 +67,12 @@
 # define KS0108BLINE
 #endif
 
+#ifdef BUILD_ADC
+# define ADCLINE _ROM(ADC)
+#else
+# define ADCLINE
+#endif
+
 #define PICOLISP_PLATFORM_LIBS_ROM\
   _ROM(PD)\
   _ROM(TERM)\
@@ -78,6 +84,7 @@
   _ROM(PIO)\
   _ROM(UART)\
   _ROM(CAN)\
+  ADCLINE\
   KS0108BLINE
 
 #endif
