@@ -42,6 +42,7 @@
 #define BUILD_C_INT_HANDLERS
 #define BUILD_LUA_INT_HANDLERS
 #define ENABLE_ENC
+//#define BUILD_KS0108B
 
 #define PLATFORM_HAS_SYSTIMER
 
@@ -60,6 +61,12 @@
 // *****************************************************************************
 // Language configurations: PicoLisp.
 
+#ifdef BUILD_KS0108B
+# define KS0108BLINE _ROM(KS0108B)
+#else
+# define KS0108BLINE
+#endif
+
 #define PICOLISP_PLATFORM_LIBS_ROM\
   _ROM(PD)\
   _ROM(TERM)\
@@ -70,7 +77,8 @@
   _ROM(SPI)\
   _ROM(PIO)\
   _ROM(UART)\
-  _ROM(CAN)
+  _ROM(CAN)\
+  KS0108BLINE
 
 #endif
 
