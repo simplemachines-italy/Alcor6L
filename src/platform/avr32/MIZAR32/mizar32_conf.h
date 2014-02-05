@@ -38,6 +38,7 @@
 # define BUILD_RTC
 # define BUILD_TERM
 // # define BUILD_UIP
+# define BUILD_KS0108B
 
 // Interrupt handler support
 #if defined ALCOR_LANG_PICOLISP
@@ -129,6 +130,12 @@
 // ****************************************************************************
 // Language configurations: picoLisp.
 
+#ifdef BUILD_ADC
+# define ADCLINE _ROM(ADC)
+#else
+# define ADCLINE
+#endif
+
 // platform library functions
 #define PICOLISP_PLATFORM_LIBS_ROM\
   _ROM(PD)\
@@ -141,7 +148,8 @@
   _ROM(PWM)\
   _ROM(SPI)\
   _ROM(PIO)\
-  _ROM(UART)
+  _ROM(UART)\
+  ADCLINE
 
 #endif // ALCOR_LANG_PICOLISP
 
