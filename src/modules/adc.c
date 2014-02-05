@@ -211,6 +211,42 @@ any plisp_adc_getsample(any ex) {
 
 #ifdef BUF_ENABLE_ADC
 
+// (adc-getsamples 'num ['num]) -> lst
+any plisp_adc_getsamples(any ex) {
+  unsigned id, i;
+  u16 bcnt, count = 0;
+  any x, y;
+  cell c1;
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id
+  MOD_CHECK_ID(ex, adc, id);
+
+  if (plen(ex) >= 2) {
+    x = cdr(x);
+    NeedNum(ex, y = EVAL(car(x)));
+    count = (u16)unBox(y); // get count
+  }
+
+  bcnt = adc_wait_samples(id, count);
+
+  // If count is zero, grab all samples
+  if (count == 0)
+    count = bcnt;
+
+  // Don't pull more samples than are available
+  if (count > bcnt)
+    count = bcnt;
+
+  // Make the list of adc samples
+  Push(c1, y = cons(box(adc_get_processed_sample(id)), Nil));
+  for (i = 1; i < count - 1; i++)
+    Push(c1, y = cons(box(adc_get_processed_sample(id)), y));
+
+  return Pop(c1);
+}
+
 // Helper function:
 //
 // Insert one element (value) in a list (list) at a
