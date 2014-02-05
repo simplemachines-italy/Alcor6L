@@ -326,6 +326,17 @@ any plisp_uart_getchar(any ex);
 any plisp_uart_vuart_tmr_ident(any ex);
 any plisp_uart_read(any ex);
 
+// adc module.
+any plisp_adc_maxval(any ex);
+any plisp_adc_setclock(any ex);
+any plisp_adc_isdone(any ex);
+any plisp_adc_setblocking(any ex);
+any plisp_adc_setsmoothing(any ex);
+any plisp_adc_sample(any ex);
+any plisp_adc_getsample(any ex);
+any plisp_adc_getsamples(any ex);
+any plisp_adc_insertsamples(any ex);
+
 // ks0108b glcd module.
 any plisp_ks0108b_init(any ex);
 any plisp_ks0108b_setall(any ex);
