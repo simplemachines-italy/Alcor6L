@@ -19,12 +19,13 @@
 /** \defgroup low_level Hardware Interface Functions
  * \ingroup gKS0108B \{  */
 
+#include "platform_conf.h"
+
 #ifdef BUILD_KS0108B
 
 // common files.
 #include "platform.h"
 #include "common.h"
-#include "platform_conf.h"
 #include "font_5_7.h"
 #include "font_8_16.h"
 
