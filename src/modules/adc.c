@@ -149,13 +149,13 @@ any plisp_adc_setsmoothing(any ex) {
 any plisp_adc_sample(any ex) {
   unsigned id, count = 0, nchans = 1;
   int res, i;
-  any x, y;
+  any x, y, s;
 
   // get count value, the second parameter
   // in the picoLisp function call.
-  x = cadr(ex), y = EVAL(car(x));
-  if (isNum(y))
-    count = unBox(y);
+  s = cdr(ex), y = EVAL(car(s)); s = cdr(s);
+  NeedNum(ex, y = EVAL(car(s)));
+  count = unBox(y);
 
   // validate count.
   if ((count == 0) || count & (count - 1))
