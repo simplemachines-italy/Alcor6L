@@ -192,7 +192,7 @@ any plisp_adc_sample(any ex) {
   return Nil;
 }
 
-// (adc-sample 'num) -> num
+// (adc-getsample 'num) -> num
 any plisp_adc_getsample(any ex) {
   unsigned id;
   any x, y;
