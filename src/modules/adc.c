@@ -298,7 +298,7 @@ any plisp_adc_insertsamples(any ex) {
   for (i = startidx; i < (count + startidx); i++)
     tab = ins_element(tab, i, adc_get_processed_sample(id));
 
-  return y;
+  return tab;
 }
 
 #else
