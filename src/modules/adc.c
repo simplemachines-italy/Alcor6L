@@ -209,10 +209,9 @@ any plisp_adc_getsample(any ex) {
   return Nil;
 }
 
-#ifdef BUF_ENABLE_ADC
-
 // (adc-getsamples 'num ['num]) -> lst
 any plisp_adc_getsamples(any ex) {
+#ifdef BUF_ENABLE_ADC
   unsigned id, i;
   u16 bcnt, count = 0;
   any x, y;
@@ -245,6 +244,9 @@ any plisp_adc_getsamples(any ex) {
     Push(c1, y = cons(box(adc_get_processed_sample(id)), y));
 
   return Pop(c1);
+#else
+  err(NULL, NULL, "BUF_ENABLE_ADC not defined");
+#endif
 }
 
 // Helper function:
@@ -267,6 +269,7 @@ static any ins_element(any list, int pos, int value) {
 
 // (adc-insertsamples 'num 'lst 'num 'num) -> lst
 any plisp_adc_insertsamples(any ex) {
+#ifdef BUF_ENABLE_ADC
   unsigned id, i, startidx;
   u16 bcnt, count;
   any x, y, tab;
@@ -299,22 +302,10 @@ any plisp_adc_insertsamples(any ex) {
     tab = ins_element(tab, i, adc_get_processed_sample(id));
 
   return tab;
-}
-
 #else
-
-// empty definitions in case BUF_ENABLE_ADC
-// is not defined.
-
-any plisp_adc_insertsamples(any ex) {
-  return Nil;
+  err(NULL, NULL, "BUF_ENABLE_ADC not defined");
+#endif
 }
-
-any plisp_adc_getsamples(any ex) {
-  return Nil;
-}
-
-#endif // BUF_ENABLE_ADC
 
 #endif // ALCOR_LANG_PICOLISP
 
