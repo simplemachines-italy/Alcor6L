@@ -209,6 +209,77 @@ any plisp_adc_getsample(any ex) {
   return Nil;
 }
 
+#ifdef BUF_ENABLE_ADC
+
+// Helper function:
+//
+// Insert one element (value) in a list (list) at a
+// given position (pos). The function will return the
+// new list with the inserted value.
+
+static any ins_element(any list, int pos, int value) {
+  any temp, tab;
+  int i;
+
+  tab = temp = list;
+  temp = cons(box(value), nCdr(pos - 1, temp));
+  for (i = pos - 1; i > 0; i--) {
+    temp = cons(car(nth(i, tab)), temp);
+  }
+  return temp;
+}
+
+// (adc-insertsamples 'num 'lst 'num 'num) -> lst
+any plisp_adc_insertsamples(any ex) {
+  unsigned id, i, startidx;
+  u16 bcnt, count;
+  any x, y, tab;
+  
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  id = unBox(y); // get id
+  MOD_CHECK_ID(ex, adc, id);
+
+  // get the list of samples
+  x = cdr(x);
+  NeedLst(ex, y = EVAL(car(x)));
+  tab = y;
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  startidx = unBox(y); // get startidx
+  if (startidx <= 0)
+    err(ex, y, "idx must be > 0");
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  count = unBox(y); // get count
+  if (count == 0)
+    err(ex, y, "count must be > 0");
+
+  bcnt = adc_wait_samples(id, count);
+
+  for (i = startidx; i < (count + startidx); i++)
+    tab = ins_element(tab, i, adc_get_processed_sample(id));
+
+  return y;
+}
+
+#else
+
+// empty definitions in case BUF_ENABLE_ADC
+// is not defined.
+
+any plisp_adc_insertsamples(any ex) {
+  return Nil;
+}
+
+any plisp_adc_getsamples(any ex) {
+  return Nil;
+}
+
+#endif // BUF_ENABLE_ADC
+
 #endif // ALCOR_LANG_PICOLISP
 
 #if defined ALCOR_LANG_PICOC
