@@ -378,6 +378,11 @@ void initSymbols(void) {
    plisp_uart_flow_cts = initSym(box(PLATFORM_UART_FLOW_CTS), "*uart-flow-cts*");
 #endif
 
+// Pull in target specific defines
+#ifdef PICOLISP_TARGET_SPECIFIC_SYM_DEFINITIONS
+   PICOLISP_TARGET_SPECIFIC_SYM_DEFINITIONS
+#endif
+
    T     = initSym(Nil, "T"),  val(T) = T;  // Last protected symbol
 
    At    = initSym(Nil, "@");
