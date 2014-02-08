@@ -167,24 +167,96 @@ static void write_rtc_regs(u8 *regs)
   i2c_send(rtc_slave_address, regs - 1, NFIELDS+1, true);
 }
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// RTC module for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// RTC module for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
 // RTC module for picoLisp.
+
+//
+// Read the time from the RTC. This function returns
+// a list in this format:
+// (day month year hour min sec wday)
+//
+// (rtc-get) -> lst
+any plisp_rtc_get(any ex) {
+  any y;
+  cell c1;
+  u8 regs[7]; // seconds to years register contents, read from device
+
+  rtc_init();
+
+  if (rtc_type == RTC_SYSTEM) {
+    // Unimplemented as yet
+    err(ex, NULL, "No real-time clock chip present");
+  }
+
+  read_rtc_regs(regs);
+
+  Push(c1, y = cons(box(regs[WDAY] & 0x07), Nil)); // wday
+  Push(c1, y = cons(box(fromBCD(regs[SEC] & 0x7F)), y)); // sec
+  Push(c1, y = cons(box(fromBCD(regs[MIN] & 0x7F)), y)); // min
+  Push(c1, y = cons(box(fromBCD(regs[HOUR] & 0x3F)), y)); // hour
+  Push(c1, y = cons(box(fromBCD(regs[YEAR] & 0xFF) + // year in century
+			(regs[MONTH] & 0x80) ? 2000 : 1900), y)); // Century
+  Push(c1, y = cons(box(fromBCD(regs[MONTH] & 0x1F)), y)); // month
+  Push(c1, y = cons(box(fromBCD(regs[DAY] & 0x3F)), y)); // day
+
+  return Pop(c1);
+}
+
+// (rtc-set 'num 'num) -> Nil
+any plisp_rtc_set(any ex) {
+  u8 buf[NFIELDS+1];  // I2C message: First byte is the register address
+  u8 *regs = buf + 1; // The registers
+  int value;          // value the field contains
+  int field;          // Which field are we handling (0-6)
+  any x, y, z;
+
+  rtc_init();
+
+  if (rtc_type == RTC_SYSTEM) {
+    // Unimplemented as yet
+    err(ex, NULL, "No real-time clock chip present");
+  }
+
+  // Read the chip's registers into our buffer so that
+  // unspecified fields remain at the same value as before
+  read_rtc_regs(regs);
+
+  x = cdr(ex);
+  NeedNum(ex, y = EVAL(car(x)));
+  field = unBox(y); // get field parameter
+  z = y;
+
+  x = cdr(x);
+  NeedNum(ex, y = EVAL(car(x)));
+  value = unBox(y); // get set value
+
+  // Special cases for some fields
+  switch (field) {
+  case SEC: case MIN: case HOUR:
+  case WDAY: case DAY:
+    regs[field] = toBCD(value);
+    break;
+  case MONTH:
+    // Set new month but preserve century bit in case they don't set the year
+    regs[MONTH] = (regs[MONTH] & 0x80) | toBCD(value);
+    break;
+  case YEAR:
+    if (value < 2000) {
+      value -= 1900; regs[MONTH] &= 0x7F;
+    } else {
+      value -= 2000; regs[MONTH] |= 0x80;
+    }
+    regs[YEAR] = toBCD(value);
+    break;
+  default:
+    err(ex, z, "Invalid real-time clock field.");
+  }
+
+  write_rtc_regs(regs);
+  return Nil;
+}
 
 #endif // ALCOR_LANG_PICOLISP
 
