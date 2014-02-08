@@ -229,6 +229,15 @@ any plisp_term_nowait;
 // can symbols.
 any can_id_ext;
 any can_id_std;
+
+#include "platform_picolisp.h"
+
+// target specific symbols:
+// from platform_picolisp.h defined for each
+// platform
+#ifdef PICOLISP_SYMBOL_VARIABLE_DECLARATIONS
+  PICOLISP_SYMBOL_VARIABLE_DECLARATIONS
+#endif
   
 // Alcor6L platform modules.
 any pd_platform(any x);
