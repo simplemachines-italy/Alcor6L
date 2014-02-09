@@ -18,7 +18,7 @@
 # include "lauxlib.h"
 # include "lrotable.h"
 # include "auxmods.h"
-# include "modcommon.h"
+//# include "modcommon.h"
 #endif
 
 #include "platform.h"
