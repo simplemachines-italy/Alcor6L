@@ -112,8 +112,8 @@ any plisp_i2c_address(any ex) {
   dir = unBox(y); // get direction.
   
   ret = platform_i2c_send_address(id, (u16)add, dir);
-  return box(ret);
 
+  return ret == 1 ? T : Nil;
 }
 
 // Helpers for picoLisp i2c 'write' function.
