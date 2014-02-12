@@ -71,7 +71,7 @@ any plisp_cpu_w32(any ex) {
   data = unBox(y); // get data.
 
   *(u32 *)addr = data;
-  return box(data);
+  return Nil;
 }
 
 // (cpu-r32 'addr) -> data
@@ -101,7 +101,7 @@ any plisp_cpu_w16(any ex) {
   data = unBox(y); // get data.
 
   *(u16 *)addr = data;
-  return box(data);
+  return Nil;
 }
 
 // (cpu-r16 'addr) -> data
@@ -131,7 +131,7 @@ any plisp_cpu_w8(any ex) {
   data = unBox(y); // get data.
 
   *(u8 *)addr = data;
-  return box(data);
+  return Nil;
 }
 
 // (cpu-r8 'addr) -> data
