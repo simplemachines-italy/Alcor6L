@@ -5,7 +5,7 @@
 
 #include "type.h"
 
-#define SHELL_WELCOMEMSG                "\nAlcor6L %s  Copyright (C) 2013 simplemachines-italy\n"
+#define SHELL_WELCOMEMSG                "\nAlcor6L %s  Copyright (C) 2014 simplemachines-italy\n"
 
 #ifdef ALCOR_LANG_PICOLISP
 # define SHELL_PROMPT                   "Alcor6L/picolisp# "
