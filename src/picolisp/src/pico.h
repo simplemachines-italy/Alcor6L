@@ -354,6 +354,8 @@ any plisp_ks0108b_on(any ex);
 any plisp_ks0108b_off(any ex);
 any plisp_ks0108b_gotoxy(any ex);
 any plisp_ks0108b_write(any ex);
+any plisp_ks0108b_prinl_small(any ex);
+any plisp_ks0108b_prinl_big(any ex);
 
 #include "platform_picolisp.h"
 
