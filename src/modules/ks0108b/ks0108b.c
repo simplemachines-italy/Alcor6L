@@ -543,6 +543,92 @@ any plisp_ks0108b_gotoxy(any ex) {
 
 // Helpers for PicoLisp's ks0108b glcd write function.
 
+#define GLCD_WRITE_BIG   0
+#define GLCD_WRITE_SMALL 1
+
+static void outString_glcd(char *s, int font_size) {
+  if (font_size == GLCD_WRITE_SMALL)
+    ks0108bh_write_small(s);
+  else
+    ks0108bh_write_big(s);
+}
+
+static void outNum_glcd(long n, int font_size) {
+  char buf[BITS/2];
+
+  bufNum(buf, n);
+  outString_glcd(buf, font_size);
+}
+
+static void plisp_glcdh_prin(any x, int font_size) {
+  if (!isNil(x)) {
+    if (isNum(x)) {
+      // char byte = (char)unBox(x);
+      outNum_glcd(unBox(x), font_size);
+    }
+    else if (isSym(x)) {
+      int i, c;
+      word w;
+      char byte[2];
+
+      for (x = name(x), c = getByte1(&i, &w, &x); c; c = getByte(&i, &w, &x)) {
+        if (c != '^') {
+          byte[0] = c; byte[1] = '\0';
+	  outString_glcd(byte, font_size);
+	  // send_data(&byte, 1);
+	}
+        else if (!(c = getByte(&i, &w, &x))) {
+	  byte[0] = '^'; byte[1] = '\0';
+	  outString_glcd(byte, font_size);
+          // send_data(&byte, 1);
+        }
+        else if (c == '?') {
+          byte[0] = 127; byte[1] = '\0';
+	  outString_glcd(byte, font_size);
+          // send_data(&byte, 1);
+        }
+        else {
+          c &= 0x1F;
+          byte[0] = (u8)c; byte[1] = '\0';
+	  outString_glcd(byte, font_size);
+          // send_data(&byte, 1);
+	}
+      }
+    }
+    else {
+      while (plisp_glcdh_prin(car(x), font_size),
+	     !isNil(x = cdr(x))) {
+	if (!isCell(x)) {
+	  plisp_glcdh_prin(x, font_size);
+          break;
+	}
+      }
+    }
+  }
+}
+
+// (glcd-prinl-small 'any ..) -> any
+any plisp_ks0108b_prinl_small(any x) {
+  any y = Nil;
+
+  while (isCell(x = cdr(x))) {
+    plisp_glcdh_prin(y = EVAL(car(x)),
+		     GLCD_WRITE_SMALL);
+  }
+  return y;
+}
+
+// (glcd-prinl-big 'any ..) -> any 
+any plisp_ks0108b_prinl_big(any x) {
+  any y = Nil;
+
+  while (isCell(x = cdr(x))) {
+    plisp_glcdh_prin(y = EVAL(car(x)),
+		     GLCD_WRITE_BIG);
+  }
+  return y;
+}
+
 // (glcd-write 'num 'sym) -> sym
 any plisp_ks0108b_write(any x) {
   // 'y' has to be initialized, else the
