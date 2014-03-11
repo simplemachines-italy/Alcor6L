@@ -629,30 +629,6 @@ any plisp_ks0108b_prinl_big(any x) {
   return y;
 }
 
-// (glcd-write 'num 'sym) -> sym
-any plisp_ks0108b_write(any x) {
-  // 'y' has to be initialized, else the
-  // compiler throws a warning.
-  any y = Nil;
-  unsigned font_size = KS0108B_SMALL;
-
-  if (plen(x) > 1) {
-    x = cdr(x);
-    NeedNum(x, y = EVAL(car(x)));
-    font_size = unBox(y);
-  }
-
-  x = cdr(x);
-  NeedSym(x, y = EVAL(car(x)));
-  char s[bufSize(y)];
-  bufString(y, s);
-  switch (font_size) {
-    case KS0108B_BIG: ks0108bh_write_big(s); break;
-    default: ks0108bh_write_small(s); break;
-  }
-  return y;
-}
-
 #endif // #ifdef ALCOR_LANG_PICOLISP
 
 #ifdef ALCOR_LANG_LUA

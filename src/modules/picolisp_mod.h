@@ -142,7 +142,6 @@
   PICOLISP_LIB_DEFINE(plisp_ks0108b_on, glcd-on),\
   PICOLISP_LIB_DEFINE(plisp_ks0108b_off, glcd-off),\
   PICOLISP_LIB_DEFINE(plisp_ks0108b_gotoxy, glcd-gotoxy),\
-  PICOLISP_LIB_DEFINE(plisp_ks0108b_write, glcd-write),\
   PICOLISP_LIB_DEFINE(plisp_ks0108b_prinl_small, glcd-prinl-small),\
   PICOLISP_LIB_DEFINE(plisp_ks0108b_prinl_big, glcd-prinl-big),  
 
