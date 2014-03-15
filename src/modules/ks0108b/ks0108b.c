@@ -563,7 +563,6 @@ static void outNum_glcd(long n, int font_size) {
 static void plisp_glcdh_prin(any x, int font_size) {
   if (!isNil(x)) {
     if (isNum(x)) {
-      // char byte = (char)unBox(x);
       outNum_glcd(unBox(x), font_size);
     }
     else if (isSym(x)) {
@@ -575,23 +574,19 @@ static void plisp_glcdh_prin(any x, int font_size) {
         if (c != '^') {
           byte[0] = c; byte[1] = '\0';
 	  outString_glcd(byte, font_size);
-	  // send_data(&byte, 1);
 	}
         else if (!(c = getByte(&i, &w, &x))) {
 	  byte[0] = '^'; byte[1] = '\0';
 	  outString_glcd(byte, font_size);
-          // send_data(&byte, 1);
         }
         else if (c == '?') {
           byte[0] = 127; byte[1] = '\0';
 	  outString_glcd(byte, font_size);
-          // send_data(&byte, 1);
         }
         else {
           c &= 0x1F;
           byte[0] = (u8)c; byte[1] = '\0';
 	  outString_glcd(byte, font_size);
-          // send_data(&byte, 1);
 	}
       }
     }
