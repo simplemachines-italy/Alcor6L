@@ -422,7 +422,7 @@ extern int pio_value_parse(char *key);
 // 6) en
 // 7) rst
 //
-// (ks0108b-init 'num 'num 'num 'num 'num 'num 'num) -> Nil
+// (glcd-init 'num 'num 'num 'num 'num 'num 'num) -> Nil
 any plisp_ks0108b_init(any ex) {
   any x, y;
 
@@ -500,31 +500,31 @@ any plisp_ks0108b_init(any ex) {
   return Nil;
 }
 
-// (ks0108b-setall) -> Nil
+// (glcd-setall) -> Nil
 any plisp_ks0108b_setall(any ex) {
   ks0108bh_setall();
   return Nil;
 }
 
-// (ks0108b-clear) -> Nil
+// (glcd-clear) -> Nil
 any plisp_ks0108b_clear(any ex) {
   ks0108bh_clear();
   return Nil;
 }
 
-// (ks0108b-on) -> Nil
+// (glcd-on) -> Nil
 any plisp_ks0108b_on(any ex) {
   ks0108bh_write_cmd(KS0108B_CMD_ON);
   return Nil;
 }
 
-// (ks0108b-off) -> Nil
+// (glcd-off) -> Nil
 any plisp_ks0108b_off(any ex) {
   ks0108bh_write_cmd(KS0108B_CMD_OFF);
   return Nil;
 }
 
-// (ks0108b-gotoxy 'num 'num) -> Nil
+// (glcd-gotoxy 'num 'num) -> Nil
 any plisp_ks0108b_gotoxy(any ex) {
   any x, y;
   int xp, yp;
