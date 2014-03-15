@@ -1,9 +1,6 @@
 Alcor6L
 =======
 
-Alcor6L is a Multilanguage Interactive Embedded System
-for 32 bit Microcontrollers with RAD &amp; fast prototyping.
-
 Alcor6L is a software system for natively programming
 microcontrollers (interactively and incrementally) using
 any of the following programming languages:
