@@ -42,46 +42,6 @@ int elua_int_add(elua_int_id inttype, elua_int_resnum resnum)
 
 #endif
 
-#if defined ALCOR_LANG_TINYSCHEME
-
-// ****************************************************************************
-// Interrupt handlers for tiny-scheme.
-
-// TODO:
-// Interrupt handler mechanism for tiny-scheme.
-
-#endif // ALCOR_LANG_TINYSCHEME
-
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// Interrupt handlers for my-basic
-
-// TODO:
-// Interrupt handler mechanism for my-basic.
-
-#endif // ALCOR_LANG_MYBASIC
-
-#if defined ALCOR_LANG_PICOLISP
-
-// ****************************************************************************
-// Interrupt handlers for picoLisp.
-
-// TODO:
-// Interrupt handler mechanism for picoLisp.
-
-#endif // ALCOR_LANG_PICOLISP
-
-#if defined ALCOR_LANG_PICOC
-
-// ****************************************************************************
-// Interrupt handlers for PicoC.
-
-// TODO:
-// Interrupt handler mechanism for PicoC.
-
-#endif // ALCOR_LANG_PICOC
-
 #if defined ALCOR_LANG_LUA
 
 // ****************************************************************************
