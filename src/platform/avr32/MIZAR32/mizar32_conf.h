@@ -24,12 +24,12 @@
 //#define BUILD_RFS
 //#define BUILD_SERMUX
 
-#if defined( ALCOR_CPU_AT32UC3A0128 )
-  // Build options for 120KB image
-# define RAM_SIZE 0x8000
+#if defined (ALCOR_CPU_AT32UC3A0128)
+# define RAM_SIZE 0x8000 // Build options for 120KB image
 #else
-  // Build options for 256KB and 512KB flash
-# define RAM_SIZE 0x10000
+# define RAM_SIZE 0x10000 // For 256KB and 512KB flash
+#endif
+
 # define BUILD_SHELL
 //# define BUILD_ADVANCED_SHELL
 # define BUILD_XMODEM
@@ -38,7 +38,7 @@
 # define BUILD_RTC
 # define BUILD_TERM
 // # define BUILD_UIP
-# define BUILD_KS0108B
+// # define BUILD_KS0108B
 
 // Interrupt handler support
 #if defined ALCOR_LANG_PICOLISP
@@ -55,7 +55,6 @@
 
 # define BUILD_USB_CDC
 # define BUILD_EDITOR_IV
-#endif
 
 // uip support.
 #ifdef BUILD_UIP
