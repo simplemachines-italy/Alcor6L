@@ -10,6 +10,7 @@ xx.xx.xxxx  SimpleMachines <simplemachines.it>
   * New feature: ks0108b 128x64 glcd module for PicoLisp
   * Language specific features:
     Lua: Option to use Lua compiler on the target
+  * Update documentation for PicoLisp in Mizar32 book
 
 04.04.2013  Bogdan Marinescu <bogdan.marinescu@gmail.com>
             Dado Sutter      <dadosutter@gmail.com>
