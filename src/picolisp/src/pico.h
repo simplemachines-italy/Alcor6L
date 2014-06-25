@@ -289,6 +289,7 @@ any tmr_getmindelay(any ex);
 any tmr_getmaxdelay(any ex);
 any tmr_setclock(any ex);
 any tmr_getclock(any ex);
+any tmr_decode(any ex);
 
 // i2c module.
 any plisp_i2c_setup(any ex);

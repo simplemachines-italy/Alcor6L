@@ -258,6 +258,19 @@ any tmr_decode(any ex) {
   return box(res + VTMR_FIRST_ID);
 }
 
+#else
+
+// Just in case VTMR_NUM_TIMERS not > 0
+//
+// This case has to be defined here since
+// there is no other validation mechanism
+// in modules/picolisp_mod.h
+//
+any tmr_decode(any ex) {
+  err(ex, NULL, "VTMR_NUM_TIMERS is not > 0");
+  return Nil;
+}
+
 #endif // #if VTMR_NUM_TIMERS > 0
 
 #endif // ALCOR_LANG_PICOLISP

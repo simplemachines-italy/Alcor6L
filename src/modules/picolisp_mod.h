@@ -64,7 +64,8 @@
   PICOLISP_LIB_DEFINE(tmr_getmindelay, tmr-getmindelay),\
   PICOLISP_LIB_DEFINE(tmr_getmaxdelay, tmr-getmaxdelay),\
   PICOLISP_LIB_DEFINE(tmr_setclock, tmr-setclock),\
-  PICOLISP_LIB_DEFINE(tmr_getclock, tmr-getclock),
+  PICOLISP_LIB_DEFINE(tmr_getclock, tmr-getclock),\
+  PICOLISP_LIB_DEFINE(tmr_decode, tmr-decode),
 
 // i2c module.
 #define PICOLISP_MOD_I2C\
