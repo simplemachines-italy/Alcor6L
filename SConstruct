@@ -173,6 +173,9 @@ def MatchEnumVariable(key, help, default, allowed_values, map={}):
 vars = Variables()
 
 vars.AddVariables(
+  BoolVariable(     'build_date',
+                    'If enabled, the build date will be appended to output file name',
+                    False ),
   MatchEnumVariable('bootloader',
                     'Build for bootloader usage, default is none.',
                     'none',
@@ -392,13 +395,15 @@ if not GetOption( 'help' ):
     print "*********************************"
     print
 
-  # fetch date.
-  t = time.localtime()
-  tstr = time.strftime("%Y%m%d", t)
+  # Date ('build_date') configuration
+  if comp['build_date'] == True: # Fetch date
+    t = time.localtime()
+    tstr = '_' + time.strftime("%Y%m%d", t)
+  else:
+    tstr = ''
 
   output = 'Alcor6L_' + comp['lang'] + '_' + comp['target'] + '_' + comp['cpu'].lower()
-  # include build date in output.
-  output += '_' + tstr
+  output += tstr
 
   # Language specific defines.
   if comp['lang'] == 'tinyscheme':
