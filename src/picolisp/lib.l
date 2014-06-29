@@ -312,6 +312,6 @@
 
 ### Debug ###
 `*Dbg
-(load "@lib/debug.l")
+(load "@debug.l")
 
 # vi:et:ts=3:sw=3
