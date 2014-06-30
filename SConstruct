@@ -226,9 +226,9 @@ elif comp['lang'] == 'mybasic':
 elif comp['lang'] == 'picolisp':
   vars.AddVariables(
     MatchEnumVariable('target',
-                      'build "regular" float miniPicoLisp',
-                      'fp',
-                      allowed_values = [ 'fp' ] ) )
+                      'build "regular" PicoLisp (mini-PicoLisp)',
+                      'regular',
+                      allowed_values = [ 'regular' ] ) )
 elif comp['lang'] == 'picoc':
   vars.AddVariables(
     MatchEnumVariable('target',
