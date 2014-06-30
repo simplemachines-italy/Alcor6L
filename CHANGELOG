@@ -3,8 +3,8 @@ xx.xx.xxxx  SimpleMachines <simplemachines.it>
   * First official release of Alcor6L (0.1)
   * Supports the following platforms: avr32, lm3s, stm32,
     i386 and simulator.
-  * Boards: Mizar32-A, Mizar32-B, EK-LM3S8962, ET-STM32
-    (Stamp module), STM3210E-EVAL and PC.
+  * Boards: Mizar32-A, Mizar32-B, Mizar32-C, EK-LM3S8962,
+    ET-STM32 (stamp module), STM3210E-EVAL and PC.
   * Languages: PicoC, PicoLisp, MY-BASIC and TinyScheme
   * New feature: iv, a vi like text editor for Alcor6L
   * New feature: ks0108b 128x64 glcd module for PicoLisp
