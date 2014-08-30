@@ -1,6 +1,6 @@
-xx.xx.xxxx  SimpleMachines <simplemachines.it>
+30.08.2014  SimpleMachines, Italy <simplemachines.it>
 
-  * First official release of Alcor6L (0.1)
+  * First official release of Alcor6L (1.0)
   * Supports the following platforms: avr32, lm3s, stm32,
     i386 and simulator.
   * Boards: Mizar32-A, Mizar32-B, Mizar32-C, EK-LM3S8962,
