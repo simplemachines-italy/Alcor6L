@@ -18,7 +18,7 @@ Alcor6L is a fork of the eLua project.
 
 For now, Alcor6L runs on the following hardware:
 
-* Mizar32 models A and B from simplemachines.it
+* Mizar32 models A and B and C from simplemachines.it
 * LM3S and STM32 ARM Cortex M3 boards
 
 The source code is available from:
