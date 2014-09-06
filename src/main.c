@@ -15,10 +15,6 @@
 # include "scheme.h"
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-# include "my_basic.h"
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #endif
@@ -58,11 +54,6 @@ char *boot_order[] = {
   "/mmc/autorun.tscm",
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-  "/mmc/autorun.bas",
-  "/mmc/autorun.bc",
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
   "/mmc/autorun.l",
   "/mmc/autorun.lc",
@@ -82,11 +73,6 @@ char *boot_order[] = {
 #if defined ALCOR_LANG_TINYSCHEME
   "/rom/autorun.scm",
   "/rom/autorun.tscm",
-#endif
-
-#if defined ALCOR_LANG_MYBASIC
-  "/rom/autorun.bas",
-  "/rom/autorun.bc",
 #endif
 
 #if defined ALCOR_LANG_PICOLISP
@@ -183,11 +169,6 @@ int main( void )
       tinyscheme_main( 2, tinyscheme_argv );
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-      char* mybasic_argv[] = { "mybasic", boot_order[i], NULL };
-      mybasic_main( 2, mybasic_argv );
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
       char* picolisp_argv[] = { "picolisp", boot_order[i], NULL };
       picolisp_main( 2, picolisp_argv );
@@ -216,11 +197,6 @@ int main( void )
 #if defined ALCOR_LANG_TINYSCHEME
     char* tinyscheme_argv[] = { "tinyscheme", NULL };
     tinyscheme_main( 1, tinyscheme_argv );
-#endif
-
-#if defined ALCOR_LANG_MYBASIC
-    char* mybasic_argv[] = { "mybasic", NULL };
-    mybasic_main( 1, mybasic_argv );
 #endif
 
 #if defined ALCOR_LANG_PICOLISP
