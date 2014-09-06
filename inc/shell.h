@@ -23,10 +23,6 @@
 # define SHELL_PROMPT                   "Alcor6L/tinyscheme# "
 #endif
 
-#ifdef ALCOR_LANG_MYBASIC
-# define SHELL_PROMPT                   "Alcor6L/mybasic# "
-#endif
-
 #define SHELL_ERRMSG                    "Invalid command, type 'help' for help\n"
 #define SHELL_MAXSIZE                   50
 #define SHELL_MAX_LUA_ARGS              8
