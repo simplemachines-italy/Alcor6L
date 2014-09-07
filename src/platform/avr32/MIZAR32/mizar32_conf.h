@@ -113,17 +113,6 @@
 
 // Auxiliary libraries that will be compiled for this platform
 
-#if defined ALCOR_LANG_MYBASIC
-
-// ****************************************************************************
-// Language configurations: my-basic
-
-#define MYBASIC_PLATFORM_LIBS_ROM\
-  _ROM(PD)\
-  _ROM(ELUA)
-
-#endif // ALCOR_LANG_MYBASIC
-
 #if defined ALCOR_LANG_PICOLISP
 
 // ****************************************************************************
