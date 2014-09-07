@@ -7,10 +7,6 @@
 # include "scheme.h"
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-# include "my_basic.h"
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #endif
@@ -135,7 +131,6 @@ static void pioh_clear_masks(void) {
 #endif // ALCOR_LANG_PICOC
 
 #if !defined ALCOR_LANG_LUA &&\
-    !defined ALCOR_LANG_MYBASIC &&\
     !defined ALCOR_LANG_TINYSCHEME
 
 // helper macro.
