@@ -41,10 +41,6 @@ char* shell_prog;
   SHELL_FUNC( shell_tinyscheme );
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-  SHELL_FUNC( shell_mybasic );
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
   SHELL_FUNC( shell_picolisp );
 #endif
@@ -229,10 +225,6 @@ static const SHELL_COMMAND shell_commands[] =
   { "tinyscheme", shell_tinyscheme },
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-  { "mybasic", shell_mybasic },
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
   { "picolisp", shell_picolisp },
 #endif
@@ -394,9 +386,6 @@ const SHELL_COMMAND* shellh_execute_command( char* cmd, int interactive_mode )
       // Special case: the "exit" command has a NULL handler
       // Special case: "lua" is not allowed in non-interactive mode
       // The same goes for the other languages in Alcor6L.
-#if defined ALCOR_LANG_MYBASIC
-      if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "mybasic" ) ) )
-#endif
 
 #if defined ALCOR_LANG_PICOLISP
       if( pcmd->handler_func && ( interactive_mode || strcasecmp( pcmd->cmd, "picolisp" ) ) )

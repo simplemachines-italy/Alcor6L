@@ -31,10 +31,6 @@ typedef struct
   SHELL_HELP( tinyscheme );
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-  SHELL_HELP( mybasic );
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
   SHELL_HELP( picolisp );
 #endif
@@ -80,10 +76,6 @@ static const SHELL_HELP_DATA shell_help_data[] =
 //
 #if defined ALCOR_LANG_TINYSCHEME
   SHELL_INFO( tinyscheme ),
-#endif
-
-#if defined ALCOR_LANG_MYBASIC
-  SHELL_INFO( mybasic ),
 #endif
 
 #if defined ALCOR_LANG_PICOLISP

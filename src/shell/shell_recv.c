@@ -18,10 +18,6 @@
 # include "scheme.h"
 #endif
 
-#if defined ALCOR_LANG_MYBASIC
-# include "my_basic.h"
-#endif
-
 #if defined ALCOR_LANG_PICOLISP
 # include "pico.h"
 #endif
