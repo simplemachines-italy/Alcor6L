@@ -16,7 +16,6 @@ usage="	avr32program	Use JTAG programmer instead of dfu bootloader
 	lualonglong	Compile eLua with 64-bit integer variables
 	picoc,picoclong Compile picoc with floating point or without
 	picolisp	Compile picolisp
-	mybasic		Compile mybasic
 	tinyscheme	Compile tinyscheme
 	simple		Use simple allocator (default for 128)
 	multiple	Use multiple allocator (default for 256/512)
@@ -30,6 +29,7 @@ usage="	avr32program	Use JTAG programmer instead of dfu bootloader
 	scons		Use the scons build system
 	build_elua	Use the Lua build system
 	clean		Remove all object files from the source tree first
+        build_date      Include the build date (as suffix) in output file
 	-a [opts]	Build all supported combinations"
 
 set -e
@@ -39,7 +39,6 @@ JFLAG="-j 8"
 if [ "$1" = "-a" ]; then
 	shift
 	for target in lua lualong lualonglong \
-		      mybasic \
 		      picoc picoclong \
 		      picolisp tinyscheme
 	do
@@ -71,6 +70,7 @@ media="$(echo /media/????-????)"
 optram=
 rostrings=
 build_system=scons
+build_date=false
 gcc=
 clean=false
 
@@ -91,10 +91,9 @@ do
   lua) lang=elua; target=fp ;;
   lualong) lang=elua; target=long ;;
   lualonglong) lang=elua; target=longlong ;;
-  mybasic) lang=mybasic; target=fp ;;
   picoc)  lang=picoc; target=fp ;;
   picoclong)  lang=picoc; target=long ;;
-  picolisp)  lang=picolisp; target=fp ;;
+  picolisp)  lang=picolisp; target=regular ;;
   tinyscheme)  lang=tinyscheme; target=fp ;;
 
   128|256|512) flash=$arg ;;
@@ -111,6 +110,8 @@ do
   scons|build_elua) build_system=$arg ;;
 
   clean) clean=true ;;
+
+  build_date) build_date=true ;;
 
   *) echo "What's \"$arg\"?  Options are:
 $usage"
@@ -198,18 +199,18 @@ case "$build_system" in
 scons)
     echo scons $JFLAG \
 	board=$board cpu=$cpu lang=$lang target=$target $bootloader $allocator \
-	$optram $rostrings
+	$optram $rostrings build_date=$build_date
     scons $JFLAG \
 	board=$board cpu=$cpu lang=$lang target=$target $bootloader $allocator \
-	$optram $rostrings || exit 1
+	$optram $rostrings build_date=$build_date || exit 1
     ;;
 build_elua)
     echo lua build_elua.lua \
 	board=$board cpu=$cpu target=$target $bootloader $allocator \
-	$optram $rostrings
+	$optram $rostrings build_date=$build_date
     lua build_elua.lua \
 	board=$board cpu=$cpu target=$target $bootloader $allocator \
-	$optram $rostrings || exit 1
+	$optram $rostrings build_date=$build_date || exit 1
     ;;
 *)
     echo "Unrecognized build system '$build_system'"
@@ -217,11 +218,17 @@ build_elua)
 esac
 
 # $firmware: basename of output filenames, different for elua and Alcor6L
+# raman: The date now is an optional parameter.
 date=`date +%Y%m%d`
 case "$(basename $(pwd))" in
 elua*)	firmware=elua_${target}_${part} ;;
 *)	case "$lang" in
-	elua|mybasic|picoc|picolisp|tinyscheme) firmware=Alcor6L_${lang}_${target}_${part}_${date} ;;
+	elua|picoc|picolisp|tinyscheme)
+        if [ ! "$build_date" ]; then
+	    firmware=Alcor6L_${lang}_${target}_${part}_${date}
+        else
+	    firmware=Alcor6L_${lang}_${target}_${part}
+        fi ;;
 	*)   echo "Unrecognised lang \"$lang\"" ; exit 1 ;;
 	esac ;;
 esac
