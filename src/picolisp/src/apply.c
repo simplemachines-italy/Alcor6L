@@ -1,4 +1,4 @@
-/* 03feb11abu
+/* 25mar14abu
  * (c) Software Lab. Alexander Burger
  */
 
@@ -445,8 +445,9 @@ any doSeek(any ex) {
          Push(c[n], EVAL(car(x))), ++n;
       while (isCell(x = cdr(x)));
       while (isCell(data(c[0]))) {
-         if (!isNil(apply(ex, data(foo), NO, n, c))) {
+         if (!isNil(x = apply(ex, data(foo), NO, n, c))) {
             drop(foo);
+            val(At2) = x;
             return data(c[0]);
          }
          for (i = 0; i < n; ++i)
@@ -471,8 +472,9 @@ any doFind(any ex) {
          Push(c[n], EVAL(car(x))), ++n;
       while (isCell(x = cdr(x)));
       while (isCell(data(c[0]))) {
-         if (!isNil(apply(ex, data(foo), YES, n, c))) {
+         if (!isNil(x = apply(ex, data(foo), YES, n, c))) {
             drop(foo);
+            val(At2) = x;
             return car(data(c[0]));
          }
          for (i = 0; i < n; ++i)
@@ -507,6 +509,32 @@ any doPick(any ex) {
    }
    drop(foo);
    return Nil;
+}
+
+// (fully 'fun 'lst ..) -> flg
+any doFully(any ex) {
+   any x = cdr(ex);
+   cell foo;
+
+   Push(foo, EVAL(car(x)));
+   if (isCell(x = cdr(x))) {
+      int i, n = 0;
+      cell c[length(x)];
+
+      do
+         Push(c[n], EVAL(car(x))), ++n;
+      while (isCell(x = cdr(x)));
+      while (isCell(data(c[0]))) {
+         if (isNil(apply(ex, data(foo), YES, n, c))) {
+            drop(foo);
+            return Nil;
+         }
+         for (i = 0; i < n; ++i)
+            data(c[i]) = cdr(data(c[i]));
+      }
+   }
+   drop(foo);
+   return T;
 }
 
 // (cnt 'fun 'lst ..) -> num
@@ -583,6 +611,7 @@ any doMaxi(any ex) {
             data(c[i]) = cdr(data(c[i]));
       }
    }
+   val(At2) = data(val);
    return Pop(res);
 }
 
@@ -608,6 +637,7 @@ any doMini(any ex) {
             data(c[i]) = cdr(data(c[i]));
       }
    }
+   val(At2) = data(val);
    return Pop(res);
 }
 

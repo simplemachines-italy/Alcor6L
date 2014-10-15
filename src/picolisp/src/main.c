@@ -1,5 +1,7 @@
-/* 23dec12abu
+/* 10mar14abu
  * (c) Software Lab. Alexander Burger
+ * Modified for Alcor6L, SimpleMachines,
+ * October, 2014
  */
 
 #include "pico.h"
@@ -89,7 +91,7 @@ any doEnv(any x) {
 
    Push(c1,Nil);
    if (!isCell(x = cdr(x))) {
-      for (p = Env.brk? Env.bind->link : Env.bind;  p;  p = p->link) {
+      for (p = Env.bind;  p;  p = p->link) {
          if (p->i == 0) {
             for (i = p->cnt;  --i >= 0;) {
                for (x = data(c1); ; x = cdr(x)) {
@@ -138,7 +140,7 @@ any doUp(any x) {
       cnt = 1;
    else
       cnt = (int)unBox(y),  x = cdr(x),  y = car(x);
-   for (p = Env.brk? Env.bind->link : Env.bind, val = &val(y);  p;  p = p->link) {
+   for (p = Env.bind, val = &val(y);  p;  p = p->link) {
       if (p->i <= 0) {
          for (i = 0;  i < p->cnt;  ++i)
             if (p->bnd[i].sym == y) {
@@ -253,7 +255,7 @@ bool equal(any x, any y) {
    return res;
 }
 
-int compare(any x, any y) {
+long compare(any x, any y) {
    any a, b;
 
    if (x == y)
@@ -289,7 +291,7 @@ int compare(any x, any y) {
       return y == T? -1 : +1;
    a = x, b = y;
    for (;;) {
-      int n;
+      long n;
 
       if (n = compare(car(x),car(y)))
          return n;
@@ -722,5 +724,5 @@ int picolisp_main(int ac, char *av[]) {
       loadAll(NULL);
    while (!feof(stdin))
       load(NULL, ':', Nil);
-   return 0;
+   bye(0);
 }

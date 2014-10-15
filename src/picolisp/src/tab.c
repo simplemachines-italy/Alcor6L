@@ -1,8 +1,7 @@
-
-/* 23jan11abu
+/* 13may14abu
  * (c) Software Lab. Alexander Burger
- * Modified for Alcor6L <simplemachines-italy>
- * July, 2013.
+ * Modified for Alcor6L, SimpleMachines, Italy
+ * October, 2014
  */
 
 #include "pico.h"
@@ -56,6 +55,7 @@ static symInit Symbols[] = {
    {doCadr, "cadr"},
    {doCar, "car"},
    {doCase, "case"},
+   {doCasq, "casq"},
    {doCatch, "catch"},
    {doCdaar, "cdaar"},
    {doCdadr, "cdadr"},
@@ -118,6 +118,7 @@ static symInit Symbols[] = {
    {doFormat, "format"},
    {doFrom, "from"},
    {doFull, "full"},
+   {doFully, "fully"},
    {doFunQ, "fun?"},
    {doGc, "gc"},
    {doGe, ">="},
@@ -231,6 +232,7 @@ static symInit Symbols[] = {
    {doQueue, "queue"},
    {doQuit, "quit"},
    {doRand, "rand"},
+   {doRange, "range"},
    {doRank, "rank"},
    {doRead, "read"},
    {doRem, "%"},
@@ -264,6 +266,7 @@ static symInit Symbols[] = {
    {doSub, "-"},
    {doSum, "sum"},
    {doSuper, "super"},
+   {doSwap, "swap"},
    {doSym, "sym"},
    {doSymQ, "sym?"},
    {doT, "t"},

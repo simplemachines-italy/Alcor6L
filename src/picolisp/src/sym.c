@@ -1,4 +1,4 @@
-/* 02mar13abu
+/* 30aug13abu
  * (c) Software Lab. Alexander Burger
  */
 
@@ -442,7 +442,7 @@ any mkSym(byte *s) {
 }
 
 /* Make string */
-any mkStr(const char *s) {return s && *s? mkSym((byte*)s) : Nil;}
+any mkStr(char *s) {return s && *s? mkSym((byte*)s) : Nil;}
 
 bool isBlank(any x) {
    int i, c;
@@ -771,6 +771,20 @@ any doSetq(any ex) {
    return val(y);
 }
 
+// (swap 'var 'any) -> any
+any doSwap(any ex) {
+   any x, y;
+   cell c1;
+
+   x = cdr(ex),  Push(c1, EVAL(car(x)));
+   NeedVar(ex,data(c1));
+   CheckVar(ex,data(c1));
+   y = val(data(c1));
+   x = cdr(x),  val(data(c1)) = EVAL(car(x));
+   drop(c1);
+   return y;
+}
+
 // (xchg 'var 'var ..) -> any
 any doXchg(any ex) {
    any x, y, z;
@@ -1026,7 +1040,8 @@ static void idx(any x, cell *p) {
 // (idx 'var) -> lst
 any doIdx(any ex) {
    any x, y, z, *p;
-   int flg, n;
+   int flg;
+   long n;
    cell c1, c2;
 
    x = cdr(ex),  Push(c1, EVAL(car(x)));
@@ -1118,7 +1133,7 @@ static void lup(any x) {
 // (lup 'lst 'any) -> lst
 // (lup 'lst 'any 'any2) -> lst
 any doLup(any x) {
-   int n;
+   long n;
    cell c1, c2;
 
    x = cdr(x),  Push(c1, EVAL(car(x)));

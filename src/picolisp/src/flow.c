@@ -1,4 +1,4 @@
-/* 03oct12abu
+/* 17apr14abu
  * (c) Software Lab. Alexander Burger
  */
 
@@ -963,6 +963,25 @@ any doCase(any x) {
    return Nil;
 }
 
+// (casq 'any (any1 . prg1) (any2 . prg2) ..) -> any
+any doCasq(any x) {
+   any y, z;
+
+   x = cdr(x),  val(At) = EVAL(car(x));
+   while (isCell(x = cdr(x))) {
+      y = car(x),  z = car(y);
+      if (z == T  ||  z == val(At))
+         return prog(cdr(y));
+      if (isCell(z)) {
+         do
+            if (car(z) == val(At))
+               return prog(cdr(y));
+         while (isCell(z = cdr(z)));
+      }
+   }
+   return Nil;
+}
+
 // (state 'var (sym|lst exe [. prg]) ..) -> any
 any doState(any ex) {
    any x, y, a;
@@ -1209,8 +1228,6 @@ any doFor(any x) {
       if (isNil(a = EVAL(cond)))
          break;
       val(At) = a;
-      if (f.cnt == 2)
-         val(f.bnd[1].sym) = (any)(num(val(f.bnd[1].sym)) + 4);
       do {
          if (!isNum(data(c1) = car(x))) {
             if (isSym(data(c1)))

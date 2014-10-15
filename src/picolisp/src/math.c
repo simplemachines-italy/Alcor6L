@@ -1,4 +1,4 @@
-/* 08jul11abu
+/* 15jun14abu
  * (c) Software Lab. Alexander Burger
  */
 
@@ -385,11 +385,13 @@ any doBitQ(any ex) {
 
    x = cdr(ex),  y = EVAL(car(x));
    NeedNum(ex,y);
+   if (num(y) < 0)
+      y = box(-unBox(y));
    while (isCell(x = cdr(x))) {
       if (isNil(z = EVAL(car(x))))
          return Nil;
       NeedNum(ex,z);
-      if ((unBox(y) & unBox(z)) != unBox(y))
+      if ((unBox(y) & (num(z)<0? -unBox(z) : unBox(z))) != unBox(y))
          return Nil;
    }
    return y;
@@ -403,11 +405,13 @@ any doBitAnd(any ex) {
    if (isNil(y = EVAL(car(x))))
       return Nil;
    NeedNum(ex,y);
+   if (num(y) < 0)
+      y = box(-unBox(y));
    while (isCell(x = cdr(x))) {
       if (isNil(z = EVAL(car(x))))
          return Nil;
       NeedNum(ex,z);
-      y = box(unBox(y) & unBox(z));
+      y = box(unBox(y) & (num(z)<0? -unBox(z) : unBox(z)));
    }
    return y;
 }
@@ -420,11 +424,13 @@ any doBitOr(any ex) {
    if (isNil(y = EVAL(car(x))))
       return Nil;
    NeedNum(ex,y);
+   if (num(y) < 0)
+      y = box(-unBox(y));
    while (isCell(x = cdr(x))) {
       if (isNil(z = EVAL(car(x))))
          return Nil;
       NeedNum(ex,z);
-      y = box(unBox(y) | unBox(z));
+      y = box(unBox(y) | (num(z)<0? -unBox(z) : unBox(z)));
    }
    return y;
 }
@@ -437,34 +443,42 @@ any doBitXor(any ex) {
    if (isNil(y = EVAL(car(x))))
       return Nil;
    NeedNum(ex,y);
+   if (num(y) < 0)
+      y = box(-unBox(y));
    while (isCell(x = cdr(x))) {
       if (isNil(z = EVAL(car(x))))
          return Nil;
       NeedNum(ex,z);
-      y = box(unBox(y) ^ unBox(z));
+      y = box(unBox(y) ^ (num(z)<0? -unBox(z) : unBox(z)));
    }
    return y;
 }
 
-// (sqrt 'num) -> num
+// (sqrt 'num ['flg|num]) -> num
 any doSqrt(any ex) {
    any x;
-	long a, b, n, r;
+	long m, n, r;
 
    x = cdr(ex);
    if (isNil(x = EVAL(car(x))))
       return Nil;
    NeedNum(ex,x);
 	if ((n = unBox(x)) < 0)
-      err(ex, x, "Bad argument");
+      argError(ex, x);
+   x = cddr(ex);
+   if (isNum(x = EVAL(car(x))))
+      n *= unBox(x);
+	m = 1L << BITS-4;
 	r = 0;
-	a = 1L << 28;
 	do {
-		b = r + a;
+		if ((r += m) > n)
+         r -= m;
+      else
+			n -= r,  r += m;
 		r >>= 1;
-		if (b <= n)
-			n -= b,  r += a;
-	} while (a >>= 2);
+	} while (m >>= 2);
+   if (!isNil(x) && n > r)
+      ++r;
 	return box(r);
 }
 
