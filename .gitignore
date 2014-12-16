@@ -21,4 +21,4 @@ inc/git_version.h
 luac.cross*
 sdcard.img
 core
-
+*.d
