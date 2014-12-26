@@ -1,7 +1,9 @@
 
 /* 07jun12abu
  * (c) Software Lab. Alexander Burger
- * Modified for Alcor6L, <simplemachines-italy>, 2013.
+ *
+ * 16dec2014
+ * (c) SimpleMachines. Raman Gopalan
  */
 
 #ifndef __MPLISP_H__
@@ -52,6 +54,11 @@ typedef struct cell {            // PicoLisp primary data type
 } cell, *any;
 
 typedef any (*fun)(any);
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+# include "picolisp_mod.h"
+# include "sym.d"
+#endif
 
 typedef struct heap {
    cell cells[CELLS];
@@ -171,7 +178,12 @@ typedef struct catchFrame {
 #define NeedAtom(ex,x)  if (isCell(x)) atomError(ex,x)
 #define NeedLst(ex,x)   if (!isCell(x) && !isNil(x)) lstError(ex,x)
 #define NeedVar(ex,x)   if (isNum(x)) varError(ex,x)
-#define CheckVar(ex,x)  if ((x)>=Nil && (x)<=T) protError(ex,x)
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+# define CheckVar(ex,x)  if ((x)>(any)Rom && (x)<=Quote) protError(ex,x)
+#else
+# define CheckVar(ex,x)  if ((x)>=Nil && (x)<=T) protError(ex,x)
+#endif
 
 /* Globals */
 extern int Chr, Trace;
@@ -182,12 +194,24 @@ extern stkEnv Env;
 extern catchFrame *CatchPtr;
 extern FILE *InFile, *OutFile;
 extern any TheKey, TheCls, Thrown;
-extern any Intern[2], Transient[2], Reloc;
+extern any Intern[2], Transient[2];
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+extern any Reloc;
+#endif
+
 extern any ApplyArgs, ApplyBody;
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+extern any const Rom[];
+extern any Ram[];
+#else
 extern any Nil, Meth, Quote, T, At, At2, At3, This;
 extern any Dbg, Scl, Class, Up, Err, Msg, Bye;
+#endif
 
 // globals for picoLisp platform modules.
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
 
 // system timer.
 any sys_timer;
@@ -366,6 +390,9 @@ any plisp_ks0108b_prinl_big(any ex);
   PICOLISP_TARGET_SPECIFIC_PROTOS
 #endif
 
+#endif /* PICOLISP_OPTIMIZE_MEMORY == 0 */
+
+
 /* Prototypes */
 int picolisp_main(int argc, char *argv[]);
 void *alloc(void*,size_t);
@@ -373,7 +400,9 @@ any apply(any,any,bool,int,cell*);
 void argError(any,any) __attribute__ ((noreturn));
 void atomError(any,any) __attribute__ ((noreturn));
 void begString(void);
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
 any boxSubr(fun);
+#endif
 void brkLoad(any);
 int bufNum(char[BITS/2],long);
 int bufSize(any);
@@ -401,7 +430,9 @@ int getByte1(int*,word*,any*);
 void getStdin(void);
 void giveup(char*) __attribute__ ((noreturn));
 void heapAlloc(void);
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
 void initSymbols(void);
+#endif
 any intern(any,any[2]);
 bool isBlank(any);
 any isIntern(any,any[2]);
@@ -451,6 +482,8 @@ void varError(any,any) __attribute__ ((noreturn));
 void wrOpen(any,any,outFrame*);
 long xNum(any,any);
 any xSym(any);
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
 
 any doAbs(any);
 any doAdd(any);
@@ -729,6 +762,8 @@ any doXor(any);
 any doYoke(any);
 any doZap(any);
 any doZero(any);
+
+#endif
 
 /* List element access */
 static inline any nCdr(int n, any x) {

@@ -1,4 +1,4 @@
-/* 10jul13abu
+/* 05oct14abu
  * (c) Software Lab. Alexander Burger
  */
 
@@ -298,6 +298,8 @@ static any anonymous(any s) {
    return NULL;
 }
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+
 /* Relocate anonymous symbol */
 static any reloc(any key) {
    any x, y;
@@ -331,6 +333,8 @@ static any reloc(any key) {
       }
    }
 }
+
+#endif
 
 /* Read one expression */
 static any read0(bool top) {
@@ -374,6 +378,7 @@ static any read0(bool top) {
       drop(c1);
       return x;
    }
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    if (Chr == '\\') {
       Env.get();
       Push(c1, read0(top));
@@ -395,6 +400,7 @@ static any read0(bool top) {
       drop(c1);
       return x;
    }
+#endif
    if (Chr == '"') {
       Env.get();
       if (Chr == '"') {
@@ -512,7 +518,11 @@ any doRead(any ex) {
    any x, y;
 
    if (!isCell(x = cdr(ex)))
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)   
       x = read1(0),  Reloc = Nil;
+#else
+      x = read1(0);
+#endif
    else {
       y = EVAL(car(x));
       NeedSym(ex,y);
@@ -1085,6 +1095,8 @@ any doPrintln(any x) {
    return y;
 }
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+
 /* Save one expression */
 static void save(any x) {
    any y, nm;
@@ -1151,6 +1163,8 @@ any doSave(any x) {
    } while (h = h->next);
    return x;
 }
+
+#endif
 
 // (flush) -> flg
 any doFlush(any ex __attribute__((unused))) {

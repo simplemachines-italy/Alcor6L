@@ -1,5 +1,8 @@
-/* 13may14abu
+/* 03oct14abu
  * (c) Software Lab. Alexander Burger
+ *
+ * 16dec2014
+ * (c) SimpleMachines. Raman Gopalan
  */
 
 #include "pico.h"
@@ -1104,11 +1107,17 @@ any doLength(any x) {
    }
    for (n = 0, y = x;;) {
       ++n;
-      *(word*)&car(y) |= 1;
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+      if (y < (any)Rom  ||  y >= (any)(Rom+ROMS))
+#endif
+         *(word*)&car(y) |= 1;
       if (!isCell(y = cdr(y))) {
-         do
-            *(word*)&car(x) &= ~1;
-         while (isCell(x = cdr(x)));
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+         if (x < (any)Rom  ||  x >= (any)(Rom+ROMS))
+#endif
+            do
+               *(word*)&car(x) &= ~1;
+            while (isCell(x = cdr(x)));
          return box(n);
       }
       if (num(car(y)) & 1) {
@@ -1130,11 +1139,17 @@ static int size(any x) {
       ++n;
       if (isCell(car(y)))
          n += size(car(y));
-      *(word*)&car(y) |= 1;
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+      if (y < (any)Rom  ||  y >= (any)(Rom+ROMS))
+#endif
+         *(word*)&car(y) |= 1;
       if (!isCell(y = cdr(y))) {
-         do
-            *(word*)&car(x) &= ~1;
-         while (isCell(x = cdr(x)));
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+         if (x < (any)Rom  ||  x >= (any)(Rom+ROMS))
+#endif
+            do
+               *(word*)&car(x) &= ~1;
+            while (isCell(x = cdr(x)));
          return n;
       }
       if (num(car(y)) & 1) {
@@ -1183,6 +1198,8 @@ any doAsoq(any x) {
    return Nil;
 }
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+
 static any Rank;
 
 any rank1(any lst, int n) {
@@ -1207,18 +1224,41 @@ any rank2(any lst, int n) {
    return rank2(nCdr(i,lst), n-i) ?: rank2(lst, i);
 }
 
+#endif
+
 // (rank 'any 'lst ['flg]) -> lst
 any doRank(any x) {
    any y;
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+   any z;
+#endif
    cell c1, c2;
 
    x = cdr(x),  Push(c1, EVAL(car(x)));
    x = cdr(x),  Push(c2, y = EVAL(car(x)));
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    x = cdr(x),  x = EVAL(car(x));
    Rank = Pop(c1);
    if (isCell(y))
       return (isNil(x)? rank1(y, length(y)) : rank2(y, length(y))) ?: Nil;
    return Nil;
+#else
+   z = Nil;
+   x = cdr(x);
+   if (isNil(EVAL(car(x))))
+      for (x = Pop(c1);  isCell(y);  y = cdr(y)) {
+         if (compare(caar(y), x) > 0)
+            break;
+         z = y;
+      }
+   else
+      for (x = Pop(c1);  isCell(y);  y = cdr(y)) {
+         if (compare(x, caar(y)) > 0)
+            break;
+         z = y;
+      }
+   return car(z);
+#endif
 }
 
 /* Pattern matching */
@@ -1594,3 +1634,4 @@ any doSort(any x) {
    } while (isCell(out[1]));
    return out[0];
 }
+

@@ -1,9 +1,9 @@
-/* 10mar14abu
+/* 05oct14abu
  * (c) Software Lab. Alexander Burger
- * Modified for Alcor6L, SimpleMachines,
- * October, 2014
+ *
+ * 16dec2014
+ * (c) SimpleMachines. Raman Gopalan
  */
-
 #include "pico.h"
 
 /* Globals */
@@ -15,10 +15,28 @@ stkEnv Env;
 catchFrame *CatchPtr;
 FILE *InFile, *OutFile;
 any TheKey, TheCls, Thrown;
-any Intern[2], Transient[2], Reloc;
+any Intern[2], Transient[2];
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+any Reloc;
+#endif
 any ApplyArgs, ApplyBody;
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+
 any Nil, Meth, Quote, T, At, At2, At3, This;
 any Dbg, Scl, Class, Up, Err, Msg, Bye;
+
+#else
+
+any const Rom[] = {  // ROM Data
+   #include "rom.d"
+};
+
+any Ram[] = {  // RAM Symbols
+   #include "ram.d"
+};
+
+#endif
 
 static bool Jam;
 static jmp_buf ErrRst;
@@ -160,9 +178,19 @@ any doUp(any x) {
 
 /*** Primitives ***/
 any circ(any x) {
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    any y = x;
+#else
+   any y;
+#endif
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    for (;;) {
+#else
+   if (x >= (any)Rom  &&  x < (any)(Rom+ROMS))
+      return NULL;
+   for (y = x;;) {
+#endif
       any z = cdr(y);
 
       *(word*)&cdr(y) |= 1;
@@ -172,6 +200,14 @@ any circ(any x) {
          while (isCell(x = cdr(x)));
          return NULL;
       }
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+      if (y >= (any)Rom  &&  y < (any)(Rom+ROMS)) {
+         do
+            *(word*)&cdr(x) &= ~1;
+         while (y != (x = cdr(x)));
+         return NULL;
+      }
+#endif
       if (num(cdr(y)) & 1) {
          while (x != y)
             *(word*)&cdr(x) &= ~1,  x = cdr(x);
@@ -219,7 +255,13 @@ bool equal(any x, any y) {
       }
       if (!isCell(cdr(y)))
          break;
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
       *(word*)&car(x) |= 1,  x = cdr(x),  y = cdr(y);
+#else
+      if (x < (any)Rom  ||  x >= (any)(Rom+ROMS))
+         *(word*)&car(x) |= 1;
+      x = cdr(x),  y = cdr(y);
+#endif
       if (num(car(x)) & 1) {
          for (;;) {
             if (a == x) {
@@ -250,7 +292,11 @@ bool equal(any x, any y) {
          return res;
       }
    }
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    while (a != x)
+#else
+   while (a != x  &&  (a < (any)Rom  ||  a >= (any)(Rom+ROMS)))
+#endif
       *(word*)&car(a) &= ~1,  a = cdr(a);
    return res;
 }
@@ -311,7 +357,9 @@ void err(any ex, any x, char *fmt, ...) {
    outFrame f;
 
    Chr = 0;
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    Reloc = Nil;
+#endif
    Env.brk = NO;
    f.fp = stderr;
    pushOutFiles(&f);
@@ -337,6 +385,10 @@ void err(any ex, any x, char *fmt, ...) {
    Env.make = Env.yoke = NULL;
    Env.parser = NULL;
    Trace = 0;
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+   Env.put = putStdout;
+   Env.get = getStdin;
+#endif
    longjmp(ErrRst, +1);
 }
 
@@ -549,6 +601,7 @@ any xSym(any x) {
    return i? y : Nil;
 }
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
 any boxSubr(fun f) {
 #ifdef ALCOR_BOARD_MIZAR32
    if (num(f) & 3)
@@ -558,6 +611,8 @@ any boxSubr(fun f) {
    return (any)((num(f) << 2) + 2);
 #endif
 }
+
+#endif
 
 // (args) -> flg
 any doArgs(any ex __attribute__((unused))) {
@@ -702,12 +757,30 @@ any loadAll(any ex) {
 
 /*** Main ***/
 int picolisp_main(int ac, char *av[]) {
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+   int i;
+#endif
    char *p;
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+   if (!isCell(Rom) || !isCell(Ram))
+      giveup("Unaligned memory");
+#endif
    AV0 = *av++;
    AV = av;
    heapAlloc();
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    initSymbols();
+#else
+   Intern[0] = Intern[1] = Transient[0] = Transient[1] = Nil;
+   intern(Nil, Intern);
+   intern(T, Intern);
+   intern(Meth, Intern);
+   intern(Quote, Intern);  // Last protected symbol
+   for (i = 1; i < RAMS; i += 2)
+      if (Ram[i] != (any)(Ram + i))
+         intern((any)(Ram + i), Intern);
+#endif
    if (ac >= 2 && strcmp(av[ac-2], "+") == 0)
       val(Dbg) = T,  av[ac-2] = NULL;
    if (av[0] && *av[0] != '-' && (p = strrchr(av[0], '/')) && !(p == av[0]+1 && *av[0] == '.')) {
@@ -715,7 +788,9 @@ int picolisp_main(int ac, char *av[]) {
       memcpy(Home, av[0], p - av[0] + 1);
       Home[p - av[0] + 1] = '\0';
    }
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    Reloc = Nil;
+#endif
    InFile = stdin,  Env.get = getStdin;
    OutFile = stdout,  Env.put = putStdout;
    ApplyArgs = cons(cons(consSym(Nil,0), Nil), Nil);

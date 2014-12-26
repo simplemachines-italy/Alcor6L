@@ -559,6 +559,22 @@ if not GetOption( 'help' ):
     source_files += Split( tinyscheme_full_files )
   elif comp['lang'] == 'picolisp':
     source_files += Split( picolisp_full_files )
+    # Now, we also have gen3m.c. This file is only
+    # compiled when RAM optimizations are on.
+    if comp['optram'] == 1:
+      gen3m_file = " ".join( ["src/picolisp/src/%s" % name for name in "gen3m.c".split() ] )
+      gen3m_out_file = " ".join( ["src/picolisp/src/%s" % name for name in "gen3m".split() ] )
+      try:
+        gen3m_compile = subprocess.check_output(["gcc", "-o", gen3m_out_file, gen3m_file]).strip()
+        gen3m_input_names = " " + "init.s lib.s"
+        try:
+          os.chdir("src/picolisp/src")
+          gen3m_gen = subprocess.check_output(["./gen3m", "init.s", "lib.s"]).strip()
+          os.chdir("../../../")
+        except:
+          print "WARNING: unable to generate rom.d, ram.d and sym.d for PicoLisp"
+      except:
+        print "WARNING: unable to compile gen3m for PicoLisp"
   elif comp['lang'] == 'picoc':
     source_files += Split( picoc_full_files )
   else:

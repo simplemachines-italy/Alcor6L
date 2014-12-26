@@ -1,11 +1,23 @@
-/* 01may14abu
+/* 05oct14abu
  * (c) Software Lab. Alexander Burger
+ *
+ * 15dec2014
+ * (c) SimpleMachines. Raman Gopalan
  */
 
 #include "pico.h"
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+static void mark(any);
+#endif
+
 /* Mark data */
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+static void markTail(any x) {
+#else
 static void mark(any x) {
+#endif
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    while (isCell(x)) {
       if (!(num(cdr(x)) & 1))
          return;
@@ -15,6 +27,7 @@ static void mark(any x) {
    if (!isNum(x)  &&  num(val(x)) & 1) {
       *(long*)&val(x) &= ~1;
       mark(val(x)),  x = tail(x);
+#endif
       while (isCell(x)) {
          if (!(num(cdr(x)) & 1))
             return;
@@ -27,8 +40,26 @@ static void mark(any x) {
                return;
             *(long*)&val(x) &= ~1;
          } while (!isNum(x = val(x)));
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+   }
+#endif
+}   
+
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+static void mark(any x) {
+   while (isCell(x)) {
+      if (!(num(cdr(x)) & 1))
+         return;
+      *(long*)&cdr(x) &= ~1;
+      mark(car(x)),  x = cdr(x);
+   }
+   if (!isNum(x)  &&  num(val(x)) & 1) {
+      *(long*)&val(x) &= ~1;
+      mark(val(x));
+      markTail(tail(x));
    }
 }
+#endif
 
 /* Garbage collector */
 static void gc(long c) {
@@ -44,11 +75,20 @@ static void gc(long c) {
       while (--p >= h->cells);
    } while (h = h->next);
    /* Mark */
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+   for (i = 0;  i < RAMS;  i += 2) {
+      markTail(Ram[i]);
+      mark(Ram[i+1]);
+   }
+#else
    mark(Nil+1);
+#endif
    mark(Intern[0]),  mark(Intern[1]);
    mark(Transient[0]), mark(Transient[1]);
    mark(ApplyArgs),  mark(ApplyBody);
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
    mark(Reloc);
+#endif
    for (p = Env.stack; p; p = cdr(p))
       mark(car(p));
    for (p = (any)Env.bind;  p;  p = (any)((bindFrame*)p)->link)

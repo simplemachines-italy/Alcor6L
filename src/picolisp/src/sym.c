@@ -1,4 +1,4 @@
-/* 30aug13abu
+/* 05oct14abu
  * (c) Software Lab. Alexander Burger
  */
 
@@ -575,7 +575,11 @@ any doZap(any ex) {
 
    x = cdr(ex),  x = EVAL(car(x));
    NeedSymb(ex,x);
+#if (PICOLISP_OPTIMIZE_MEMORY == 2)
+   if (x >= Nil && x <= Quote  ||  x > (any)Ram &&  x <= Bye)
+#else
    if (x >= Nil  &&  x <= Bye)
+#endif
       protError(ex,x);
    unintern(x, Intern);
    return x;

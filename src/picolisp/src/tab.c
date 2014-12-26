@@ -4,6 +4,8 @@
  * October, 2014
  */
 
+#if (PICOLISP_OPTIMIZE_MEMORY == 0)
+
 #include "pico.h"
 #include "platform_conf.h"
 
@@ -403,3 +405,5 @@ void initSymbols(void) {
    for (i = 0; i < (int)(sizeof(Symbols)/sizeof(symInit)); ++i)
       initSym(boxSubr(Symbols[i].code), Symbols[i].name);
 }
+
+#endif /* PICOLISP_OPTIMIZE_MEMORY == 0 */
