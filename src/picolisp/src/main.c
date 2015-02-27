@@ -28,11 +28,11 @@ any Dbg, Scl, Class, Up, Err, Msg, Bye;
 
 #else
 
-any const Rom[] = {  // ROM Data
+any const Rom[] __attribute__ ((aligned (8))) = {  // ROM Data
    #include "rom.d"
 };
 
-any Ram[] = {  // RAM Symbols
+any Ram[] __attribute__ ((aligned (8))) = {  // RAM Symbols
    #include "ram.d"
 };
 
