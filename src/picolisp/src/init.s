@@ -16,6 +16,7 @@ meth [Meth] {doMeth}
 ^ [Up] NIL
 *Err [Err] NIL
 *Msg [Msg] NIL
+#*pio-output* [plisp_pio_output] 0
 *Bye [Bye] NIL  # Last unremovable symbol
 
 ### System Functions ###
@@ -297,104 +298,104 @@ zero {doZero}
 ### Microcontroller specific modules ###
 
 ### Platform ###
-#pd-platform {pd_platform}
-#pd-cpu {pd_cpu}
-#pd-board {pd_board}
+pd-platform {pd_platform}
+pd-cpu {pd_cpu}
+pd-board {pd_board}
 
 ### Terminal ###
-#term-clrscr {plisp_term_clrscr}
-#term-clreol {plisp_term_clreol}
-#term-moveto {plisp_term_moveto}
-#term-moveup {plisp_term_moveup}
-#term-movedown {plisp_term_movedown}
-#term-moveleft {plisp_term_moveleft}
-#term-moveright {plisp_term_moveright}
-#term-getlines {plisp_term_getlines}
-#term-getcols {plisp_term_getcols}
-#term-prinl {plisp_term_prinl}
-#term-getcx {plisp_term_getcx}
-#term-getcy {plisp_term_getcy}
-#term-getchar {plisp_term_getchar}
-#term-decode {plisp_term_decode}
+term-clrscr {plisp_term_clrscr}
+term-clreol {plisp_term_clreol}
+term-moveto {plisp_term_moveto}
+term-moveup {plisp_term_moveup}
+term-movedown {plisp_term_movedown}
+term-moveleft {plisp_term_moveleft}
+term-moveright {plisp_term_moveright}
+term-getlines {plisp_term_getlines}
+term-getcols {plisp_term_getcols}
+term-prinl {plisp_term_prinl}
+term-getcx {plisp_term_getcx}
+term-getcy {plisp_term_getcy}
+term-getchar {plisp_term_getchar}
+term-decode {plisp_term_decode}
 
 ### eLua ###
-#elua-version {plisp_elua_version}
-#elua-save-history {plisp_elua_save_history}
-#elua-shell {plisp_elua_shell}
+elua-version {plisp_elua_version}
+elua-save-history {plisp_elua_save_history}
+elua-shell {plisp_elua_shell}
 
 ### CPU ###
-#cpu-w32 {plisp_cpu_w32}
-#cpu-r32 {plisp_cpu_r32}
-#cpu-w16 {plisp_cpu_w16}
-#cpu-r16 {plisp_cpu_r16}
-#cpu-w8 {plisp_cpu_w8}
-#cpu-r8 {plisp_cpu_r8}
-#cpu-clock {plisp_cpu_clock}
+cpu-w32 {plisp_cpu_w32}
+cpu-r32 {plisp_cpu_r32}
+cpu-w16 {plisp_cpu_w16}
+cpu-r16 {plisp_cpu_r16}
+cpu-w8 {plisp_cpu_w8}
+cpu-r8 {plisp_cpu_r8}
+cpu-clock {plisp_cpu_clock}
 
 ### Timers ###
-#tmr-delay {tmr_delay}
-#tmr-read  {tmr_read}
-#tmr-start {tmr_start}
-#tmr-gettimediff {tmr_gettimediff}
-#tmr-getdiffnow {tmr_getdiffnow}
-#tmr-getmindelay {tmr_getmindelay}
-#tmr-getmaxdelay {tmr_getmaxdelay}
-#tmr-setclock {tmr_setclock}
-#tmr-getclock {tmr_getclock}
-#tmr-decode {tmr_decode}
+tmr-delay {tmr_delay}
+tmr-read  {tmr_read}
+tmr-start {tmr_start}
+tmr-gettimediff {tmr_gettimediff}
+tmr-getdiffnow {tmr_getdiffnow}
+tmr-getmindelay {tmr_getmindelay}
+tmr-getmaxdelay {tmr_getmaxdelay}
+tmr-setclock {tmr_setclock}
+tmr-getclock {tmr_getclock}
+tmr-decode {tmr_decode}
 
 ### I2C ###
-#i2c-setup {plisp_i2c_setup}
-#i2c-start {plisp_i2c_start}
-#i2c-stop {plisp_i2c_stop}
-#i2c-address {plisp_i2c_address}
-#i2c-write {plisp_i2c_write}
-#i2c-read {plisp_i2c_read}
+i2c-setup {plisp_i2c_setup}
+i2c-start {plisp_i2c_start}
+i2c-stop {plisp_i2c_stop}
+i2c-address {plisp_i2c_address}
+i2c-write {plisp_i2c_write}
+i2c-read {plisp_i2c_read}
 
 ### PWM ###
-#pwm-setup {plisp_pwm_setup}
-#pwm-start {plisp_pwm_start}
-#pwm-stop {plisp_pwm_stop}
-#pwm-setclock {plisp_pwm_setclock}
-#pwm-getclock {plisp_pwm_getclock}
+pwm-setup {plisp_pwm_setup}
+pwm-start {plisp_pwm_start}
+pwm-stop {plisp_pwm_stop}
+pwm-setclock {plisp_pwm_setclock}
+pwm-getclock {plisp_pwm_getclock}
 
 ### SPI ###
-#spi-sson {plisp_spi_sson}
-#spi-ssoff {plisp_spi_ssoff}
-#spi-setup {plisp_spi_setup}
-#spi-write {plisp_spi_write}
+spi-sson {plisp_spi_sson}
+spi-ssoff {plisp_spi_ssoff}
+spi-setup {plisp_spi_setup}
+spi-write {plisp_spi_write}
 
 ### GPIO ###
-#pio-pin-setdir {plisp_pio_pin_setdir}
-#pio-pin-setpull {plisp_pio_pin_setpull}
-#pio-pin-setval {plisp_pio_pin_setval}
-#pio-pin-sethigh {plisp_pio_pin_sethigh}
-#pio-pin-setlow {plisp_pio_pin_setlow}
-#pio-pin-getval {plisp_pio_pin_getval}
-#pio-pin-setdir {plisp_pio_port_setdir}
-#pio-pin-setpull {plisp_pio_port_setpull}
-#pio-port-setval {plisp_pio_port_setval}
-#pio-port-sethigh {plisp_pio_port_sethigh}
-#pio-port-setlow {plisp_pio_port_setlow}
-#pio-port-getval {plisp_pio_port_getval}
-#pio-decode {plisp_pio_decode}
+pio-pin-setdir {plisp_pio_pin_setdir}
+pio-pin-setpull {plisp_pio_pin_setpull}
+pio-pin-setval {plisp_pio_pin_setval}
+pio-pin-sethigh {plisp_pio_pin_sethigh}
+pio-pin-setlow {plisp_pio_pin_setlow}
+pio-pin-getval {plisp_pio_pin_getval}
+pio-port-setdir {plisp_pio_port_setdir}
+pio-port-setpull {plisp_pio_port_setpull}
+pio-port-setval {plisp_pio_port_setval}
+pio-port-sethigh {plisp_pio_port_sethigh}
+pio-port-setlow {plisp_pio_port_setlow}
+pio-port-getval {plisp_pio_port_getval}
+pio-decode {plisp_pio_decode}
 
 ### UART ###
-#uart-setup {plisp_uart_setup}
-#uart-write {plisp_uart_write}
-#uart-set-buffer {plisp_uart_set_buffer}
-#uart-set-flow-control {plisp_uart_set_flow_control}
-#uart-getchar {plisp_uart_getchar}
-#uart-vuart-tmr-ident {plisp_uart_vuart_tmr_ident}
-#uart-read {plisp_uart_read}
+uart-setup {plisp_uart_setup}
+uart-write {plisp_uart_write}
+uart-set-buffer {plisp_uart_set_buffer}
+uart-set-flow-control {plisp_uart_set_flow_control}
+uart-getchar {plisp_uart_getchar}
+uart-vuart-tmr-ident {plisp_uart_vuart_tmr_ident}
+uart-read {plisp_uart_read}
 
 ### ADC ###
-#adc-maxval {plisp_adc_maxval}
-#adc-setclock {plisp_adc_setclock}
-#adc-isdone {plisp_adc_isdone}
-#adc-setblocking {plisp_adc_setblocking}
-#adc-setsmoothing {plisp_adc_setsmoothing}
-#adc-sample {plisp_adc_sample}
-#adc-getsample {plisp_adc_getsample}
-#adc-getsamples {plisp_adc_getsamples}
-#adc-insertsamples {plisp_adc_insertsamples}
+adc-maxval {plisp_adc_maxval}
+adc-setclock {plisp_adc_setclock}
+adc-isdone {plisp_adc_isdone}
+adc-setblocking {plisp_adc_setblocking}
+adc-setsmoothing {plisp_adc_setsmoothing}
+adc-sample {plisp_adc_sample}
+adc-getsample {plisp_adc_getsample}
+adc-getsamples {plisp_adc_getsamples}
+adc-insertsamples {plisp_adc_insertsamples}
