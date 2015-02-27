@@ -565,7 +565,7 @@ if not GetOption( 'help' ):
       gen3m_file = " ".join( ["src/picolisp/src/%s" % name for name in "gen3m.c".split() ] )
       gen3m_out_file = " ".join( ["src/picolisp/src/%s" % name for name in "gen3m".split() ] )
       try:
-        gen3m_compile = subprocess.check_output(["gcc", "-o", gen3m_out_file, gen3m_file]).strip()
+        gen3m_compile = subprocess.check_output(["gcc", "-m32", "-o", gen3m_out_file, gen3m_file]).strip()
         gen3m_input_names = " " + "init.s lib.s"
         try:
           os.chdir("src/picolisp/src")
